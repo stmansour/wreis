@@ -65,7 +65,7 @@ type Property struct {
 //
 // INPUTS
 // ctx - db context
-// id - RSID of the record to read
+// id - PRID of the record to read
 //
 // RETURNS
 // Any errors encountered, or nil if no errors
@@ -95,7 +95,7 @@ func DeleteProperty(ctx context.Context, id int64) error {
 //
 // INPUTS
 // ctx - db context
-// id - RSID of the record to read
+// id - PRID of the record to read
 //
 // RETURNS
 // ErrSessionRequired if the session is invalid
