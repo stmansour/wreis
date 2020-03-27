@@ -80,44 +80,6 @@ func main() {
 	ctx = db.SetSessionContextKey(ctx, sess)
 
 	TestRentStep(ctx)
-}
-
-// TestRentStep checks the basic db functions for the RentStep struct
-//-----------------------------------------------------------------------------
-func TestRentStep(ctx context.Context) {
-	var err error
-	rs := db.RentStep{
-		RSID:  0,
-		RSLID: 1,
-		Dt:    time.Date(2020, time.March, 23, 0, 0, 0, 0, time.UTC),
-		Rent:  float64(2750.00),
-	}
-	var delid, id int64
-	if id, err = db.InsertRentStep(ctx, &rs); err != nil {
-		fmt.Printf("Error inserting RentStep: %s\n", err)
-		os.Exit(1)
-	}
-
-	// Insert another for delete...
-	if delid, err = db.InsertRentStep(ctx, &rs); err != nil {
-		fmt.Printf("Error inserting RentStep: %s\n", err)
-		os.Exit(1)
-	}
-	if err = db.DeleteRentStep(ctx, delid); err != nil {
-		fmt.Printf("Error deleting RentStep: %s\n", err)
-		os.Exit(1)
-	}
-
-	var rs1 db.RentStep
-	if rs1, err = db.GetRentStep(ctx, id); err != nil {
-		fmt.Printf("error in GetRentStep: %s\n", err.Error())
-		os.Exit(1)
-	}
-	rs1.Rent += float64(10)
-	if err = db.UpdateRentStep(ctx, &rs1); err != nil {
-		fmt.Printf("Error updating RentStep: %s\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("Success! Delete, Get, Insert, and Update RentStep\n")
+	TestRentSteps(ctx)
+	TestProperty(ctx)
 }

@@ -92,6 +92,21 @@ func BuildPreparedStatements() {
 	var s1, s2, s3, flds string
 
 	//==========================================
+	// Property
+	//==========================================
+	flds = "PRID,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,LeaseCommencementDt,LeaseExpirationDt,TermRemainingOnLease,ROID,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,CreateTS,CreateBy,LastModTime,LastModBy"
+	Wdb.DBFields["Property"] = flds
+	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property where PRID=?")
+	Errcheck(err)
+	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
+	Wdb.Prepstmt.InsertProperty, err = Wdb.DB.Prepare("INSERT INTO Property (" + s1 + ") VALUES(" + s2 + ")")
+	Errcheck(err)
+	Wdb.Prepstmt.UpdateProperty, err = Wdb.DB.Prepare("UPDATE Property SET " + s3 + " WHERE PRID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.DeleteProperty, err = Wdb.DB.Prepare("DELETE from Property WHERE PRID=?")
+	Errcheck(err)
+
+	//==========================================
 	// Rent Step
 	//==========================================
 	flds = "RSID,RSLID,Dt,Rent,CreateTS,CreateBy,LastModTime,LastModBy"

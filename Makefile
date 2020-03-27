@@ -8,3 +8,5 @@ clean:
 
 test:
 	for dir in $(DIRS); do make -C $$dir test;done
+
+all: clean wreis test
