@@ -1,0 +1,20 @@
+package util
+
+// RRDATEFMT and the rest are constants used throughout the program
+const (
+	// RRDATEFMT is a date format
+	RRDATEFMT         = "01/02/06"
+	RRDATEFMT2        = "1/2/06"
+	RRDATEFMT3        = "1/2/2006"
+	RRDATEFMT4        = "01/02/2006"
+	RRDATEINPFMT      = "2006-01-02"
+	RRDATEFMTSQL      = RRDATEINPFMT
+	RRDATETIMESQL     = "2006-01-02 15:04:05"
+	RRJSUTCDATETIME   = "Mon, 02 Jan 2006 15:04:05 MST"
+	RRDATETIMEINPFMT  = "2006-01-02 15:04:00 MST"
+	RRDATETIMEFMT     = "2006-01-02T15:04:00Z"
+	RRDATETIMEW2UIFMT = "1/2/2006 3:04 pm"
+	RRDATEREPORTFMT   = "Jan 2, 2006"
+	RRDATETIMERPTFMT  = "Jan 2, 2006 3:04pm MST"
+	RRDATERECEIPTFMT  = "January 2, 2006"
+)

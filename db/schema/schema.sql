@@ -31,7 +31,7 @@ CREATE TABLE Property (
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes
                                                             */
     Ownership SMALLINT NOT NULL DEFAULT 0,                  -- 0 = fee simple, 1 = leasehold
-    TenantTradeName VARCHAR(256),
+    TenantTradeName VARCHAR(256) NOT NULL DEFAULT '',       -- trade name of business
     LeaseGuarantor SMALLINT NOT NULL DEFAULT 0,             -- 0 = corporate, 1 = franchise
     LeaseType SMALLINT NOT NULL DEFAULT 0,                  -- 0 = Absolute NNN, 1 = Double Net, ...
     DeliveryDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',             -- GMT datetime
@@ -79,7 +79,7 @@ CREATE TABLE RenewOption (
     ROID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Renew Option, part of a list
     ROLID BIGINT NOT NULL DEFAULT 0,                        -- Renew Options List ID to which this RO belongs
     Description VARCHAR(1024),                              -- text of this option
-    Dt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',     -- Date that the rent went into effect
+    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
@@ -101,7 +101,7 @@ CREATE TABLE RentSteps (
 CREATE TABLE RentStep (
     RSID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Rent Step, part of a list
     RSLID BIGINT NOT NULL DEFAULT 0,                        -- RentStep List ID to which this RS belongs
-    Dt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',     -- Date that the rent went into effect
+    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it

@@ -1,6 +1,6 @@
-DIRS=util db
+DIRS=lib
 
-wreis:
+db:
 	for dir in $(DIRS); do make -C $$dir;done
 
 clean:
