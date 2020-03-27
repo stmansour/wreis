@@ -143,3 +143,127 @@ func insertError(err error, n string, a interface{}) error {
 	}
 	return err
 }
+
+// deleteDBRow encapsulates about 6 or 7 lines of code to handle deleting a
+// database row either in the context of a transaction or not.  These lines
+// appear in every Get call, so it simplifies the code a lot.
+//
+// INPUTS
+// ctx        - db context
+// s          - name of TABLE, used only for error logging
+// stmt       - the prepared statement to execute, caller must de
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
+// 				note that the caller needs to defer stmt.Close() when stmt is
+//              not nil.
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, error) {
+	var err error
+
+	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
+		stmt := tx.Stmt(stmt)
+		// defer stmt.Close()
+		_, err = stmt.Exec(fields...)
+	} else {
+		_, err = stmt.Exec(fields...)
+	}
+	if err != nil {
+		util.Ulog("Error deleting %s fields[]=%#v, error: %v\n", s, fields, err)
+	}
+
+	return stmt, err
+}
+
+// getRowFromDB encapsulates about 6 or 7 lines of code to handle getting a
+// database row either in the context of a transaction or not.  These lines
+// appear in every Get call, so it simplifies the code a lot.
+//
+// INPUTS
+// ctx        - db context
+// stmt       - the prepared statement to execute
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
+// 				note that the caller needs to defer stmt.Close() when stmt is
+//              not nil.
+// *sql.Row   - the database row to read
+//-----------------------------------------------------------------------------
+func getRowFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, *sql.Row) {
+	var row *sql.Row
+	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
+		stmt := tx.Stmt(stmt)
+		row = stmt.QueryRow(fields...)
+		return stmt, row
+	}
+	row = stmt.QueryRow(fields...)
+	return nil, row
+}
+
+// insertRowToDB encapsulates about 6 or 7 lines of code to handle inserting a
+// database row either in the context of a transaction or not.  These lines
+// appear in every Insert call, so it simplifies the code a lot.
+//
+// INPUTS
+// ctx        - db context
+// stmt       - the prepared statement to execute
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
+// 				note that the caller needs to defer stmt.Close() when stmt is
+//              not nil.
+// sql.Result - the database Result
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func insertRowToDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, sql.Result, error) {
+	var res sql.Result
+	var err error
+	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
+		stmt := tx.Stmt(stmt)
+		res, err = stmt.Exec(fields...)
+		return stmt, res, err
+	}
+	res, err = stmt.Exec(fields...)
+	return nil, res, err
+}
+
+// updateDBRow encapsulates about 6 or 7 lines of code to handle updating a
+// database row either in the context of a transaction or not.  These lines
+// appear in every Update call, so it simplifies the code a lot.
+//
+// INPUTS
+// ctx        - db context
+// stmt       - the prepared statement to execute
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func updateDBRow(ctx context.Context, stmt *sql.Stmt, fields []interface{}) error {
+	var err error
+
+	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
+		stmt := tx.Stmt(stmt)
+		//defer stmt.Close()
+		_, err = stmt.Exec(fields...)
+	} else {
+		_, err = stmt.Exec(fields...)
+	}
+	return err
+}
+
+func getIDFromResult(s string, res sql.Result, a interface{}, err error) (int64, error) {
+	if nil == err {
+		x, err := res.LastInsertId()
+		if err == nil {
+			id := int64(x)
+			return id, nil
+		}
+	}
+
+	return 0, insertError(err, s, a)
+}

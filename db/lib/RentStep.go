@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"mojo/util"
 	"time"
 )
 
@@ -32,21 +31,16 @@ type RentStep struct {
 //-----------------------------------------------------------------------------
 func DeleteRentStep(ctx context.Context, id int64) error {
 	var err error
+	var stmt *sql.Stmt
 
 	if err = ValidateSessionForDBDelete(ctx); err != nil {
 		return err
 	}
 
 	fields := []interface{}{id}
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.DeleteRentStep)
+	stmt, err = deleteDBRow(ctx, "RentStep", Wdb.Prepstmt.DeleteRentStep, fields)
+	if stmt != nil {
 		defer stmt.Close()
-		_, err = stmt.Exec(fields...)
-	} else {
-		_, err = Wdb.Prepstmt.DeleteRentStep.Exec(fields...)
-	}
-	if err != nil {
-		util.Ulog("Error deleting RentStep id=%d error: %v\n", id, err)
 	}
 	return err
 }
@@ -66,15 +60,10 @@ func GetRentStep(ctx context.Context, id int64) (RentStep, error) {
 	if !ValidateSession(ctx) {
 		return a, ErrSessionRequired
 	}
-
-	var row *sql.Row
 	fields := []interface{}{id}
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.GetRentStep)
+	stmt, row := getRowFromDB(ctx, Wdb.Prepstmt.GetRentStep, fields)
+	if stmt != nil {
 		defer stmt.Close()
-		row = stmt.QueryRow(fields...)
-	} else {
-		row = Wdb.Prepstmt.GetRentStep.QueryRow(fields...)
 	}
 	return a, ReadRentStep(row, &a)
 }
@@ -107,24 +96,12 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 		a.LastModBy,
 	}
 
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.InsertRentStep)
+	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertRentStep, fields)
+	if stmt != nil {
 		defer stmt.Close()
-		res, err = stmt.Exec(fields...)
-	} else {
-		res, err = Wdb.Prepstmt.InsertRentStep.Exec(fields...)
 	}
 
-	// After getting result...
-	if nil == err {
-		x, err := res.LastInsertId()
-		if err == nil {
-			id = int64(x)
-			a.RSID = id
-		}
-	} else {
-		err = insertError(err, "RentStep", *a)
-	}
+	a.RSID, err = getIDFromResult("RentStep", res, a, err)
 	return id, err
 }
 
@@ -178,12 +155,7 @@ func UpdateRentStep(ctx context.Context, a *RentStep) error {
 		a.LastModBy,
 		a.RSID,
 	}
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.UpdateRentStep)
-		defer stmt.Close()
-		_, err = stmt.Exec(fields...)
-	} else {
-		_, err = Wdb.Prepstmt.UpdateRentStep.Exec(fields...)
-	}
+	err = updateDBRow(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
+
 	return updateError(err, "RentStep", *a)
 }
