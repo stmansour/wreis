@@ -19,6 +19,7 @@ relink:
 
 test: dbtest
 	@touch fail
+	./dbtest
 	@echo "*** TEST completed in ${THISDIR} ***"
 	@rm -f fail
 

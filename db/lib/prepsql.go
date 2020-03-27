@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -100,8 +99,6 @@ func BuildPreparedStatements() {
 	Wdb.Prepstmt.GetRentStep, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentStep where RSID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
-	fmt.Printf("s1 = %s\n", s1)
-	fmt.Println("INSERT INTO RentStep (" + s1 + ") VALUES(" + s2 + ")")
 	Wdb.Prepstmt.InsertRentStep, err = Wdb.DB.Prepare("INSERT INTO RentStep (" + s1 + ") VALUES(" + s2 + ")")
 	Errcheck(err)
 	Wdb.Prepstmt.UpdateRentStep, err = Wdb.DB.Prepare("UPDATE RentStep SET " + s3 + " WHERE RSID=?")
