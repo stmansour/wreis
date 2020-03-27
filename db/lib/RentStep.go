@@ -38,8 +38,7 @@ func DeleteRentStep(ctx context.Context, id int64) error {
 	}
 
 	fields := []interface{}{id}
-	stmt, err = deleteDBRow(ctx, "RentStep", Wdb.Prepstmt.DeleteRentStep, fields)
-	if stmt != nil {
+	if stmt, err = deleteDBRow(ctx, "RentStep", Wdb.Prepstmt.DeleteRentStep, fields); stmt != nil {
 		defer stmt.Close()
 	}
 	return err
