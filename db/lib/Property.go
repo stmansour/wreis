@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"mojo/util"
 	"time"
 )
 
@@ -72,21 +71,15 @@ type Property struct {
 //-----------------------------------------------------------------------------
 func DeleteProperty(ctx context.Context, id int64) error {
 	var err error
+	var stmt *sql.Stmt
 
 	if err = ValidateSessionForDBDelete(ctx); err != nil {
 		return err
 	}
 
 	fields := []interface{}{id}
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.DeleteProperty)
+	if stmt, err = deleteDBRow(ctx, "Property", Wdb.Prepstmt.DeleteProperty, fields); stmt != nil {
 		defer stmt.Close()
-		_, err = stmt.Exec(fields...)
-	} else {
-		_, err = Wdb.Prepstmt.DeleteProperty.Exec(fields...)
-	}
-	if err != nil {
-		util.Ulog("Error deleting Property id=%d error: %v\n", id, err)
 	}
 	return err
 }
@@ -109,12 +102,9 @@ func GetProperty(ctx context.Context, id int64) (Property, error) {
 
 	var row *sql.Row
 	fields := []interface{}{id}
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.GetProperty)
+	stmt, row := getRowFromDB(ctx, Wdb.Prepstmt.GetProperty, fields)
+	if stmt != nil {
 		defer stmt.Close()
-		row = stmt.QueryRow(fields...)
-	} else {
-		row = Wdb.Prepstmt.GetProperty.QueryRow(fields...)
 	}
 	return a, ReadProperty(row, &a)
 }
@@ -183,24 +173,12 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.LastModBy,
 	}
 
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.InsertProperty)
+	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertProperty, fields)
+	if stmt != nil {
 		defer stmt.Close()
-		res, err = stmt.Exec(fields...)
-	} else {
-		res, err = Wdb.Prepstmt.InsertProperty.Exec(fields...)
 	}
 
-	// After getting result...
-	if nil == err {
-		x, err := res.LastInsertId()
-		if err == nil {
-			id = int64(x)
-			a.PRID = id
-		}
-	} else {
-		err = insertError(err, "Property", *a)
-	}
+	a.PRID, err = getIDFromResult("Property", res, a, err)
 	return id, err
 }
 
@@ -327,12 +305,6 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LastModBy,
 		a.PRID,
 	}
-	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		stmt := tx.Stmt(Wdb.Prepstmt.UpdateProperty)
-		defer stmt.Close()
-		_, err = stmt.Exec(fields...)
-	} else {
-		_, err = Wdb.Prepstmt.UpdateProperty.Exec(fields...)
-	}
+	err = updateDBRow(ctx, Wdb.Prepstmt.UpdateProperty, fields)
 	return updateError(err, "Property", *a)
 }
