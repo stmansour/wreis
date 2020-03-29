@@ -278,7 +278,7 @@ func genericInsert(ctx context.Context, s string, g *sql.Stmt, fields []interfac
 		return crid, upid, id, err
 	}
 
-	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertProperty, fields)
+	stmt, res, err := insertRowToDB(ctx, g, fields)
 	if stmt != nil {
 		defer stmt.Close()
 	}

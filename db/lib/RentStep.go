@@ -30,18 +30,7 @@ type RentStep struct {
 // Any errors encountered, or nil if no errors
 //-----------------------------------------------------------------------------
 func DeleteRentStep(ctx context.Context, id int64) error {
-	var err error
-	var stmt *sql.Stmt
-
-	if err = ValidateSessionForDBDelete(ctx); err != nil {
-		return err
-	}
-
-	fields := []interface{}{id}
-	if stmt, err = deleteDBRow(ctx, "RentStep", Wdb.Prepstmt.DeleteRentStep, fields); stmt != nil {
-		defer stmt.Close()
-	}
-	return err
+	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteRentStep, id)
 }
 
 // GetRentStep reads and returns a RentStep structure
@@ -78,14 +67,6 @@ func GetRentStep(ctx context.Context, id int64) (RentStep, error) {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
-	var id = int64(0)
-	var err error
-	var res sql.Result
-
-	if err = ValidateSessionForDBInsert(ctx, &a.CreateBy, &a.LastModBy); err != nil {
-		return id, err
-	}
-
 	// transaction... context
 	fields := []interface{}{
 		a.RSLID,
@@ -94,14 +75,9 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 		a.CreateBy,
 		a.LastModBy,
 	}
-
-	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertRentStep, fields)
-	if stmt != nil {
-		defer stmt.Close()
-	}
-
-	a.RSID, err = getIDFromResult("RentStep", res, a, err)
-	return id, err
+	var err error
+	a.CreateBy, a.LastModBy, a.RSID, err = genericInsert(ctx, "RentStep", Wdb.Prepstmt.InsertRentStep, fields, a)
+	return a.RSID, err
 }
 
 // ReadRentStep reads a full RentStep structure of data from the database based
@@ -141,12 +117,6 @@ func ReadRentStep(row *sql.Row, a *RentStep) error {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func UpdateRentStep(ctx context.Context, a *RentStep) error {
-	var err error
-
-	if err = ValidateSessionForDBUpdate(ctx, &a.LastModBy); err != nil {
-		return err
-	}
-
 	fields := []interface{}{
 		a.RSLID,
 		a.Dt,
@@ -154,7 +124,15 @@ func UpdateRentStep(ctx context.Context, a *RentStep) error {
 		a.LastModBy,
 		a.RSID,
 	}
-	err = updateDBRow(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
+	// var err error
+	//
+	// if err = ValidateSessionForDBUpdate(ctx, &a.LastModBy); err != nil {
+	// 	return err
+	// }
+	//
+	// err = updateDBRow(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
 
+	var err error
+	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
 	return updateError(err, "RentStep", *a)
 }

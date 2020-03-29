@@ -27,19 +27,7 @@ type RentSteps struct {
 // Any errors encountered, or nil if no errors
 //-----------------------------------------------------------------------------
 func DeleteRentSteps(ctx context.Context, id int64) error {
-	var err error
-	var stmt *sql.Stmt
-
-	if err = ValidateSessionForDBDelete(ctx); err != nil {
-		return err
-	}
-
-	fields := []interface{}{id}
-	if stmt, err = deleteDBRow(ctx, "RentSteps", Wdb.Prepstmt.DeleteRentSteps, fields); stmt != nil {
-		defer stmt.Close()
-	}
-
-	return err
+	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteRentSteps, id)
 }
 
 // GetRentSteps reads and returns a RentSteps structure
@@ -78,26 +66,14 @@ func GetRentSteps(ctx context.Context, id int64) (RentSteps, error) {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func InsertRentSteps(ctx context.Context, a *RentSteps) (int64, error) {
-	var id = int64(0)
-	var err error
-	var res sql.Result
-
-	if err = ValidateSessionForDBInsert(ctx, &a.CreateBy, &a.LastModBy); err != nil {
-		return id, err
-	}
-
 	fields := []interface{}{
 		a.CreateBy,
 		a.LastModBy,
 	}
 
-	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertRentSteps, fields)
-	if stmt != nil {
-		defer stmt.Close()
-	}
-
-	a.RSLID, err = getIDFromResult("RentSteps", res, a, err)
-	return id, err
+	var err error
+	a.CreateBy, a.LastModBy, a.RSLID, err = genericInsert(ctx, "RentSteps", Wdb.Prepstmt.InsertRentSteps, fields, a)
+	return a.RSLID, err
 }
 
 // ReadRentSteps reads a full RentSteps structure of data from the database based
@@ -134,17 +110,12 @@ func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func UpdateRentSteps(ctx context.Context, a *RentSteps) error {
-	var err error
-
-	if err = ValidateSessionForDBUpdate(ctx, &a.LastModBy); err != nil {
-		return err
-	}
-
 	fields := []interface{}{
 		a.LastModBy,
 		a.RSLID,
 	}
-	err = updateDBRow(ctx, Wdb.Prepstmt.UpdateRentSteps, fields)
 
+	var err error
+	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateRentSteps, fields)
 	return updateError(err, "RentSteps", *a)
 }
