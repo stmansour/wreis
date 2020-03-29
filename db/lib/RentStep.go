@@ -124,13 +124,6 @@ func UpdateRentStep(ctx context.Context, a *RentStep) error {
 		a.LastModBy,
 		a.RSID,
 	}
-	// var err error
-	//
-	// if err = ValidateSessionForDBUpdate(ctx, &a.LastModBy); err != nil {
-	// 	return err
-	// }
-	//
-	// err = updateDBRow(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
 
 	var err error
 	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
