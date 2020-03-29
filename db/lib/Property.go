@@ -70,18 +70,7 @@ type Property struct {
 // Any errors encountered, or nil if no errors
 //-----------------------------------------------------------------------------
 func DeleteProperty(ctx context.Context, id int64) error {
-	var err error
-	var stmt *sql.Stmt
-
-	if err = ValidateSessionForDBDelete(ctx); err != nil {
-		return err
-	}
-
-	fields := []interface{}{id}
-	if stmt, err = deleteDBRow(ctx, "Property", Wdb.Prepstmt.DeleteProperty, fields); stmt != nil {
-		defer stmt.Close()
-	}
-	return err
+	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteProperty, id)
 }
 
 // GetProperty reads and returns a Property structure
@@ -120,15 +109,6 @@ func GetProperty(ctx context.Context, id int64) (Property, error) {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func InsertProperty(ctx context.Context, a *Property) (int64, error) {
-	var id = int64(0)
-	var err error
-	var res sql.Result
-
-	if err = ValidateSessionForDBInsert(ctx, &a.CreateBy, &a.LastModBy); err != nil {
-		return id, err
-	}
-
-	// transaction... context
 	fields := []interface{}{
 		a.Name,
 		a.YearsInBusiness,
@@ -173,13 +153,9 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.LastModBy,
 	}
 
-	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertProperty, fields)
-	if stmt != nil {
-		defer stmt.Close()
-	}
-
-	a.PRID, err = getIDFromResult("Property", res, a, err)
-	return id, err
+	var err error
+	a.CreateBy, a.LastModBy, a.PRID, err = genericInsert(ctx, "Property", Wdb.Prepstmt.InsertProperty, fields, a)
+	return a.PRID, err
 }
 
 // ReadProperty reads a full Property structure of data from the database based
@@ -256,12 +232,6 @@ func ReadProperty(row *sql.Row, a *Property) error {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func UpdateProperty(ctx context.Context, a *Property) error {
-	var err error
-
-	if err = ValidateSessionForDBUpdate(ctx, &a.LastModBy); err != nil {
-		return err
-	}
-
 	fields := []interface{}{
 		a.Name,
 		a.YearsInBusiness,
@@ -305,6 +275,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LastModBy,
 		a.PRID,
 	}
-	err = updateDBRow(ctx, Wdb.Prepstmt.UpdateProperty, fields)
+	var err error
+	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateProperty, fields)
 	return updateError(err, "Property", *a)
 }

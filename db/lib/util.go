@@ -177,6 +177,33 @@ func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interfa
 	return stmt, err
 }
 
+// genericDelete encapsulates the most generic form of the database delete
+// functionality supplied in this package.
+//
+// INPUTS
+// ctx        - db context
+// s          - name of TABLE, used only for error logging
+// stmt       - the prepared statement to execute, caller must de
+// id         - id of the table record to delete
+//
+// RETURNS
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func genericDelete(ctx context.Context, s string, g *sql.Stmt, id int64) error {
+	var err error
+	var stmt *sql.Stmt
+
+	if err = ValidateSessionForDBDelete(ctx); err != nil {
+		return err
+	}
+
+	fields := []interface{}{id}
+	if stmt, err = deleteDBRow(ctx, s, g, fields); stmt != nil {
+		defer stmt.Close()
+	}
+	return err
+}
+
 // getRowFromDB encapsulates about 6 or 7 lines of code to handle getting a
 // database row either in the context of a transaction or not.  These lines
 // appear in every Get call, so it simplifies the code a lot.
@@ -231,6 +258,35 @@ func insertRowToDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*
 	return nil, res, err
 }
 
+// genericInsert encapsulates the code to insert a new record.
+//
+// INPUTS
+// ctx        - db context
+// stmt       - the prepared statement to execute
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// crid       - creator id
+// upid       - modifier id
+// id         - id of the record inserted
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func genericInsert(ctx context.Context, s string, g *sql.Stmt, fields []interface{}, a interface{}) (int64, int64, int64, error) {
+	var crid, upid, id int64
+	var err error
+	if err = ValidateSessionForDBInsert(ctx, &crid, &upid); err != nil {
+		return crid, upid, id, err
+	}
+
+	stmt, res, err := insertRowToDB(ctx, Wdb.Prepstmt.InsertProperty, fields)
+	if stmt != nil {
+		defer stmt.Close()
+	}
+
+	id, err = getIDFromResult(s, res, a, err)
+	return crid, upid, id, err
+}
+
 // updateDBRow encapsulates about 6 or 7 lines of code to handle updating a
 // database row either in the context of a transaction or not.  These lines
 // appear in every Update call, so it simplifies the code a lot.
@@ -254,6 +310,26 @@ func updateDBRow(ctx context.Context, stmt *sql.Stmt, fields []interface{}) erro
 		_, err = stmt.Exec(fields...)
 	}
 	return err
+}
+
+// genericUpdate encapsulates the code to update an existing record.
+//
+// INPUTS
+// ctx        - db context
+// stmt       - the prepared statement to execute
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// id         - LastModBy id
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func genericUpdate(ctx context.Context, g *sql.Stmt, fields []interface{}) (int64, error) {
+	var err error
+	var id int64
+	if err = ValidateSessionForDBUpdate(ctx, &id); err != nil {
+		return id, err
+	}
+	return id, updateDBRow(ctx, g, fields)
 }
 
 func getIDFromResult(s string, res sql.Result, a interface{}, err error) (int64, error) {
