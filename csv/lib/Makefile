@@ -1,5 +1,5 @@
 TOP=../..
-THISDIR="util/lib"
+THISDIR="csv/lib"
 
 lib: *.go
 	@touch fail

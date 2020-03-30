@@ -1,25 +1,25 @@
 TOP=../..
-THISDIR="util/lib"
+THISDIR="csv/functest"
 
-lib: *.go
+functest: *.go
 	@touch fail
-	go vet
-	golint
+	@go vet
+	@golint
 	go build
-	go install
 	@rm -f fail
 	@echo "*** Completed in ${THISDIR} ***"
 
 clean:
-	rm -f log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? ${THISDIR} fail conf*.json
+	rm -f log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? ${THISDIR} fail
 	@echo "*** CLEAN completed in ${THISDIR} ***"
 
 relink:
 	go build
 	@echo "*** RELINK completed in ${THISDIR} ***"
 
-test:
+test: functest
 	@touch fail
+	./dbtest
 	@echo "*** TEST completed in ${THISDIR} ***"
 	@rm -f fail
 

@@ -89,7 +89,6 @@ func GetProperty(ctx context.Context, id int64) (Property, error) {
 		return a, ErrSessionRequired
 	}
 
-	var row *sql.Row
 	fields := []interface{}{id}
 	stmt, row := getRowFromDB(ctx, Wdb.Prepstmt.GetProperty, fields)
 	if stmt != nil {
