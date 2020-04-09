@@ -1,4 +1,4 @@
-DIRS=util db
+DIRS=util db csv
 
 wreis:
 	for dir in $(DIRS); do make -C $$dir;done

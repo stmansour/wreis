@@ -17,18 +17,6 @@ import (
 // the values from the csv file record just read in the canonical order.
 //------------------------------------------------------------------------------
 
-// HandlerFunc is the prototype of a csv handler function. The CSV subsystem
-// will read a requested file, parse each line, and call a HandlerFunc to do
-// something with the data.
-// INPUTS
-// []string = values found in this row
-// int      = line number of csv file
-//
-// RETURNS
-// nothing at this time
-//------------------------------------------------------------------------------
-type HandlerFunc func([]string, int)
-
 // ColumnDef defines a column of the supplied csv file so that it can be handdled
 // efficiently. Each column is compared to the ColumnDefs in the canonical list.
 // If it is found, the index of the expected position (from the []CanonicalIndex
@@ -51,6 +39,18 @@ type Context struct {
 	csvfile    *os.File    // the csv file to parse
 	reader     *csv.Reader // csv file reader
 }
+
+// HandlerFunc is the prototype of a csv handler function. The CSV subsystem
+// will read a requested file, parse each line, and call a HandlerFunc to do
+// something with the data.
+// INPUTS
+// []string = values found in this row
+// int      = line number of csv file
+//
+// RETURNS
+// nothing at this time
+//------------------------------------------------------------------------------
+type HandlerFunc func(Context, []string, int) []error
 
 // nameMatch compares the supplied name to the names listed in the columndef.
 // It returns true if there is a match, false otherwise.
@@ -93,7 +93,7 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 	//----------------------------------
 	// make sure we can open the file
 	//----------------------------------
-	ctx.csvfile, err = os.Open("input.csv")
+	ctx.csvfile, err = os.Open(fname)
 	if err != nil {
 		return ctx, err
 	}
@@ -105,6 +105,7 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 	// to be column headers
 	//-------------------------------------------------------------------------
 	ctx.ColumnDefs = deepCopy(CanonicalPropertyList)
+	// util.Console("len ctx.ColumnDefs = %d\n", len(ctx.ColumnDefs))
 	ctx.reader = csv.NewReader(ctx.csvfile)
 	if cols, err = ctx.reader.Read(); err != nil {
 		return ctx, err
@@ -114,8 +115,10 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 	// Strip the whitespace from the column titles...
 	//--------------------------------------------------
 	var pcount = len(cols)
+	ctx.Order = make([]int, pcount)
 	for i := 0; i < pcount; i++ {
 		rec = append(rec, util.Stripchars(cols[i], " \r\n\t"))
+		ctx.Order[i] = -1 // initialize to indicate no mapping for this column
 	}
 	//-------------------------------------------------------------------------
 	// rec now has the column headers of the file we're looking at. Spin through
@@ -142,6 +145,9 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 				break                       // no need to loop further
 			}
 		}
+		if ctx.ColumnDefs[i].Index < 0 {
+			// util.Console("Didn't find it!\n")
+		}
 		//-------------------------------------------------------------------
 		// If this CanonicalIndex was not matched AND it is required, then
 		// return now with an error.
@@ -150,7 +156,6 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 			return ctx, fmt.Errorf("Required column %s was not found", ctx.ColumnDefs[i].Name[0])
 		}
 	}
-
 	return ctx, nil
 }
 
@@ -161,12 +166,17 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 // h     = handler function to be called with an array of strings containing
 //         all the column values for a line in the csv file. It will be called
 //         once for each data line of the csv file.
+//
+// RETURNS
+// errlist = slice of all errors encountered
 //------------------------------------------------------------------------------
-func ReadPropertyFile(fname string, h HandlerFunc) error {
+func ReadPropertyFile(fname string, h HandlerFunc) []error {
 	var record []string
+	var errlist []error
 	ctx, err := GetContext(fname, h)
 	if err != nil {
-		return err
+		errlist = append(errlist, err)
+		return errlist
 	}
 	line := 2
 	for {
@@ -176,10 +186,11 @@ func ReadPropertyFile(fname string, h HandlerFunc) error {
 			break
 		}
 		if err != nil {
-			return err
+			errlist = append(errlist, err)
+			return errlist
 		}
-		ctx.Handler(record, line)
+		errlist = ctx.Handler(ctx, record, line)
 		line++
 	}
-	return nil
+	return errlist
 }
