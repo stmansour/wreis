@@ -1,6 +1,7 @@
 package wcsv
 
 import (
+	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -34,11 +35,12 @@ type ColumnDef struct {
 // Context is the context structure for a specific csv file
 //------------------------------------------------------------------------------
 type Context struct {
-	Handler    HandlerFunc // handler to call for each line
-	ColumnDefs []ColumnDef // array of line definitions
-	Order      []int       // []index that enables referencing the supplied csv values in an expected order
-	csvfile    *os.File    // the csv file to parse
-	reader     *csv.Reader // csv file reader
+	Handler    HandlerFunc     // handler to call for each line
+	ColumnDefs []ColumnDef     // array of line definitions
+	Order      []int           // []index that enables referencing the supplied csv values in an expected order
+	csvfile    *os.File        // the csv file to parse
+	reader     *csv.Reader     // csv file reader
+	dbctx      context.Context // database context
 }
 
 // HandlerFunc is the prototype of a csv handler function. The CSV subsystem
@@ -86,7 +88,7 @@ func nameMatch(n string, def *ColumnDef) bool {
 
 // GetContext is the context structure for a specific csv file
 //------------------------------------------------------------------------------
-func GetContext(fname string, h HandlerFunc) (Context, error) {
+func GetContext(dbctx context.Context, fname string, h HandlerFunc) (Context, error) {
 	var ctx Context
 	var err error
 	var cols, rec []string
@@ -99,6 +101,7 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 		return ctx, err
 	}
 	ctx.Handler = h
+	ctx.dbctx = dbctx
 
 	//-------------------------------------------------------------------------
 	// Read the first line of the file. There's no way to tell if the first
@@ -146,9 +149,9 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 				break                       // no need to loop further
 			}
 		}
-		if ctx.ColumnDefs[i].Index < 0 {
-			// util.Console("Didn't find it!\n")
-		}
+		// if ctx.ColumnDefs[i].Index < 0 {
+		// 	// util.Console("Didn't find it!\n")
+		// }
 		//-------------------------------------------------------------------
 		// If this CanonicalIndex was not matched AND it is required, then
 		// return now with an error.
@@ -170,6 +173,7 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 // ReadPropertyFile reads the csvfile line by line and handles each line.
 //
 // INPUTS
+// dbctx = database context
 // fname = file to parse
 // h     = handler function to be called with an array of strings containing
 //         all the column values for a line in the csv file. It will be called
@@ -178,10 +182,10 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 // RETURNS
 // errlist = slice of all errors encountered
 //------------------------------------------------------------------------------
-func ReadPropertyFile(fname string, h HandlerFunc) []error {
+func ReadPropertyFile(dbctx context.Context, fname string, h HandlerFunc) []error {
 	var record []string
 	var errlist []error
-	ctx, err := GetContext(fname, h)
+	ctx, err := GetContext(dbctx, fname, h)
 	if err != nil {
 		errlist = append(errlist, err)
 		return errlist

@@ -87,7 +87,7 @@ func main() {
 	// process the csv file...
 	//----------------------------
 	var errlist []error
-	if errlist = wcsv.ImportPropertyFile(App.fname); len(errlist) > 0 {
+	if errlist = wcsv.ImportPropertyFile(ctx, App.fname); len(errlist) > 0 {
 		fmt.Printf("csv.ImportPropertyFile returned %d errors\n", len(errlist))
 		for i := 0; i < len(errlist); i++ {
 			fmt.Printf("%d. %s\n", i, errlist[i].Error())

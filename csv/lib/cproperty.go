@@ -1,6 +1,7 @@
 package wcsv
 
 import (
+	"context"
 	"fmt"
 	db "wreis/db/lib"
 	util "wreis/util/lib"
@@ -112,7 +113,6 @@ var CanonicalPropertyList = []ColumnDef{
 func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 	var p db.Property
 	var errlist []error
-	var elcount = int(0)
 	var u uint64
 
 	for i := 0; i < len(csvctx.Order); i++ {
@@ -203,14 +203,17 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			u, errlist = GetBitFlagValue(ss[csvctx.Order[i]], 1<<2, errlist)
 			p.FLAGS |= u
 		}
-		if len(errlist) > elcount {
+		if len(errlist) > 0 {
 			errlist = append(errlist, fmt.Errorf("PropertyHandler: last error was detected on value for: %s = %s", CanonicalPropertyList[i].Name, ss[csvctx.Order[i]]))
-			elcount = len(errlist)
 			break
 		}
 	}
 
 	util.Console("Line: %d p = %#v\n", lineno, p)
+	_, err := db.InsertProperty(csvctx.dbctx, &p)
+	if err != nil {
+		errlist = append(errlist, err)
+	}
 
 	return errlist
 }
@@ -224,6 +227,6 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 // a list of errors encountered. If there were no errors the length of the list
 // will be 0.
 //------------------------------------------------------------------------------
-func ImportPropertyFile(fname string) []error {
-	return ReadPropertyFile(fname, PropertyHandler)
+func ImportPropertyFile(ctx context.Context, fname string) []error {
+	return ReadPropertyFile(ctx, fname, PropertyHandler)
 }
