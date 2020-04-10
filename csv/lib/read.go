@@ -28,6 +28,7 @@ type ColumnDef struct {
 	CaseSensitive  bool     // is the column heading match case-sensitive: false = no
 	CanonicalIndex int      // column index in the canonical definition
 	Index          int      // index where this
+	FlagBit        uint64   // 0 means not a flag bit, otherwise 1<<n where n is the bit number
 }
 
 // Context is the context structure for a specific csv file
@@ -156,6 +157,13 @@ func GetContext(fname string, h HandlerFunc) (Context, error) {
 			return ctx, fmt.Errorf("Required column %s was not found", ctx.ColumnDefs[i].Name[0])
 		}
 	}
+
+	dbg := false
+	if dbg {
+		for i := 0; i < len(ctx.Order); i++ {
+			util.Console("%s is in col %d\n", CanonicalPropertyList[i].Name, ctx.Order[i])
+		}
+	}
 	return ctx, nil
 }
 
@@ -190,6 +198,9 @@ func ReadPropertyFile(fname string, h HandlerFunc) []error {
 			return errlist
 		}
 		errlist = ctx.Handler(ctx, record, line)
+		if len(errlist) > 0 {
+			break
+		}
 		line++
 	}
 	return errlist

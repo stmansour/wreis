@@ -8,7 +8,7 @@ import (
 // TIME0 is the "beginning of time" constant to use when we need
 // to set a time far enough in the past so that there won't be a
 // date prior issue
-var TIME0 = time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC)
+var TIME0 = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
 
 // ENDOFTIME can be used when there is no end time
 var ENDOFTIME = time.Date(9999, time.December, 31, 0, 0, 0, 0, time.UTC)

@@ -29,7 +29,7 @@ type Property struct {
 	//     1<<0  Drive Through?  0 = no, 1 = yes
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
-	FLAGS                int64
+	FLAGS                uint64
 	Ownership            int
 	TenantTradeName      string
 	LeaseGuarantor       int64
@@ -39,7 +39,7 @@ type Property struct {
 	LeaseCommencementDt  time.Time
 	LeaseExpirationDt    time.Time
 	TermRemainingOnLease int64
-	ROID                 int64
+	ROID                 float64
 	Address              string
 	Address2             string
 	City                 string
