@@ -39,7 +39,8 @@ CREATE TABLE Property (
     LeaseCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',    -- GMT datetime
     LeaseExpirationDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',      -- GMT datetime
     TermRemainingOnLease BIGINT NOT NULL DEFAULT 0,         -- Duration
-    ROID BIGINT NOT NULL DEFAULT 0,                         -- ID of associated Renew Options
+    ROLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Renew Options
+    RSLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Rent Steps
 
     Address VARCHAR(100) NOT NULL DEFAULT '',               -- property address
     Address2 VARCHAR(100) NOT NULL DEFAULT '',
@@ -67,7 +68,23 @@ CREATE TABLE Property (
 
 CREATE TABLE RenewOptions (
     ROLID BIGINT NOT NULL AUTO_INCREMENT,                   -- Renew Options List ID
-    /* anything that applies to the whole list*/
+    /*
+    ++  bit 0 - There are 2 fundamental ways in which Renew Options are specified.
+    **          bit 0 set to 0 means that each RenewOption record specifies an absolute
+    **          date.  Bit 0 set to 1 means that each RenewOption record specifies
+    **          a count of years past commencement.  Examples:
+    **
+    **    ----------- bit 0 = 0 -----------     ----------- bit 0 = 1 -----------
+    **
+    **                 Option     Annual        Option       Option     Annual
+    **    Count        Period     Rent          Year         Period     Rent
+    **    ---------------------------------     ------------------------------------
+    **    16           1          183,568.85    7/4/2024     1          109,709.45
+    **    21           2          201,925.74    7/4/2025     1          111,903.63
+    **    26           3          222,118.32    7/4/2026     2          116.424.54
+    **    ...                                   ...
+    */
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
@@ -79,7 +96,8 @@ CREATE TABLE RenewOption (
     ROID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Renew Option, part of a list
     ROLID BIGINT NOT NULL DEFAULT 0,                        -- Renew Options List ID to which this RO belongs
     Description VARCHAR(1024),                              -- text of this option
-    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect
+    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    Count BIGINT NOT NULL DEFAULT 0,                        -- count - valid only win ROLID FLAGS bit 0 = 0
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
@@ -90,7 +108,7 @@ CREATE TABLE RenewOption (
 
 CREATE TABLE RentSteps (
     RSLID BIGINT NOT NULL AUTO_INCREMENT,                   -- RentStep List ID
-    /* anything that applies to the whole list*/
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = count, 1 = dates -- See comment for RenewOptions FLAGS
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
@@ -101,7 +119,8 @@ CREATE TABLE RentSteps (
 CREATE TABLE RentStep (
     RSID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Rent Step, part of a list
     RSLID BIGINT NOT NULL DEFAULT 0,                        -- RentStep List ID to which this RS belongs
-    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect
+    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    Count BIGINT NOT NULL DEFAULT 0,                        -- count - valid only win ROLID FLAGS bit 0 = 0
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it

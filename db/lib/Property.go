@@ -39,7 +39,8 @@ type Property struct {
 	LeaseCommencementDt  time.Time
 	LeaseExpirationDt    time.Time
 	TermRemainingOnLease int64
-	ROID                 float64
+	ROLID                int64
+	RSLID                int64
 	Address              string
 	Address2             string
 	City                 string
@@ -133,7 +134,8 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.LeaseCommencementDt,
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
-		a.ROID,
+		a.ROLID,
+		a.RSLID,
 		a.Address,
 		a.Address2,
 		a.City,
@@ -196,7 +198,8 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.LeaseCommencementDt,
 		&a.LeaseExpirationDt,
 		&a.TermRemainingOnLease,
-		&a.ROID,
+		&a.ROLID,
+		&a.RSLID,
 		&a.Address,
 		&a.Address2,
 		&a.City,
@@ -256,7 +259,8 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LeaseCommencementDt,
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
-		a.ROID,
+		a.ROLID,
+		a.RSLID,
 		a.Address,
 		a.Address2,
 		a.City,

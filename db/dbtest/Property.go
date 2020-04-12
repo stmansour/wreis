@@ -40,7 +40,7 @@ func TestProperty(ctx context.Context) {
 		LeaseCommencementDt:  dt,
 		LeaseExpirationDt:    dt,
 		TermRemainingOnLease: int64(dur),
-		ROID:                 0,
+		ROLID:                 0,
 		Address:              "1234 Elm Street",
 		Address2:             "",
 		City:                 "Corn Bluff",
@@ -77,7 +77,7 @@ func TestProperty(ctx context.Context) {
 		fmt.Printf("error in GetProperty: %s\n", err.Error())
 		os.Exit(1)
 	}
-	rs1.ROID += 4
+	rs1.ROLID += 4
 	if err = db.UpdateProperty(ctx, &rs1); err != nil {
 		fmt.Printf("Error updating Property: %s\n", err)
 		os.Exit(1)

@@ -35,7 +35,7 @@ const (
 	PRLeaseCommencementDt  = iota
 	PRLeaseExpirationDt    = iota
 	PRTermRemainingOnLease = iota
-	PRROID                 = iota
+	PRROLID                = iota
 	PRAddress              = iota
 	PRAddress2             = iota
 	PRCity                 = iota
@@ -53,6 +53,8 @@ const (
 	PRDriveThrough         = iota
 	PRRoofStructResp       = iota
 	PRFirstRightofRefusal  = iota
+	PRRenewOptions         = iota
+	PRRentSteps            = iota
 )
 
 // CanonicalPropertyList defines the cannonical array of ColumnDefs for the CSV
@@ -82,7 +84,7 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"LeaseCommencementDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseCommencementDt, Index: -1, FlagBit: 0},
 	{Name: []string{"LeaseExpirationDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseExpirationDt, Index: -1, FlagBit: 0},
 	{Name: []string{"TermRemainingOnLease"}, Required: false, CaseSensitive: false, CanonicalIndex: PRTermRemainingOnLease, Index: -1, FlagBit: 0},
-	{Name: []string{"ROID"}, Required: false, CaseSensitive: false, CanonicalIndex: PRROID, Index: -1, FlagBit: 0},
+	{Name: []string{"ROLID"}, Required: false, CaseSensitive: false, CanonicalIndex: PRROLID, Index: -1, FlagBit: 0},
 	{Name: []string{"Address"}, Required: false, CaseSensitive: false, CanonicalIndex: PRAddress, Index: -1, FlagBit: 0},
 	{Name: []string{"Address2"}, Required: false, CaseSensitive: false, CanonicalIndex: PRAddress2, Index: -1, FlagBit: 0},
 	{Name: []string{"City"}, Required: false, CaseSensitive: false, CanonicalIndex: PRCity, Index: -1, FlagBit: 0},
@@ -99,7 +101,8 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"HQCountry"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQCountry, Index: -1, FlagBit: 0},
 	{Name: []string{"DriveThrough"}, Required: false, CaseSensitive: false, CanonicalIndex: PRDriveThrough, Index: -1, FlagBit: uint64(1 << 0)},
 	{Name: []string{"RoofStructResp"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRoofStructResp, Index: -1, FlagBit: uint64(1 << 1)},
-	{Name: []string{"FirstRightofRefusal"}, Required: false, CaseSensitive: false, CanonicalIndex: PRFirstRightofRefusal, Index: -1, FlagBit: uint64(1 << 2)},
+	{Name: []string{"RenewOptions"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRenewOptions, Index: -1, FlagBit: 0},
+	{Name: []string{"RentSteps"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRentSteps, Index: -1, FlagBit: 0},
 }
 
 // PropertyHandler is called for each record of a Property csv file.
@@ -163,8 +166,6 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			p.LeaseExpirationDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
 		case PRTermRemainingOnLease:
 			p.TermRemainingOnLease, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
-		case PRROID:
-			p.ROID, errlist = ParseFloat64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRAddress:
 			p.Address = ss[csvctx.Order[i]]
 		case PRAddress2:
@@ -202,6 +203,8 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 		case PRFirstRightofRefusal:
 			u, errlist = GetBitFlagValue(ss[csvctx.Order[i]], 1<<2, errlist)
 			p.FLAGS |= u
+		case PRRenewOptions:
+		case PRRentSteps:
 		}
 		if len(errlist) > 0 {
 			errlist = append(errlist, fmt.Errorf("PropertyHandler: last error was detected on value for: %s = %s", CanonicalPropertyList[i].Name, ss[csvctx.Order[i]]))
@@ -216,6 +219,21 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 	}
 
 	return errlist
+}
+
+// ParseRenewOptions reads properties into the database from eht supplied file
+//
+// INPUTS
+// fname = name of the csv file with Property data
+//
+// RETURNS
+// a list of errors encountered. If there were no errors the length of the list
+// will be 0.
+//------------------------------------------------------------------------------
+func ParseRenewOptions(s string) ([]db.RenewOptions, error) {
+	var ROs []db.RenewOptions
+	var err error
+	return ROs, err
 }
 
 // ImportPropertyFile reads properties into the database from eht supplied file

@@ -6,14 +6,14 @@ import (
 	"time"
 )
 
-// RentStep defines a date and a rent amount for a property. A RentStep record
-// is part of a group or list. The group is defined by the RSLID
+// RenewOption defines a date and a rent amount for a property. A RenewOption record
+// is part of a group or list. The group is defined by the ROLID
 //-----------------------------------------------------------------------------
-type RentStep struct {
-	RSID        int64     // unique id for this record
-	RSLID       int64     // id of RentStepList to which this record belongs
-	Count       int64     // valid when RSLID.FLAGS bit 0 = 0
-	Dt          time.Time // date for the rent amount; valid when RSLID.FLAGS bit 0 = 1
+type RenewOption struct {
+	ROID        int64     // unique id for this record
+	ROLID       int64     // id of RenewOptionList to which this record belongs
+	Count       int64     // count, valid when ROLID.FLAGS bit 0 = 0
+	Dt          time.Time // date for the rent amount, valid when ROLID.FLAGS bit 0 = 1
 	Rent        float64   // amount of rent on the associated date
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
@@ -21,43 +21,43 @@ type RentStep struct {
 	CreateBy    int64     // id of user that created it
 }
 
-// DeleteRentStep deletes the RentStep with the specified id from the database
+// DeleteRenewOption deletes the RenewOption with the specified id from the database
 //
 // INPUTS
 // ctx - db context
-// id - RSID of the record to read
+// id - ROID of the record to read
 //
 // RETURNS
 // Any errors encountered, or nil if no errors
 //-----------------------------------------------------------------------------
-func DeleteRentStep(ctx context.Context, id int64) error {
-	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteRentStep, id)
+func DeleteRenewOption(ctx context.Context, id int64) error {
+	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteRenewOption, id)
 }
 
-// GetRentStep reads and returns a RentStep structure
+// GetRenewOption reads and returns a RenewOption structure
 //
 // INPUTS
 // ctx - db context
-// id - RSID of the record to read
+// id - ROID of the record to read
 //
 // RETURNS
 // ErrSessionRequired if the session is invalid
 // nil if the session is valid
 //-----------------------------------------------------------------------------
-func GetRentStep(ctx context.Context, id int64) (RentStep, error) {
-	var a RentStep
+func GetRenewOption(ctx context.Context, id int64) (RenewOption, error) {
+	var a RenewOption
 	if !ValidateSession(ctx) {
 		return a, ErrSessionRequired
 	}
 	fields := []interface{}{id}
-	stmt, row := getRowFromDB(ctx, Wdb.Prepstmt.GetRentStep, fields)
+	stmt, row := getRowFromDB(ctx, Wdb.Prepstmt.GetRenewOption, fields)
 	if stmt != nil {
 		defer stmt.Close()
 	}
-	return a, ReadRentStep(row, &a)
+	return a, ReadRenewOption(row, &a)
 }
 
-// InsertRentStep writes a new RentStep record to the database
+// InsertRenewOption writes a new RenewOption record to the database
 //
 // INPUTS
 // ctx - db context
@@ -67,10 +67,10 @@ func GetRentStep(ctx context.Context, id int64) (RentStep, error) {
 // id of the record just inserted
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
-func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
+func InsertRenewOption(ctx context.Context, a *RenewOption) (int64, error) {
 	// transaction... context
 	fields := []interface{}{
-		a.RSLID,
+		a.ROLID,
 		a.Count,
 		a.Dt,
 		a.Rent,
@@ -78,11 +78,11 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 		a.LastModBy,
 	}
 	var err error
-	a.CreateBy, a.LastModBy, a.RSID, err = genericInsert(ctx, "RentStep", Wdb.Prepstmt.InsertRentStep, fields, a)
-	return a.RSID, err
+	a.CreateBy, a.LastModBy, a.ROID, err = genericInsert(ctx, "RenewOption", Wdb.Prepstmt.InsertRenewOption, fields, a)
+	return a.ROID, err
 }
 
-// ReadRentStep reads a full RentStep structure of data from the database based
+// ReadRenewOption reads a full RenewOption structure of data from the database based
 // on the supplied Rows pointer.
 //
 // INPUTS
@@ -94,10 +94,10 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 // ErrSessionRequired if the session is invalid
 // nil if the session is valid
 //-----------------------------------------------------------------------------
-func ReadRentStep(row *sql.Row, a *RentStep) error {
+func ReadRenewOption(row *sql.Row, a *RenewOption) error {
 	err := row.Scan(
-		&a.RSID,
-		&a.RSLID,
+		&a.ROID,
+		&a.ROLID,
 		&a.Count,
 		&a.Dt,
 		&a.Rent,
@@ -109,7 +109,7 @@ func ReadRentStep(row *sql.Row, a *RentStep) error {
 	return err
 }
 
-// UpdateRentStep updates an existing RentStep record in the database
+// UpdateRenewOption updates an existing RenewOption record in the database
 //
 // INPUTS
 // ctx - db context
@@ -119,17 +119,17 @@ func ReadRentStep(row *sql.Row, a *RentStep) error {
 // id of the record just inserted
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
-func UpdateRentStep(ctx context.Context, a *RentStep) error {
+func UpdateRenewOption(ctx context.Context, a *RenewOption) error {
 	fields := []interface{}{
-		a.RSLID,
+		a.ROLID,
 		a.Count,
 		a.Dt,
 		a.Rent,
 		a.LastModBy,
-		a.RSID,
+		a.ROID,
 	}
 
 	var err error
-	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateRentStep, fields)
-	return updateError(err, "RentStep", *a)
+	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateRenewOption, fields)
+	return updateError(err, "RenewOption", *a)
 }
