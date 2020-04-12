@@ -55,10 +55,12 @@ type Property struct {
 	HQState              string
 	HQPostalCode         string
 	HQCountry            string
-	LastModTime          time.Time // when was the record last written
-	LastModBy            int64     // id of user that did the modify
-	CreateTS             time.Time // when was this record created
-	CreateBy             int64     // id of user that created it
+	LastModTime          time.Time    // when was the record last written
+	LastModBy            int64        // id of user that did the modify
+	CreateTS             time.Time    // when was this record created
+	CreateBy             int64        // id of user that created it
+	RO                   RenewOptions // contains the list of RenewOptions and context
+	RS                   RentSteps    // contains the list of RentSteps and context
 }
 
 // DeleteProperty deletes the Property with the specified id from the database

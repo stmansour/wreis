@@ -101,6 +101,7 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"HQCountry"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQCountry, Index: -1, FlagBit: 0},
 	{Name: []string{"DriveThrough"}, Required: false, CaseSensitive: false, CanonicalIndex: PRDriveThrough, Index: -1, FlagBit: uint64(1 << 0)},
 	{Name: []string{"RoofStructResp"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRoofStructResp, Index: -1, FlagBit: uint64(1 << 1)},
+	{Name: []string{"FirstRightofRefusal"}, Required: false, CaseSensitive: false, CanonicalIndex: PRFirstRightofRefusal, Index: -1, FlagBit: uint64(1 << 2)},
 	{Name: []string{"RenewOptions"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRenewOptions, Index: -1, FlagBit: 0},
 	{Name: []string{"RentSteps"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRentSteps, Index: -1, FlagBit: 0},
 }
@@ -203,8 +204,6 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 		case PRFirstRightofRefusal:
 			u, errlist = GetBitFlagValue(ss[csvctx.Order[i]], 1<<2, errlist)
 			p.FLAGS |= u
-		case PRRenewOptions:
-		case PRRentSteps:
 		}
 		if len(errlist) > 0 {
 			errlist = append(errlist, fmt.Errorf("PropertyHandler: last error was detected on value for: %s = %s", CanonicalPropertyList[i].Name, ss[csvctx.Order[i]]))
