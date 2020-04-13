@@ -15,6 +15,7 @@ type RentStep struct {
 	Count       int64     // valid when RSLID.FLAGS bit 0 = 0
 	Dt          time.Time // date for the rent amount; valid when RSLID.FLAGS bit 0 = 1
 	Rent        float64   // amount of rent on the associated date
+	FLAGS       uint64    // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
 	CreateTS    time.Time // when was this record created
@@ -74,6 +75,7 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 		a.Count,
 		a.Dt,
 		a.Rent,
+		a.FLAGS,
 		a.CreateBy,
 		a.LastModBy,
 	}
@@ -101,6 +103,7 @@ func ReadRentStep(row *sql.Row, a *RentStep) error {
 		&a.Count,
 		&a.Dt,
 		&a.Rent,
+		&a.FLAGS,
 		&a.CreateTS,
 		&a.CreateBy,
 		&a.LastModTime,
@@ -125,6 +128,7 @@ func UpdateRentStep(ctx context.Context, a *RentStep) error {
 		a.Count,
 		a.Dt,
 		a.Rent,
+		a.FLAGS,
 		a.LastModBy,
 		a.RSID,
 	}

@@ -3,6 +3,9 @@ package wcsv
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
 	db "wreis/db/lib"
 	util "wreis/util/lib"
 )
@@ -204,6 +207,11 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 		case PRFirstRightofRefusal:
 			u, errlist = GetBitFlagValue(ss[csvctx.Order[i]], 1<<2, errlist)
 			p.FLAGS |= u
+		case PRRenewOptions:
+			p.RO.ROs, errlist = HandleRenewOptions(ss[csvctx.Order[i]], lineno, errlist)
+			if len(errlist) == 0 && len(p.RO.ROs) > 0 {
+				p.RO.FLAGS |= p.RO.ROs[0].FLAGS & 0x1
+			}
 		}
 		if len(errlist) > 0 {
 			errlist = append(errlist, fmt.Errorf("PropertyHandler: last error was detected on value for: %s = %s", CanonicalPropertyList[i].Name, ss[csvctx.Order[i]]))
@@ -220,19 +228,72 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 	return errlist
 }
 
-// ParseRenewOptions reads properties into the database from eht supplied file
+// HandleRenewOptions reads properties into the database from the supplied file
+//
+// The intput will be a string in the form:  [x;opt;amount[;]]...
+//
+// x      = either a date or a number.  We try to parse it as a date first, if that
+//          fails we parse it as a number. If that fails we return an error.
+// amount = the amount for rent
+//
+// Example:
+//			7/4/2024;109709.45;7/4/2025;111903.63;7/4/2026;114141.71
 //
 // INPUTS
-// fname = name of the csv file with Property data
+// s       = semicolon-separated list of values
+// lineno  = current line in csv file
+// errlist = list of errors encountered
 //
 // RETURNS
-// a list of errors encountered. If there were no errors the length of the list
-// will be 0.
+// []db.RenewOption parsed from s
+// errlist
 //------------------------------------------------------------------------------
-func ParseRenewOptions(s string) ([]db.RenewOptions, error) {
-	var ROs []db.RenewOptions
-	var err error
-	return ROs, err
+func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption, []error) {
+	var ROs []db.RenewOption
+
+	ss := strings.Split(s, ";")
+	lss := len(ss)
+	if lss < 2 {
+		return ROs, errlist
+	}
+	if len(ss)%2 != 0 {
+		errlist = append(errlist, fmt.Errorf("Arguments in %q are not a multiple of 2", s))
+		return ROs, errlist
+	}
+
+	// util.Console("len(ss) = %d\n", len(ss))
+	for i := 0; i < len(ss); i += 2 {
+		var ro db.RenewOption
+		var x time.Time
+		var el []error
+		// util.Console("i = %d, ss[i] = %q, ss[i+1 = %q]\n", i, ss[i], ss[i+1])
+		x, el = ParseDate(ss[i], lineno, el)
+		if len(el) == 0 {
+			ro.Dt = x
+			ro.FLAGS |= 0x1 // set bit 1, indicate Dt is valid
+		} else {
+			j, err := strconv.ParseInt(ss[i], 10, 64)
+			if err != nil {
+				errlist = append(errlist, fmt.Errorf("Line %d: no valid date or number found", lineno))
+				return ROs, errlist
+			}
+			// FLAGS bit 0 defaults to 0 -> Count is valid, no FLAGS updated needed
+			ro.Count = j
+		}
+		ro.Rent, errlist = ParseFloat64(ss[i+1], lineno, errlist)
+		ROs = append(ROs, ro)
+	}
+
+	// one more check.  Make sure we have consistent FLAGS bit 0.  That is, we
+	// either specify dates, or counts, but not both
+	//--------------------------------------------------------------------------
+	for i := 1; i < len(ROs); i++ {
+		if ROs[0].FLAGS&0x1 != ROs[i].FLAGS&0x1 {
+			errlist = append(errlist, fmt.Errorf("Line %d: inconsistent formats for Renew options, date versus option period", lineno))
+		}
+	}
+
+	return ROs, errlist
 }
 
 // ImportPropertyFile reads properties into the database from eht supplied file

@@ -118,9 +118,13 @@ func GetContext(dbctx context.Context, fname string, h HandlerFunc) (Context, er
 	//--------------------------------------------------
 	// Strip the whitespace from the column titles...
 	//--------------------------------------------------
-	var pcount = len(cols)
+	var pcount = len(CanonicalPropertyList)
 	ctx.Order = make([]int, pcount)
+	nocols := len(cols) // number of columns in the supplied csv file
 	for i := 0; i < pcount; i++ {
+		if i >= nocols {
+			continue
+		}
 		rec = append(rec, util.Stripchars(cols[i], " \r\n\t"))
 		ctx.Order[i] = -1 // initialize to indicate no mapping for this column
 	}
@@ -142,6 +146,9 @@ func GetContext(dbctx context.Context, fname string, h HandlerFunc) (Context, er
 		//------------------------------------------------------------------
 		ctx.ColumnDefs[i].Index = -1 // assume we don't find it
 		for j := 0; j < pcount; j++ {
+			if j >= nocols {
+				continue
+			}
 			if nameMatch(rec[j], &ctx.ColumnDefs[i]) {
 				rec[j] = ""                 // don't need to look for this any further
 				ctx.ColumnDefs[i].Index = j // col j of the csv matches CanonicalIndex i

@@ -16,7 +16,7 @@ type RentSteps struct {
 	LastModBy   int64      // id of user that did the modify
 	CreateTS    time.Time  // when was this record created
 	CreateBy    int64      // id of user that created it
-	RS          []RentStep // associated slice of RentStep records
+	RSs         []RentStep // associated slice of RentStep records
 }
 
 // DeleteRentSteps deletes the RentSteps with the specified id from the database

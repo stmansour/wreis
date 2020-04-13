@@ -12,9 +12,10 @@ import (
 type RenewOption struct {
 	ROID        int64     // unique id for this record
 	ROLID       int64     // id of RenewOptionList to which this record belongs
-	Count       int64     // count, valid when ROLID.FLAGS bit 0 = 0
+	Count       int64     // count valid when ROLID.FLAGS bit 0 = 0
 	Dt          time.Time // date for the rent amount, valid when ROLID.FLAGS bit 0 = 1
 	Rent        float64   // amount of rent on the associated date
+	FLAGS       uint64    // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
 	CreateTS    time.Time // when was this record created
@@ -74,6 +75,7 @@ func InsertRenewOption(ctx context.Context, a *RenewOption) (int64, error) {
 		a.Count,
 		a.Dt,
 		a.Rent,
+		a.FLAGS,
 		a.CreateBy,
 		a.LastModBy,
 	}
@@ -101,6 +103,7 @@ func ReadRenewOption(row *sql.Row, a *RenewOption) error {
 		&a.Count,
 		&a.Dt,
 		&a.Rent,
+		&a.FLAGS,
 		&a.CreateTS,
 		&a.CreateBy,
 		&a.LastModTime,
@@ -125,6 +128,7 @@ func UpdateRenewOption(ctx context.Context, a *RenewOption) error {
 		a.Count,
 		a.Dt,
 		a.Rent,
+		a.FLAGS,
 		a.LastModBy,
 		a.ROID,
 	}

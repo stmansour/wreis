@@ -109,7 +109,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Rent Step
 	//==========================================
-	flds = "RSID,RSLID,Count,Dt,Rent,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "RSID,RSLID,Count,Dt,Rent,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentStep"] = flds
 	Wdb.Prepstmt.GetRentStep, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentStep where RSID=?")
 	Errcheck(err)
@@ -139,7 +139,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Renew Option
 	//==========================================
-	flds = "ROID,ROLID,Count,Dt,Rent,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "ROID,ROLID,Count,Dt,Rent,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RenewOption"] = flds
 	Wdb.Prepstmt.GetRenewOption, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOption where ROID=?")
 	Errcheck(err)

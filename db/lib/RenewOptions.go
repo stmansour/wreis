@@ -16,7 +16,7 @@ type RenewOptions struct {
 	LastModBy   int64         // id of user that did the modify
 	CreateTS    time.Time     // when was this record created
 	CreateBy    int64         // id of user that created it
-	RO          []RenewOption // associated slice of RenewOption records
+	ROs         []RenewOption // associated slice of RenewOption records
 }
 
 // DeleteRenewOptions deletes the RenewOptions with the specified id from the database
