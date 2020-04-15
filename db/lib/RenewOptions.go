@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"mojo/util"
 	"time"
 )
 
@@ -97,7 +96,6 @@ func InsertRenewOptionsWithList(ctx context.Context, a *RenewOptions) (int64, er
 	if err != nil {
 		return id, err
 	}
-	util.Console("InsertRenewOptionsWithList: created id = %d\n", id)
 	l := len(a.RO)
 	for i := 0; i < l; i++ {
 		a.RO[i].ROLID = id
@@ -105,7 +103,6 @@ func InsertRenewOptionsWithList(ctx context.Context, a *RenewOptions) (int64, er
 			return id, err
 		}
 	}
-	util.Console("InsertRenewOptionsWithList: returning id = %d\n", id)
 	return id, err
 }
 
