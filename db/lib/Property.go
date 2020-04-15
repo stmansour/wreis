@@ -161,6 +161,33 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 	return a.PRID, err
 }
 
+// InsertPropertyWithLists writes a new Property record to the database and
+//     creates the RentSteps and RenewOptions if needed
+//
+// INPUTS
+// ctx - db context
+// a   - pointer to struct to fill
+//
+// RETURNS
+// id of the record just inserted
+// any error encountered or nil if no error
+//-----------------------------------------------------------------------------
+func InsertPropertyWithLists(ctx context.Context, a *Property) (int64, error) {
+	var id int64
+	var err error
+	if len(a.RO.RO) > 0 {
+		if a.ROLID, err = InsertRenewOptionsWithList(ctx, &a.RO); err != nil {
+			return id, err
+		}
+	}
+	if len(a.RS.RS) > 0 {
+		if a.RSLID, err = InsertRentStepsWithList(ctx, &a.RS); err != nil {
+			return id, err
+		}
+	}
+	return InsertProperty(ctx, a)
+}
+
 // ReadProperty reads a full Property structure of data from the database based
 // on the supplied Rows pointer.
 //

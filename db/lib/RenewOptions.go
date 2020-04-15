@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"mojo/util"
 	"time"
 )
 
@@ -16,7 +17,7 @@ type RenewOptions struct {
 	LastModBy   int64         // id of user that did the modify
 	CreateTS    time.Time     // when was this record created
 	CreateBy    int64         // id of user that created it
-	ROs         []RenewOption // associated slice of RenewOption records
+	RO          []RenewOption // associated slice of RenewOption records
 }
 
 // DeleteRenewOptions deletes the RenewOptions with the specified id from the database
@@ -77,6 +78,35 @@ func InsertRenewOptions(ctx context.Context, a *RenewOptions) (int64, error) {
 	var err error
 	a.CreateBy, a.LastModBy, a.RSLID, err = genericInsert(ctx, "RenewOptions", Wdb.Prepstmt.InsertRenewOptions, fields, a)
 	return a.RSLID, err
+}
+
+// InsertRenewOptionsWithList writes a new RenewOptions record to the database
+//    and if there are any RenewOption structures in the list, it will write
+//    and those as well as updating their ROLID value.
+//
+// INPUTS
+// ctx - db context
+// a   - pointer to struct to fill
+//
+// RETURNS
+// id of the record just inserted
+// any error encountered or nil if no error
+//-----------------------------------------------------------------------------
+func InsertRenewOptionsWithList(ctx context.Context, a *RenewOptions) (int64, error) {
+	id, err := InsertRenewOptions(ctx, a)
+	if err != nil {
+		return id, err
+	}
+	util.Console("InsertRenewOptionsWithList: created id = %d\n", id)
+	l := len(a.RO)
+	for i := 0; i < l; i++ {
+		a.RO[i].ROLID = id
+		if _, err = InsertRenewOption(ctx, &a.RO[i]); err != nil {
+			return id, err
+		}
+	}
+	util.Console("InsertRenewOptionsWithList: returning id = %d\n", id)
+	return id, err
 }
 
 // ReadRenewOptions reads a full RenewOptions structure of data from the database based

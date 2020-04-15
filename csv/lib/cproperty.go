@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 	db "wreis/db/lib"
-	util "wreis/util/lib"
 )
 
 // cproperty.go defines structures needed to parse a Property csv file
@@ -208,9 +207,9 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			u, errlist = GetBitFlagValue(ss[csvctx.Order[i]], 1<<2, errlist)
 			p.FLAGS |= u
 		case PRRenewOptions:
-			p.RO.ROs, errlist = HandleRenewOptions(ss[csvctx.Order[i]], lineno, errlist)
-			if len(errlist) == 0 && len(p.RO.ROs) > 0 {
-				p.RO.FLAGS |= p.RO.ROs[0].FLAGS & 0x1
+			p.RO.RO, errlist = HandleRenewOptions(ss[csvctx.Order[i]], lineno, errlist)
+			if len(errlist) == 0 && len(p.RO.RO) > 0 {
+				p.RO.FLAGS |= p.RO.RO[0].FLAGS & 0x1
 			}
 		}
 		if len(errlist) > 0 {
@@ -218,11 +217,26 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			break
 		}
 	}
-
-	util.Console("Line: %d p = %#v\n", lineno, p)
-	_, err := db.InsertProperty(csvctx.dbctx, &p)
+	// ------------------
+	// START TRANSACTION
+	// ------------------
+	tx, ctx, err := db.NewTransactionWithContext(csvctx.dbctx)
 	if err != nil {
 		errlist = append(errlist, err)
+		return errlist
+	}
+	if _, err = db.InsertPropertyWithLists(ctx, &p); err != nil {
+		tx.Rollback()
+		errlist = append(errlist, err)
+		return errlist
+	}
+	// ------------------
+	// COMMIT TRANSACTION
+	// ------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		errlist = append(errlist, err)
+		return errlist
 	}
 
 	return errlist
@@ -249,16 +263,16 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 // errlist
 //------------------------------------------------------------------------------
 func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption, []error) {
-	var ROs []db.RenewOption
+	var RO []db.RenewOption
 
 	ss := strings.Split(s, ";")
 	lss := len(ss)
 	if lss < 2 {
-		return ROs, errlist
+		return RO, errlist
 	}
 	if len(ss)%2 != 0 {
 		errlist = append(errlist, fmt.Errorf("Arguments in %q are not a multiple of 2", s))
-		return ROs, errlist
+		return RO, errlist
 	}
 
 	// util.Console("len(ss) = %d\n", len(ss))
@@ -275,25 +289,25 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 			j, err := strconv.ParseInt(ss[i], 10, 64)
 			if err != nil {
 				errlist = append(errlist, fmt.Errorf("Line %d: no valid date or number found", lineno))
-				return ROs, errlist
+				return RO, errlist
 			}
 			// FLAGS bit 0 defaults to 0 -> Count is valid, no FLAGS updated needed
 			ro.Count = j
 		}
 		ro.Rent, errlist = ParseFloat64(ss[i+1], lineno, errlist)
-		ROs = append(ROs, ro)
+		RO = append(RO, ro)
 	}
 
 	// one more check.  Make sure we have consistent FLAGS bit 0.  That is, we
 	// either specify dates, or counts, but not both
 	//--------------------------------------------------------------------------
-	for i := 1; i < len(ROs); i++ {
-		if ROs[0].FLAGS&0x1 != ROs[i].FLAGS&0x1 {
+	for i := 1; i < len(RO); i++ {
+		if RO[0].FLAGS&0x1 != RO[i].FLAGS&0x1 {
 			errlist = append(errlist, fmt.Errorf("Line %d: inconsistent formats for Renew options, date versus option period", lineno))
 		}
 	}
 
-	return ROs, errlist
+	return RO, errlist
 }
 
 // ImportPropertyFile reads properties into the database from eht supplied file

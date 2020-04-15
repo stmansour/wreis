@@ -19,6 +19,7 @@ relink:
 
 test: functest
 	@touch fail
+	mysql --no-defaults < ../../db/schema/db.sql
 	./functest
 	@echo "*** TEST completed in ${THISDIR} ***"
 	@rm -f fail

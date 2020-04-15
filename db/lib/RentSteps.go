@@ -16,7 +16,7 @@ type RentSteps struct {
 	LastModBy   int64      // id of user that did the modify
 	CreateTS    time.Time  // when was this record created
 	CreateBy    int64      // id of user that created it
-	RSs         []RentStep // associated slice of RentStep records
+	RS          []RentStep // associated slice of RentStep records
 }
 
 // DeleteRentSteps deletes the RentSteps with the specified id from the database
@@ -77,6 +77,31 @@ func InsertRentSteps(ctx context.Context, a *RentSteps) (int64, error) {
 	var err error
 	a.CreateBy, a.LastModBy, a.RSLID, err = genericInsert(ctx, "RentSteps", Wdb.Prepstmt.InsertRentSteps, fields, a)
 	return a.RSLID, err
+}
+
+// InsertRentStepsWithList writes a new RentSteps record to the database
+//
+// INPUTS
+// ctx - db context
+// a   - pointer to struct to fill
+//
+// RETURNS
+// id of the record just inserted
+// any error encountered or nil if no error
+//-----------------------------------------------------------------------------
+func InsertRentStepsWithList(ctx context.Context, a *RentSteps) (int64, error) {
+	id, err := InsertRentSteps(ctx, a)
+	if err != nil {
+		return id, err
+	}
+	l := len(a.RS)
+	for i := 0; i < l; i++ {
+		a.RS[i].RSLID = id
+		if _, err = InsertRentStep(ctx, &a.RS[i]); err != nil {
+			return id, err
+		}
+	}
+	return id, err
 }
 
 // ReadRentSteps reads a full RentSteps structure of data from the database based
