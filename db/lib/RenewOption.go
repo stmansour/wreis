@@ -14,6 +14,7 @@ type RenewOption struct {
 	ROLID       int64     // id of RenewOptionList to which this record belongs
 	Count       int64     // count valid when ROLID.FLAGS bit 0 = 0
 	Dt          time.Time // date for the rent amount, valid when ROLID.FLAGS bit 0 = 1
+	Opt         int64     // option number, 1 .. n
 	Rent        float64   // amount of rent on the associated date
 	FLAGS       uint64    // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
 	LastModTime time.Time // when was the record last written
