@@ -109,7 +109,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Rent Step
 	//==========================================
-	flds = "RSID,RSLID,Count,Dt,Rent,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "RSID,RSLID,Count,Dt,Opt,Rent,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentStep"] = flds
 	Wdb.Prepstmt.GetRentStep, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentStep where RSID=?")
 	Errcheck(err)

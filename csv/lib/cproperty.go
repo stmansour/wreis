@@ -211,6 +211,11 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			if len(errlist) == 0 && len(p.RO.RO) > 0 {
 				p.RO.FLAGS |= p.RO.RO[0].FLAGS & 0x1
 			}
+		case PRRentSteps:
+			p.RS.RS, errlist = HandleRentSteps(ss[csvctx.Order[i]], lineno, errlist)
+			if len(errlist) == 0 && len(p.RS.RS) > 0 {
+				p.RS.FLAGS |= p.RS.RS[0].FLAGS & 0x1
+			}
 		}
 		if len(errlist) > 0 {
 			errlist = append(errlist, fmt.Errorf("PropertyHandler: last error was detected on value for: %s = %s", CanonicalPropertyList[i].Name, ss[csvctx.Order[i]]))
@@ -329,6 +334,95 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 	}
 
 	return RO, errlist
+}
+
+// HandleRentSteps reads properties into the database from the supplied file
+//
+// The intput will be a string in the form:  [x;opt;amount[;]]...
+//
+// x      = either a date or a number.  We try to parse it as a date first, if that
+//          fails we parse it as a number. If that fails we return an error.
+// opt    = a count, a number, 1, 2, ...
+// amount = the amount for rent
+//
+// Example:
+//			7/4/2024;1;109709.45;7/4/2025;2;111903.63;7/4/2026;3;11295.34
+//
+// INPUTS
+// s       = semicolon-separated list of values
+// lineno  = current line in csv file
+// errlist = list of errors encountered
+//
+// RETURNS
+// []db.RentStep parsed from s
+// errlist
+//------------------------------------------------------------------------------
+func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []error) {
+	var RS []db.RentStep
+	var ntuple = 3 // 3 items per entry: x, opt, amount
+
+	ss := strings.Split(s, ";")
+	lss := len(ss)
+	if lss < ntuple {
+		return RS, errlist
+	}
+	if len(ss)%ntuple != 0 {
+		errlist = append(errlist, fmt.Errorf("Arguments in %q are not a multiple of %d", s, ntuple))
+		return RS, errlist
+	}
+
+	for i := 0; i < len(ss); i += ntuple {
+		var rs db.RentStep
+		var x time.Time
+		var el []error
+		var err error
+		var j int64
+		//--------------------------------------------------------------------
+		// First index can be either a date or a number, determine which...
+		//--------------------------------------------------------------------
+		x, el = ParseDate(ss[i], lineno, el) // index i -> "7/4/2024"
+		if len(el) > 0 {
+			j, err = strconv.ParseInt(ss[i], 10, 64)
+			if err != nil {
+				errlist = append(errlist, fmt.Errorf("Line %d: no valid date or number found: %q", lineno, ss[i]))
+				return RS, errlist
+			}
+		}
+		//--------------------------------------------------------------------
+		// If it was a date, then there will be no error from ParseDate..
+		//--------------------------------------------------------------------
+		if len(el) == 0 {
+			rs.Dt = x
+			rs.Count = j    // the number already parsed above
+			rs.FLAGS |= 0x1 // set bit 1, indicate Dt is valid
+		} else {
+			// FLAGS bit 0 defaults to 0 -> Count is valid, no FLAGS updated needed
+			rs.Count = j
+		}
+		rs.Opt, err = strconv.ParseInt(ss[i+1], 10, 64) // index i+1 holds the opt number
+		if err != nil {
+			errlist = append(errlist, fmt.Errorf("Line %d: invalid opt number found: %q", lineno, ss[i+1]))
+			return RS, errlist
+		}
+
+		rs.Rent, el = ParseFloat64(ss[i+2], lineno, errlist) // index i+2 holds the Amount
+		if len(el) > 0 {
+			errlist = append(errlist, el[0]) // add the error to the list we'll be returning
+			return RS, errlist
+		}
+		RS = append(RS, rs)
+	}
+
+	// one more check.  Make sure we have consistent FLAGS bit 0.  That is, we
+	// either specify dates, or counts, but not both
+	//--------------------------------------------------------------------------
+	for i := 1; i < len(RS); i++ {
+		if RS[0].FLAGS&0x1 != RS[i].FLAGS&0x1 {
+			errlist = append(errlist, fmt.Errorf("Line %d: inconsistent formats for Renew options, date versus option period", lineno))
+		}
+	}
+
+	return RS, errlist
 }
 
 // ImportPropertyFile reads properties into the database from eht supplied file

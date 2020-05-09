@@ -122,6 +122,7 @@ CREATE TABLE RentStep (
     RSLID BIGINT NOT NULL DEFAULT 0,                        -- RentStep List ID to which this RS belongs
     Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
     Count BIGINT NOT NULL DEFAULT 0,                        -- count - valid only win ROLID FLAGS bit 0 = 0
+    Opt BIGINT NOT NULL DEFAULT 0,                          -- option period
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
