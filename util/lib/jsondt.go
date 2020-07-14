@@ -13,15 +13,6 @@ var TIME0 = time.Date(0, time.January, 0, 0, 0, 0, 0, time.UTC)
 // ENDOFTIME can be used when there is no end time
 var ENDOFTIME = time.Date(9999, time.December, 31, 0, 0, 0, 0, time.UTC)
 
-// XJSONYesNo is a UI converter: back-end int, UI: string
-type XJSONYesNo string
-
-// YesNoMap is the mapping for no = 0, 1 = yes
-var YesNoMap = Str2Int64Map{
-	"no":  int64(0),
-	"yes": int64(1),
-}
-
 // JSONDate is a wrapper around time.Time. We need it
 // in order to be able to control the formatting used
 // on the date values sent to the w2ui controls.  Without
