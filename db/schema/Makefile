@@ -1,5 +1,5 @@
 TOPDIR="../.."
-DIST=wreis
+DIST=${TOPDIR}/dist/wreis
 THISDIR=schema
 
 schema:
@@ -19,7 +19,8 @@ test:
 	@echo "*** TEST completed in ${THISDIR} ***"
 
 package:
-	cp schema.sql ../../dist/${DIST}
+	mkdir -p ${DIST}
+	cp schema.sql ${DIST}/
 	@echo "*** PACKAGE completed in ${THISDIR} ***"
 
 secure:
