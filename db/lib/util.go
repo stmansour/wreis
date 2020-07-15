@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"extres"
 	"fmt"
-	"mojo/util"
 	"runtime/debug"
+	util "wreis/util/lib"
 )
 
 // SkipSQLNoRowsError assing nil to original err variable

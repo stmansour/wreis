@@ -7,12 +7,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"mojo/db"
-	"mojo/util"
 	"net/http"
 	"os"
 	"phonebook/lib"
 	"strings"
+	db "wreis/db/lib"
+	util "wreis/util/lib"
 	"wreis/ws"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,7 +23,7 @@ var App struct {
 	db        *sql.DB
 	DBName    string
 	DBUser    string
-	Port      int      // port on which mojo listens
+	Port      int      // port on which wreis listens
 	LogFile   *os.File // where to log messages
 	fname     string
 	startName string
@@ -50,7 +50,7 @@ func initHTTP() {
 }
 
 func readCommandLineArgs() {
-	portPtr := flag.Int("p", 8275, "port on which mojo server listens")
+	portPtr := flag.Int("p", 8276, "port on which wsrv server listens")
 	vptr := flag.Bool("v", false, "Show version, then exit")
 	flag.Parse()
 	if *vptr {
@@ -72,33 +72,34 @@ func main() {
 	//==============================================
 	// Open the logfile and begin logging...
 	//==============================================
-	App.LogFile, err = os.OpenFile("mojo.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	App.LogFile, err = os.OpenFile("wsrv.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	lib.Errcheck(err)
 	defer App.LogFile.Close()
 	log.SetOutput(App.LogFile)
-	util.Ulog("*** Accord MOJO ***\n")
+	util.Ulog("*** WREIS WERTZ REAL ESTATE INVESTMENT SERVICES ***\n")
 
 	// Get the database...
 	// s := "<awsdbusername>:<password>@tcp(<rdsinstancename>:3306)/accord"
-	s := extres.GetSQLOpenString(db.MojoDBConfig.MojoDbname, &db.MojoDBConfig)
+	s := extres.GetSQLOpenString(db.Wdb.Config.WREISDbname, &db.Wdb.Config)
 	App.db, err = sql.Open("mysql", s)
 	if nil != err {
-		fmt.Printf("sql.Open for database=%s, dbuser=%s: Error = %v\n", db.MojoDBConfig.MojoDbname, db.MojoDBConfig.MojoDbuser, err)
+		fmt.Printf("sql.Open for database=%s, dbuser=%s: Error = %v\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, err)
 		os.Exit(1)
 	}
 	defer App.db.Close()
 
 	err = App.db.Ping()
 	if nil != err {
-		fmt.Printf("App.db.Ping for database=%s, dbuser=%s: Error = %v\n", db.MojoDBConfig.MojoDbname, db.MojoDBConfig.MojoDbuser, err)
+		fmt.Printf("App.db.Ping for database=%s, dbuser=%s: Error = %v\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, err)
 		os.Exit(1)
 	}
-	db.InitDB(App.db)
-	db.BuildPreparedStatements()
+	db.Init(App.db)              // initializes database
+	db.SessionInit(10)           // we must have login sessions
+	db.BuildPreparedStatements() // the prepared statement for db access
 	initHTTP()
 	util.Ulog("mojosrv initiating HTTP service on port %d\n", App.Port)
-	util.Ulog("Using database: %s , host = %s, port = %d\n", db.MojoDBConfig.MojoDbname, db.MojoDBConfig.MojoDbhost, db.MojoDBConfig.MojoDbport)
-	fmt.Printf("Using database: %s , host = %s, port = %d\n", db.MojoDBConfig.MojoDbname, db.MojoDBConfig.MojoDbhost, db.MojoDBConfig.MojoDbport)
+	util.Ulog("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
+	fmt.Printf("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 
 	//go http.ListenAndServeTLS(fmt.Sprintf(":%d", App.Port+1), App.CertFile, App.KeyFile, nil)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", App.Port), nil)

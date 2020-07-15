@@ -25,7 +25,7 @@ var App struct {
 func readCommandLineArgs() {
 	dbuPtr := flag.String("B", "ec2-user", "database user name")
 	dbrrPtr := flag.String("M", "wreis", "database name (wreis)")
-	portPtr := flag.Int("p", 8275, "port on which WREIS server listens")
+	portPtr := flag.Int("p", 8276, "port on which WREIS server listens")
 	noauth := flag.Bool("noauth", false, "if specified, inhibit authentication")
 
 	flag.Parse()

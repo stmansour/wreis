@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"mojo/util"
 	"time"
+	util "wreis/util/lib"
 
 	"github.com/kardianos/osext"
 )

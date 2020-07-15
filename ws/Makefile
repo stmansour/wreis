@@ -34,3 +34,6 @@ mkprod:
 	cp confprod.json config.json
 secure:
 	@rm -f config.json confdev.json confprod.json
+
+package:
+	@echo "*** ${THISDIR}: completed package ***"

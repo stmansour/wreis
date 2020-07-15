@@ -7,10 +7,10 @@ import (
 	"rentroll/rlib"
 )
 
-// MojoUISupport is a structure of data that will be passed to all html pages.
+// WREISUISupport is a structure of data that will be passed to all html pages.
 // It is the responsibility of the page function to populate the data needed by
 // the page. The recommendation is to populate only the data needed.
-type MojoUISupport struct {
+type WREISUISupport struct {
 	Language string // what language
 	Template string // which template
 	ErrMsg   string
@@ -26,7 +26,7 @@ type MojoUISupport struct {
 // <tmpl> specifies which template to use. The default is "dflt"
 //------------------------------------------------------------------
 func HomeUIHandler(w http.ResponseWriter, r *http.Request) {
-	var ui MojoUISupport
+	var ui WREISUISupport
 	var err error
 	funcname := "HomeUIHandler"
 	appPage := "home.html"

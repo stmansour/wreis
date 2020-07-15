@@ -8,3 +8,6 @@ clean:
 
 test:
 	for dir in $(DIRS); do make -C $$dir test;done
+
+package:
+	for dir in $(DIRS); do make -C $$dir package;done

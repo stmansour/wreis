@@ -12,13 +12,22 @@ server: *.go config.json
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed mojosrv ***"
 
+# you can update the config files as follows:
+# $ jfrog rt u[pload] confdev.json accord/misc/
+# $ deployfile.sh confdev.json accord/db/
+
 config.json:
 	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
 	cp confdev.json config.json
 
+pushconf: confdev.json
+	jfrog rt u confdev.json accord/misc/
+	/usr/local/accord/bin/deployfile.sh confdev.json accord/db/
+
 package: server
 	mkdir -p ${BINDIR}
 	cp server ${BINDIR}/wsrv
+	cp confdev.json ${BINDIR}/config.json
 
 ver.go:
 	./mkver.sh
