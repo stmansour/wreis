@@ -97,7 +97,7 @@ func main() {
 	db.SessionInit(10)           // we must have login sessions
 	db.BuildPreparedStatements() // the prepared statement for db access
 	initHTTP()
-	util.Ulog("mojosrv initiating HTTP service on port %d\n", App.Port)
+	util.Ulog("wsrv initiating HTTP service on port %d\n", App.Port)
 	util.Ulog("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 	fmt.Printf("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 

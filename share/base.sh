@@ -71,7 +71,14 @@ if [ "x${RRBIN}" = "x" ]; then
 else
 	echo "RBIN was pre-set to:  \"${RRBIN}\""
 fi
-TREPORT="${RRBIN}/../../test/testreport.txt"
+if [ "x${WSRVBIN}" = "x" ]; then
+	WSRVBIN="../../dist/wreis"
+else
+	echo "WSRVBIN was pre-set to:  \"${WSRVBIN}\""
+fi
+
+TREPORT="${WSRVBIN}/../../test/testreport.txt"
+WSRV="${WSRVBIN}/wsrv"
 
 RENTROLL="${RRBIN}/rentroll -A ${NOCONSOLE} -noauth"
 CSVLOAD="${RRBIN}/rrloadcsv ${NOCONSOLE} -noauth"
@@ -314,6 +321,10 @@ forcemsg() {
 	printf "FORCED  %-20.20s  %-40.40s  %6d  \n" "${TESTDIR}" "${TESTNAME}" ${TESTCOUNT} >> ${TREPORT}
 }
 
+#############################################################################
+# tdir is used to set the internal variable TESTDIR to the directory where
+# the script is located
+#############################################################################
 tdir() {
 	local IFS=/
 	local p n m
@@ -890,6 +901,36 @@ startRentRollServer() {
 stopRentRollServer() {
 	if [ ${MANAGESERVER} -eq 1 ]; then
 		killall rentroll > /dev/null 2>&1
+		sleep 1
+	fi
+}
+
+
+#########################################################
+# startWsrv()
+#	Kills any currently running instances of the server
+#   then starts it up again. Configuration of the server
+#   should be done using a config.json file.
+#########################################################
+startWsrv() {
+	if [ ${MANAGESERVER} -eq 1 ]; then
+		stopWsrv
+		cmd="${WSRV} > ${WSRVBIN}/wsrvlog 2>&1 &"
+		echo "${cmd}"
+		${WSRV} > ${WSRVBIN}/wsrvlog 2>&1 &
+		sleep 1
+		rm -f wsrvlog
+		ln -s ${WSRVBIN}/wsrvlog
+	fi
+}
+
+#########################################################
+# stopWsrv()
+#	Kills any currently running instances of the server
+#########################################################
+stopWsrv() {
+	if [ ${MANAGESERVER} -eq 1 ]; then
+		killall wsrv > /dev/null 2>&1
 		sleep 1
 	fi
 }

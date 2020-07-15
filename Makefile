@@ -1,4 +1,5 @@
-DIRS=util db csv ws server
+DIRS=util db csv ws server test
+.PHONY: test
 
 wreis:
 	for dir in $(DIRS); do make -C $$dir;done
@@ -14,3 +15,5 @@ package:
 	for dir in $(DIRS); do make -C $$dir package;done
 
 all: clean wreis package test
+	echo "Completed"
+	cat test/testreport.txt
