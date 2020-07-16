@@ -10,6 +10,12 @@ import (
 
 // PropertyGrid contains the data from Property that is targeted to the UI Grid that displays
 // a list of Property structs
+
+//-------------------------------------------------------------------
+//                        **** SEARCH ****
+//-------------------------------------------------------------------
+
+// PropertyGrid is the structure of data for a property we send to the UI
 type PropertyGrid struct {
 	Recid             int64 `json:"recid"`
 	PID               int64
@@ -28,10 +34,12 @@ type PropertyGrid struct {
 	CapRate           float64
 	AvgCap            float64
 	BuildDate         time.Time
+	//======================================================================
 	// FLAGS
 	//     1<<0  Drive Through?  0 = no, 1 = yes
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
+	//======================================================================
 	FLAGS                uint64
 	Ownership            int
 	TenantTradeName      string
@@ -62,16 +70,48 @@ type PropertyGrid struct {
 	RS                   db.RentSteps    // contains the list of RentSteps and context
 }
 
-// SvcHandlerProperty formats a complete data record for an assessment for use with the w2ui Form
+// SearchPropertyResponse is the response data for a Rental Agreement Search
+type SearchPropertyResponse struct {
+	Status  string         `json:"status"`
+	Total   int64          `json:"total"`
+	Records []PropertyGrid `json:"records"`
+}
+
+//-------------------------------------------------------------------
+//                         **** SAVE ****
+//-------------------------------------------------------------------
+
+// SaveProperty is sent to save one of open time slots as a reservation
+type SaveProperty struct {
+	Cmd    string       `json:"cmd"`
+	Record PropertyGrid `json:"record"`
+}
+
+//-------------------------------------------------------------------
+//                         **** GET ****
+//-------------------------------------------------------------------
+
+// GetProperty is the struct returned on a request for a reservation.
+type GetProperty struct {
+	Status string       `json:"status"`
+	Record PropertyGrid `json:"record"`
+}
+
+//-----------------------------------------------------------------------------
+//##########################################################################################################################################################
+//-----------------------------------------------------------------------------
+
+// SvcHandlerProperty formats a complete data record for an assessment for use
+// with the w2ui Form
 // For this call, we expect the URI to contain the BID and the PID as follows:
 //
 // The server command can be:
 //      get
 //      save
 //      delete
-//-----------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
-	util.Console("Entered SvcHandlerProperty\n")
+	util.Console("Entered SvcHandlerProperty, d.ID = %d\n", d.ID)
 
 	switch d.wsSearchReq.Cmd {
 	case "get":
@@ -113,13 +153,12 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "SvcSearchProperty"
 	util.Console("Entered %s\n", funcname)
 
-	// var g PropertySearchResponse
-	//
-	// util.Console("g.Total = %d\n", g.Total)
-	// w.Header().Set("Content-Type", "application/json")
-	// g.Status = "success"
-	// SvcWriteResponse(&g, w)
+	var g SearchPropertyResponse
 
+	util.Console("g.Total = %d\n", g.Total)
+	w.Header().Set("Content-Type", "application/json")
+	g.Status = "success"
+	SvcWriteResponse(&g, w)
 }
 
 // deleteProperty deletes a payment type from the database

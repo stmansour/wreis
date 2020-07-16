@@ -29,14 +29,37 @@ startWsrv
 TFILES="a"
 if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
     echo "Test ${TFILES}"
-    curl -s http://localhost:8276/v1/ping | tee serverreply | cat
+    C=$(curl -s http://localhost:8276/v1/ping | tee serverreply | grep "WREIS - Version 1.0" | wc -l | sed 's/ *//' )
+    if [ "${C}" = "1" ]; then
+        passmsg
+    else
+        failmsg
+    fi
     ((TESTCOUNT++))
-
-
-    # | python -m json.tool >${3} 2>>${LOGFILE}
-
 fi
 
+#------------------------------------------------------------------------------
+#  TEST b
+#
+#  Validate the property search command
+#
+#  Scenario:
+#  Search
+#
+#  Expected Results:
+#   1.
+#   2.
+#------------------------------------------------------------------------------
+TFILES="b"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    # stopWsrv
+    mysql --no-defaults wreis < x${TFILES}.sql
+    # startWsrv
+
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/property/" "request" "${TFILES}${STEP}"  "Property-Search"
+fi
 
 stopWsrv
 echo "WREIS SERVER STOPPED"
