@@ -252,6 +252,70 @@ func ReadProperty(row *sql.Row, a *Property) error {
 	return err
 }
 
+// ReadProperties reads a full Property structure of data from the database based
+// on the supplied Rows pointer.
+//
+// INPUTS
+// row - db Row pointer
+// a   - pointer to struct to fill
+//
+// RETURNS
+//
+// ErrSessionRequired if the session is invalid
+// nil if the session is valid
+//-----------------------------------------------------------------------------
+func ReadProperties(rows *sql.Rows, a *Property) error {
+	err := rows.Scan(
+		&a.PRID,
+		&a.Name,
+		&a.YearsInBusiness,
+		&a.ParentCompany,
+		&a.URL,
+		&a.Symbol,
+		&a.Price,
+		&a.DownPayment,
+		&a.RentableArea,
+		&a.RentableAreaUnits,
+		&a.LotSize,
+		&a.LotSizeUnits,
+		&a.CapRate,
+		&a.AvgCap,
+		&a.BuildDate,
+		&a.FLAGS,
+		&a.Ownership,
+		&a.TenantTradeName,
+		&a.LeaseGuarantor,
+		&a.LeaseType,
+		&a.DeliveryDt,
+		&a.OriginalLeaseTerm,
+		&a.LeaseCommencementDt,
+		&a.LeaseExpirationDt,
+		&a.TermRemainingOnLease,
+		&a.ROLID,
+		&a.RSLID,
+		&a.Address,
+		&a.Address2,
+		&a.City,
+		&a.State,
+		&a.PostalCode,
+		&a.Country,
+		&a.LLResponsibilities,
+		&a.NOI,
+		&a.HQAddress,
+		&a.HQAddress2,
+		&a.HQCity,
+		&a.HQState,
+		&a.HQPostalCode,
+		&a.HQCountry,
+		&a.LastModTime,
+		&a.LastModBy,
+		&a.CreateTS,
+		&a.CreateBy,
+	)
+	SkipSQLNoRowsError(&err)
+	return err
+}
+
 // UpdateProperty updates an existing Property record in the database
 //
 // INPUTS

@@ -10,8 +10,12 @@ dblib: *.go
 	@echo "*** Completed in ${THISDIR} ***"
 
 clean:
-	rm -f log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? ${THISDIR} fail
+	rm -f config.json log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? ${THISDIR} fail
 	@echo "*** CLEAN completed in ${THISDIR} ***"
+
+config.json:
+	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
+	cp confdev.json config.json
 
 relink:
 	go build

@@ -66,8 +66,13 @@ type PropertyGrid struct {
 	HQState              string
 	HQPostalCode         string
 	HQCountry            string
-	RO                   db.RenewOptions // contains the list of RenewOptions and context
-	RS                   db.RentSteps    // contains the list of RentSteps and context
+	CreateTime           util.JSONDateTime
+	CreatedBy            int64
+	LastModifyTime       util.JSONDateTime
+	LastModifyBy         int64
+	//
+	// RO db.RenewOptions // contains the list of RenewOptions and context
+	// RS db.RentSteps    // contains the list of RentSteps and context
 }
 
 // SearchPropertyResponse is the response data for a Rental Agreement Search
@@ -154,11 +159,68 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	util.Console("Entered %s\n", funcname)
 
 	var g SearchPropertyResponse
+	var err error
+
+	//---------------------------------------------
+	// We'll grab all fields for the properties
+	//---------------------------------------------
+	q := fmt.Sprintf("SELECT %s FROM Property ", db.Wdb.DBFields["Property"]) // the fields we want
+
+	// any WHERE clause work store in qw
+	qw := "" // for now, no WHERE clause
+	q += " ORDER BY "
+	order := "PRID ASC" // default ORDER
+	if len(d.wsSearchReq.Sort) > 0 {
+		for i := 0; i < len(d.wsSearchReq.Sort); i++ {
+			if i > 0 {
+				q += ","
+			}
+			q += d.wsSearchReq.Sort[i].Field + " " + d.wsSearchReq.Sort[i].Direction
+		}
+	} else {
+		q += order
+	}
+	// now set up the offset and limit
+	q += fmt.Sprintf(" LIMIT %d OFFSET %d", d.wsSearchReq.Limit, d.wsSearchReq.Offset)
+	g.Total, err = db.GetRowCountRaw("Property", "", qw)
+	if err != nil {
+		util.Console("Error from db.GetRowCountRaw: %s\n", err.Error())
+		SvcGridErrorReturn(w, err)
+		return
+	}
+
+	util.Console("\nQuery = %s\n\n", q)
+	rows, err := db.Wdb.DB.Query(q)
+	if err != nil {
+		util.Console("Error from DB Query: %s\n", err.Error())
+		SvcGridErrorReturn(w, err)
+		return
+	}
+	defer rows.Close()
+
+	i := int64(d.wsSearchReq.Offset)
+	count := 0
+	for rows.Next() {
+		var q PropertyGrid
+		var p db.Property
+		if err = db.ReadProperties(rows, &p); err != nil {
+			util.Console("%s.  Error reading Person: %s\n", funcname, err.Error())
+		}
+		util.MigrateStructVals(&p, &q)
+		q.Recid = p.PRID
+		g.Records = append(g.Records, q)
+		count++ // update the count only after adding the record
+		if count >= d.wsSearchReq.Limit {
+			break // if we've added the max number requested, then exit
+		}
+		i++
+	}
 
 	util.Console("g.Total = %d\n", g.Total)
 	w.Header().Set("Content-Type", "application/json")
 	g.Status = "success"
 	SvcWriteResponse(&g, w)
+
 }
 
 // deleteProperty deletes a payment type from the database

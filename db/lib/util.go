@@ -128,6 +128,32 @@ func ValidateSessionForDBUpdate(ctx context.Context, id2 *int64) error {
 	return nil
 }
 
+// GetRowCountRaw returns the number of database rows in the supplied table with
+// the supplied where clause. The where clause can be empty.
+//
+// INPUTS
+//    table - table are we querying
+//    joins - any join info, can be nil or an empty string
+//    where - the where clause, can be nil or an empty string
+//-----------------------------------------------------------------------------
+func GetRowCountRaw(table, joins, where string) (int64, error) {
+	count := int64(0)
+	var err error
+	s := fmt.Sprintf("SELECT COUNT(*) FROM %s", table)
+	if len(joins) > 0 {
+		s += " " + joins
+	}
+	if len(where) > 0 {
+		s += " " + where
+	}
+	util.Console("\n\nGetRowCountRaw: QUERY = %s\n", s)
+	de := Wdb.DB.QueryRow(s).Scan(&count)
+	if de != nil {
+		err = fmt.Errorf("GetRowCountRaw: query=\"%s\"    err = %s", s, de.Error())
+	}
+	return count, err
+}
+
 func updateError(err error, n string, a interface{}) error {
 	if nil != err {
 		util.Ulog("Update%s: error updating %s:  %v\n", n, n, err)
