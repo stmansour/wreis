@@ -920,7 +920,7 @@ startWsrv() {
 		${WSRV} > ${WSRVBIN}/wsrvlog 2>&1 &
 		sleep 1
 		rm -f wsrvlog
-		ln -s ${WSRVBIN}/wsrvlog
+		ln -s ${WSRVBIN}/slog
 	fi
 }
 
@@ -950,7 +950,11 @@ stopWsrv() {
 dojsonPOST () {
 	((TESTCOUNT++))
 	printf "PHASE %2s  %3s  %s... " ${TESTCOUNT} $3 $4
-	CMD="curl -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
+	COOK=""
+	if [ "${COOKIES}x" != "x" ]; then
+		COOK="${COOKIES}"
+	fi
+	CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
 	${CMD} | tee serverreply | python -m json.tool >${3} 2>>${LOGFILE}
 
 	incStep
@@ -967,7 +971,7 @@ dojsonPOST () {
 		fi
 
 		#--------------------------------------------------------------------
-		# The actual data has timestamp information that changes every run.
+		# The actual data has timestamp and token information that changes every run.
 		# The timestamp can be filtered out for purposes of testing whether
 		# or not the web service could be called and can return the expected
 		# data.
@@ -975,20 +979,8 @@ dojsonPOST () {
 		declare -a out_filters=(
 			's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
 			's/(^[ \t]+"CreateTS":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"ApplicationReadyDate":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"DecisionDate1":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"DecisionDate2":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"MoveInDate":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"ActiveDate":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"NoticeToMoveReported":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"TerminationDate":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"UserRefNo":).*/$1 USEREFNO/'
-			's/(^[ \t]+"AgreementStart":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"AgreementStop":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"RentStart":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"RentStop":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"PossessionStart":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"PossessionStop":).*/$1 TIMESTAMP/'
+			's/(^[ \t]+"Token":).*/$1 TOKEN/'
+			's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
 		)
 		cp gold/${3}.gold qqx
 		cp ${3} qqy

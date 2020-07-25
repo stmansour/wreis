@@ -12,6 +12,7 @@ import (
 	"phonebook/lib"
 	"strings"
 	db "wreis/db/lib"
+	"wreis/session"
 	util "wreis/util/lib"
 	"wreis/ws"
 
@@ -93,9 +94,9 @@ func main() {
 		fmt.Printf("App.db.Ping for database=%s, dbuser=%s: Error = %v\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, err)
 		os.Exit(1)
 	}
-	db.Init(App.db)              // initializes database
-	db.SessionInit(10)           // we must have login sessions
-	db.BuildPreparedStatements() // the prepared statement for db access
+	db.Init(App.db)                 // initializes database
+	session.Init(10, db.Wdb.Config) // we must have login sessions
+	db.BuildPreparedStatements()    // the prepared statement for db access
 	initHTTP()
 	util.Ulog("wsrv initiating HTTP service on port %d\n", App.Port)
 	util.Ulog("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)

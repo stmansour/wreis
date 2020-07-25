@@ -3,8 +3,8 @@ package ws
 import (
 	"fmt"
 	"html/template"
+	"mojo/util"
 	"net/http"
-	"rentroll/rlib"
 )
 
 // WREISUISupport is a structure of data that will be passed to all html pages.
@@ -46,7 +46,7 @@ func HomeUIHandler(w http.ResponseWriter, r *http.Request) {
 	err = t.Execute(w, &ui)
 
 	if nil != err {
-		rlib.LogAndPrintError(funcname, err)
+		util.LogAndPrintError(funcname, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

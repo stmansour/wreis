@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 	db "wreis/db/lib"
+	"wreis/session"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -61,7 +62,7 @@ func main() {
 		os.Exit(1)
 	}
 	db.Init(App.db)
-	db.SessionInit(10)
+	session.Init(10, db.Wdb.Config)
 
 	//------------------------------------------------------------------------
 	// Create a session that this process can use for accessing the database
@@ -69,7 +70,7 @@ func main() {
 	now := time.Now()
 	ctx := context.Background()
 	expire := now.Add(10 * time.Minute)
-	sess := db.SessionNew(
+	sess := session.New(
 		"dbtest-app"+fmt.Sprintf("%010x", expire.Unix()), // token
 		"dbtest",      // username
 		"dbtest-app",  // name string
@@ -77,7 +78,7 @@ func main() {
 		"",            // image url
 		-1,            // security role id
 		&expire)       // expiredt
-	ctx = db.SetSessionContextKey(ctx, sess)
+	ctx = session.SetSessionContextKey(ctx, sess)
 
 	TestRentStep(ctx)
 	TestRentSteps(ctx)

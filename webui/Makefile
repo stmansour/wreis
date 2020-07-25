@@ -8,7 +8,7 @@ webui:
 	@touch fail
 	# insert steps here...
 	@rm -f fail
-	@echo "*** ${THISDIR}: completed mojosrv ***"
+	@echo "*** ${THISDIR}: completed webui ***"
 
 jshint:
 	@touch fail
@@ -23,7 +23,7 @@ package:
 	@touch fail
 	mkdir -p ${BINDIR}
 	cp -r html ${BINDIR}/
-	if [ -d "./js" ]; then cp -r js ${BINDIR}/; fi
+	if [ -d "./js" ]; then mkdir -p ${BINDIR}/js;cp js/*.js ${BINDIR}/js/;cp js/elems/*.js ${BINDIR}/js; fi
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed package ***"
 

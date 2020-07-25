@@ -124,7 +124,7 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 			SvcSearchProperty(w, r, d) // it is a query for the grid.
 		} else {
 			if d.ID < 0 {
-				SvcGridErrorReturn(w, fmt.Errorf("PropertyID is required but was not specified"))
+				SvcErrorReturn(w, fmt.Errorf("PropertyID is required but was not specified"))
 				return
 			}
 			getProperty(w, r, d)
@@ -137,7 +137,7 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 		deleteProperty(w, r, d)
 	default:
 		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
-		SvcGridErrorReturn(w, err)
+		SvcErrorReturn(w, err)
 		return
 	}
 }
@@ -185,7 +185,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	g.Total, err = db.GetRowCountRaw("Property", "", qw)
 	if err != nil {
 		util.Console("Error from db.GetRowCountRaw: %s\n", err.Error())
-		SvcGridErrorReturn(w, err)
+		SvcErrorReturn(w, err)
 		return
 	}
 
@@ -193,7 +193,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	rows, err := db.Wdb.DB.Query(q)
 	if err != nil {
 		util.Console("Error from DB Query: %s\n", err.Error())
-		SvcGridErrorReturn(w, err)
+		SvcErrorReturn(w, err)
 		return
 	}
 	defer rows.Close()
@@ -264,7 +264,7 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//
 	// if err != nil {
 	// 	e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
-	// 	SvcGridErrorReturn(w, e)
+	// 	SvcErrorReturn(w, e)
 	// 	return
 	// }
 
@@ -282,29 +282,29 @@ func PropertyUpdate(p *PropertyGrid, d *ServiceData) error {
 // GetProperty returns the requested assessment
 // wsdoc {
 //  @Title  Get Property
-//	@URL /v1/dep/:BUI/:PID
+//	@URL /v1/property/:PID
 //  @Method  GET
 //	@Synopsis Get information on a Property
 //  @Description  Return all fields for assessment :PID
 //	@Input WebGridSearchRequest
-//  @Response PropertyGetResponse
+//  @Response GetProperty
 // wsdoc }
 //-----------------------------------------------------------------------------
 func getProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "getProperty"
 	util.Console("entered %s\n", funcname)
-	// var g PropertyGetResponse
-	// a, err := db.GetProperty(d.ID)
-	// if err != nil {
-	// 	SvcGridErrorReturn(w, err)
-	// 	return
-	// }
-	// if a.PID > 0 {
-	// 	var gg PropertyGrid
-	// 	util.MigrateStructVals(&a, &gg)
-	// 	gg.Recid = gg.PID
-	// 	g.Record = gg
-	// }
-	// g.Status = "success"
-	// SvcWriteResponse(&g, w)
+	var g GetProperty
+	a, err := db.GetProperty(r.Context(), d.ID)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+	if a.PRID > 0 {
+		var gg PropertyGrid
+		util.MigrateStructVals(&a, &gg)
+		gg.Recid = gg.PRID
+		g.Record = gg
+	}
+	g.Status = "success"
+	SvcWriteResponse(&g, w)
 }

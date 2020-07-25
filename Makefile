@@ -1,4 +1,4 @@
-DIRS=util db csv ws server test
+DIRS=util session db csv ws server webui test
 .PHONY: test
 
 wreis:

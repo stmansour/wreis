@@ -10,7 +10,7 @@ functest: *.go config.json
 	@echo "*** Completed in ${THISDIR} ***"
 
 clean:
-	rm -f config.json log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? functest fail
+	rm -f conf*.json log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? functest fail
 	@echo "*** CLEAN completed in ${THISDIR} ***"
 
 config.json:

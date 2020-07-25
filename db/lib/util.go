@@ -3,11 +3,16 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"extres"
 	"fmt"
 	"runtime/debug"
+	"wreis/session"
 	util "wreis/util/lib"
 )
+
+// ErrSessionRequired session required error
+var ErrSessionRequired = errors.New("Session Required, Please Login")
 
 // SkipSQLNoRowsError assing nil to original err variable
 // if its kind of no rows in result error from sql package
@@ -50,7 +55,7 @@ func Errcheck(err error) {
 //------------------------------------------------------------------------------
 func ValidateSession(ctx context.Context) bool {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
-		_, ok := SessionFromContext(ctx)
+		_, ok := session.GetSessionFromContext(ctx)
 		if !ok {
 			return false
 		}
@@ -70,7 +75,7 @@ func ValidateSession(ctx context.Context) bool {
 //------------------------------------------------------------------------------
 func ValidateSessionForDBDelete(ctx context.Context) error {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
-		_, ok := SessionFromContext(ctx)
+		_, ok := session.GetSessionFromContext(ctx)
 		if !ok {
 			return ErrSessionRequired
 		}
@@ -93,7 +98,7 @@ func ValidateSessionForDBDelete(ctx context.Context) error {
 //-----------------------------------------------------------------------------
 func ValidateSessionForDBInsert(ctx context.Context, id1, id2 *int64) error {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
-		sess, ok := SessionFromContext(ctx)
+		sess, ok := session.GetSessionFromContext(ctx)
 		if !ok {
 			return ErrSessionRequired
 		}
@@ -118,7 +123,7 @@ func ValidateSessionForDBInsert(ctx context.Context, id1, id2 *int64) error {
 //-----------------------------------------------------------------------------
 func ValidateSessionForDBUpdate(ctx context.Context, id2 *int64) error {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
-		sess, ok := SessionFromContext(ctx)
+		sess, ok := session.GetSessionFromContext(ctx)
 		if !ok {
 			return ErrSessionRequired
 		}

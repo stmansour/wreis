@@ -10,11 +10,12 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"wreis/session"
 	util "wreis/util/lib"
 )
 
-// SvcGridError is the generalized error structure to return errors to the grid widget
-type SvcGridError struct {
+// SvcErrorResponse is the generalized error structure to return errors to the grid widget
+type SvcErrorResponse struct {
 	Status  string `json:"status"`
 	Message string `json:"message"`
 }
@@ -51,7 +52,6 @@ type WebGridSearchRequestJSON struct {
 	SearchLogic string      `json:"searchLogic"` // OR | AND
 	Search      []GenSearch `json:"search"`      // what fields and what values
 	Sort        []ColSort   `json:"sort"`        // sort criteria
-	GroupName   string      `json:"groupName"`   // filter on this group name
 }
 
 // WebGridSearchRequest is a struct suitable for describing a webservice operation.
@@ -113,18 +113,18 @@ type ServiceData struct { // position 0 is 'v1'
 
 // ServiceHandler describes the handler for all services
 type ServiceHandler struct {
-	Cmd        string
-	ExtOrigin  bool // false if this comes from our UI, true if it comes from external services such as AWS
-	GetPayload bool // call service handler's get Payload before calling handler?
-	Handler    func(http.ResponseWriter, *http.Request, *ServiceData)
+	Cmd           string
+	AuthNRequired bool
+	Handler       func(http.ResponseWriter, *http.Request, *ServiceData)
 }
 
 // Svcs is the table of all service handlers
 var Svcs = []ServiceHandler{
-	{"discon", true, true, SvcDisableConsole},
-	{"encon", true, true, SvcEnableConsole},
-	{"property", false, true, SvcHandlerProperty},
-	{"ping", false, true, SvcHandlerPing},
+	{Cmd: "authn", AuthNRequired: false, Handler: SvcAuthenticate},
+	{Cmd: "discon", AuthNRequired: true, Handler: SvcDisableConsole},
+	{Cmd: "encon", AuthNRequired: true, Handler: SvcEnableConsole},
+	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
+	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 }
 
 // SvcHandlerPing is the most basic test that you can run against the server
@@ -142,30 +142,24 @@ func SvcHandlerPing(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // Decoded, this message looks something like this:
 //		request={"cmd":"get","selected":[],"limit":100,"offset":0}
 //
-// The leading "request=" is optional. This routine parses the basic information, then contacts an appropriate
-// handler for more detailed processing.  It will set the Cmd member variable.
+// The leading "request=" is optional. This routine parses the basic
+// information, then contacts an appropriate handler for more detailed
+// processing.  It will set the Cmd member variable.
 //
-// W2UI sometimes sends requests that look like this: request=%7B%22search%22%3A%22s%22%2C%22max%22%3A250%7D
-// using HTTP GET (rather than its more typical POST).  The command decodes to this: request={"search":"s","max":250}
-//
-//-----------------------------------------------------------------------------------------------------------
+// W2UI sometimes sends requests that look like this:
+//      request=%7B%22search%22%3A%22s%22%2C%22max%22%3A250%7D
+// using HTTP GET (rather than its more typical POST).  The command decodes to
+// this: request={"search":"s","max":250}
+//------------------------------------------------------------------------------
 func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	funcname := "V1ServiceHandler"
 	svcDebugTxn(funcname, r)
-	// var err error
 	var d ServiceData
-
 	d.ID = -1 // indicates it has not been set
 
-	//-----------------------------------------------------------------------
-	// pathElements:  0   1            2
-	//               /v1/{subservice}/{ID}
-	//-----------------------------------------------------------------------
-	ss := strings.Split(r.RequestURI[1:], "?") // it could be GET command
-	pathElements := strings.Split(ss[0], "/")
-	lpe := len(pathElements)
-	if lpe > 1 { // look for the requested service
-		d.Service = pathElements[1]
+	if e := svcGetPayload(w, r, &d); e != nil {
+		SvcErrorReturn(w, e)
+		return
 	}
 	sid := -1 // index to the service requested. Initialize to "not found"
 	for i := 0; i < len(Svcs); i++ {
@@ -178,50 +172,66 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)
 		e := fmt.Errorf("Service not recognized: %s", d.Service)
 		util.Console("***ERROR IN URL***  %s", e.Error())
-		SvcGridErrorReturn(w, e)
+		SvcErrorReturn(w, e)
 		return
 	}
-	if lpe > 2 { // subservice, if any
-		var err error
-		d.ID, err = util.IntFromString(pathElements[2], "bad ID")
+
+	//-----------------------------------------------------------------------
+	// Is authentication required for this command?  If so validate that we
+	// have a cookie.  If not, just continue
+	//-----------------------------------------------------------------------
+	if Svcs[sid].AuthNRequired {
+		_, err := session.ValidateSessionCookie(r, 0) // this updates the expire time
 		if err != nil {
-			e := fmt.Errorf("ID in URL is invalid: %s", err.Error())
-			util.Console("***ERROR IN URL***  %s", e.Error())
-			SvcGridErrorReturn(w, e)
+			SvcErrorReturn(w, err)
 			return
 		}
+		//----------------------------------------------------------------------
+		// The air cookie is valid.  Create (or get) the internal session. This
+		// is needed to identify the person associated with the request. All
+		// database updates performed by this user will be updated captured
+		// in the database writes/updates. We maintain info about this user
+		// so we don't have to look it up every time they make a db change.
+		//----------------------------------------------------------------------
+
 	}
 
 	svcDebugURL(r, &d)
 	showRequestHeaders(r)
-	if Svcs[sid].GetPayload {
-		svcGetPayload(w, r, &d)
-	}
 	Svcs[sid].Handler(w, r, &d)
 	svcDebugTxnEnd()
 }
 
-func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
+	var err error
+	//-----------------------------------------------------------------------
+	// pathElements:  0   1            2
+	//               /v1/{subservice}/{ID}
+	//-----------------------------------------------------------------------
+	ss := strings.Split(r.RequestURI[1:], "?") // it could be GET command
+	pathElements := strings.Split(ss[0], "/")
+	lpe := len(pathElements)
+	if lpe > 1 { // look for the requested service
+		d.Service = pathElements[1]
+	}
+	if lpe > 2 { // subservice, if any
+		d.ID, err = util.IntFromString(pathElements[2], "bad ID")
+		if err != nil {
+			return fmt.Errorf("ID in URL is invalid: %s", err.Error())
+		}
+	}
 	switch r.Method {
 	case "POST":
-		if nil != getPOSTdata(w, r, d) {
-			return
+		if err = getPOSTdata(w, r, d); err != nil {
+			return err
 		}
 	case "GET":
-		if nil != getGETdata(w, r, d) {
-			return
+		if err = getGETdata(w, r, d); err != nil {
+			return err
 		}
 	}
 	showWebRequest(d)
-}
-
-// SvcGridErrorReturn formats an error return to the grid widget and sends it
-func SvcGridErrorReturn(w http.ResponseWriter, err error) {
-	var e SvcGridError
-	e.Status = "error"
-	e.Message = fmt.Sprintf("Error: %s\n", err.Error())
-	b, _ := json.Marshal(e)
-	SvcWrite(w, b)
+	return nil
 }
 
 // SvcGetInt64 tries to read an int64 value from the supplied string.
@@ -232,7 +242,7 @@ func SvcGetInt64(s, errmsg string, w http.ResponseWriter) (int64, error) {
 	i, err := util.IntFromString(s, "not an integer number")
 	if err != nil {
 		err = fmt.Errorf("%s: %s", errmsg, err.Error())
-		SvcGridErrorReturn(w, err)
+		SvcErrorReturn(w, err)
 		return i, err
 	}
 	return i, nil
@@ -258,7 +268,7 @@ func SvcExtractIDFromURI(uri, errmsg string, pos int, w http.ResponseWriter) (in
 	if len(sa) < pos+1 {
 		err = fmt.Errorf("Expecting at least %d elements in URI: %s, but found only %d", pos+1, uri, len(sa))
 		// util.Console("err = %s\n", err)
-		SvcGridErrorReturn(w, err)
+		SvcErrorReturn(w, err)
 		return ID, err
 	}
 	// util.Console("sa[pos] = %s\n", sa[pos])
@@ -274,7 +284,7 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	d.b, err = ioutil.ReadAll(r.Body)
 	if err != nil {
 		e := fmt.Errorf("%s: Error reading message Body: %s", funcname, err.Error())
-		SvcGridErrorReturn(w, e)
+		SvcErrorReturn(w, e)
 		return e
 	}
 
@@ -296,7 +306,7 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	u, err := url.QueryUnescape(string(d.b))
 	if err != nil {
 		e := fmt.Errorf("%s: Error with QueryUnescape: %s", funcname, err.Error())
-		SvcGridErrorReturn(w, e)
+		SvcErrorReturn(w, e)
 		return e
 	}
 	d.data = strings.TrimPrefix(u, "request=") // strip off "request=" if it is present
@@ -307,7 +317,7 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	err = json.Unmarshal(d.b, &wjs)
 	if err != nil {
 		e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
-		SvcGridErrorReturn(w, e)
+		SvcErrorReturn(w, e)
 		return e
 	}
 	util.MigrateStructVals(&wjs, &d.wsSearchReq)
@@ -319,7 +329,7 @@ func getGETdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	s, err := url.QueryUnescape(strings.TrimSpace(r.URL.String()))
 	if err != nil {
 		e := fmt.Errorf("%s: Error with url.QueryUnescape:  %s", funcname, err.Error())
-		SvcGridErrorReturn(w, e)
+		SvcErrorReturn(w, e)
 		return e
 	}
 	util.Console("Unescaped query = %s\n", s)
@@ -332,7 +342,7 @@ func getGETdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 		util.Console("%s: will unmarshal: %s\n", funcname, d.data)
 		if err = json.Unmarshal([]byte(d.data), &d.wsTypeDownReq); err != nil {
 			e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
-			SvcGridErrorReturn(w, e)
+			SvcErrorReturn(w, e)
 			return e
 		}
 		d.wsSearchReq.Cmd = "typedown"
@@ -405,7 +415,7 @@ func SvcWriteResponse(g interface{}, w http.ResponseWriter) {
 	if err != nil {
 		e := fmt.Errorf("Error marshaling json data: %s", err.Error())
 		util.Ulog("SvcWriteResponse: %s\n", err.Error())
-		SvcGridErrorReturn(w, e)
+		SvcErrorReturn(w, e)
 		return
 	}
 	SvcWrite(w, b)
@@ -431,4 +441,25 @@ func SvcWriteSuccessResponseWithID(w http.ResponseWriter, id int64) {
 	var g = SvcStatusResponse{Status: "success", Recid: id}
 	w.Header().Set("Content-Type", "application/json")
 	SvcWriteResponse(&g, w)
+}
+
+// SvcFuncErrorReturn formats an error return to the grid widget and sends it
+func SvcFuncErrorReturn(w http.ResponseWriter, err error, funcname string) {
+	// rlib.Console("<Function>: %s | <Error Message>: <<begin>>\n%s\n<<end>>\n", funcname, err.Error())
+	util.Console("%s: %s\n", funcname, err.Error())
+	var e SvcErrorResponse
+	e.Status = "error"
+	e.Message = err.Error()
+	w.Header().Set("Content-Type", "application/json")
+	b, _ := json.Marshal(e)
+	SvcWrite(w, b)
+}
+
+// SvcErrorReturn formats an error return to the grid widget and sends it
+func SvcErrorReturn(w http.ResponseWriter, err error) {
+	var e SvcErrorResponse
+	e.Status = "error"
+	e.Message = fmt.Sprintf("Error: %s\n", err.Error())
+	b, _ := json.Marshal(e)
+	SvcWrite(w, b)
 }

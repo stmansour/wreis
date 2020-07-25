@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="/html/images/favicon32x32.png">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/w2ui-1.5.rc1.js"></script>
+    <script src="/js/login.js"></script>
 </head>
 <body>
 
@@ -313,7 +314,7 @@ function buildPageElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
          columns: [
-            {field: 'PRID',                 size:  '60px', sortable: true, hidden: true},
+            {field: 'PRID',                 size: '60px', sortable: true, hidden: true},
             {field: 'Recid',                size: '60px', sortable: true, hidden: true},
         	{field: 'PRID',                 size: '60px', sortable: true, hidden: true},
         	{field: 'Name',                 size: '200px', sortable: true, hidden: false},
@@ -381,6 +382,7 @@ function buildPageElements() {
             setToForm('propertyForm', '/v1/property/0',500);
         },
         onRefresh: function(/*event*/) {
+            console.log('propertyGrid.onRefresh')
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
         onLoad: function(/*event*/) {
@@ -418,32 +420,55 @@ function buildPageElements() {
         name: 'propertyForm',
         style: 'border: 0px; background-color: transparent;',
         header: 'Property Detail',
-        url: '/v1/person',
-        formURL: '/html/formperson.html',
+        url: '/v1/property',
+        formURL: '/html/formproperty.html',
         fields: [
-            { field: 'recid', type: 'int', required: false },
-            { field: 'PRID', type: 'text', required: false },
-            { field: 'FirstName', type: 'text', required: false },
-            { field: 'MiddleName', type: 'text', required: false },
-            { field: 'LastName', type: 'text', required: false },
-            { field: 'PreferredName', type: 'text', required: false },
-            { field: 'JobTitle', type: 'text', required: false },
-            { field: 'OfficePhone', type: 'text', required: false },
-            { field: 'OfficeFax', type: 'text', required: false },
-            { field: 'Email1', type: 'email', required: true },
-            { field: 'Email2', type: 'email', required: false },
-            { field: 'MailAddress', type: 'text', required: false },
-            { field: 'MailAddress2', type: 'text', required: false },
-            { field: 'MailCity', type: 'text', required: false },
-            { field: 'MailState', type: 'text', required: false },
-            { field: 'MailPostalCode', type: 'text', required: false },
-            { field: 'MailCountry', type: 'text', required: false },
-            { field: 'RoomNumber', type: 'text', required: false },
-            { field: 'MailStop', type: 'text', required: false },
-            { field: 'Status', type: 'int', required: false },
-            { field: 'OptOutDate', type: 'date', required: false },
-            { field: 'LastModTime', type: 'text', required: false },
-            { field: 'LastModBy', type: 'text', required: false },
+            {field: 'recid',                type: 'int',  required: false },
+            {field: 'PRID',                 type: 'int',  required: false},
+        	{field: 'Name',                 type: 'text', required: false},
+        	{field: 'YearsInBusiness',      type: 'int',  required: false},
+        	{field: 'ParentCompany',        type: 'text', required: false},
+        	{field: 'URL',                  type: 'text', required: false},
+        	{field: 'Symbol',               type: 'text',  required: false},
+        	{field: 'Price',                type: 'money', required: false},
+        	{field: 'DownPayment',          type: 'money', required: false},
+        	{field: 'RentableArea',         type: 'int',   required: false},
+        	{field: 'RentableAreaUnits',    type: 'text', required: false},
+        	{field: 'LotSize',              type: 'int',  required: false},
+        	{field: 'LotSizeUnits',         type: 'text', required: false},
+        	{field: 'CapRate',              type: 'float', required: false},
+        	{field: 'AvgCap',               type: 'float', required: false},
+        	{field: 'BuildDate',            type: 'date', required: false},
+        	{field: 'FLAGS',                type: 'text', required: false},
+        	{field: 'Ownership',            type: 'text', required: false},
+        	{field: 'TenantTradeName',      type: 'text', required: false},
+        	{field: 'LeaseGuarantor',       type: 'text', required: false},
+        	{field: 'LeaseType',            type: 'text', required: false},
+        	{field: 'DeliveryDt',           type: 'date', required: false},
+        	{field: 'OriginalLeaseTerm',    type: 'text', required: false},
+        	{field: 'LeaseCommencementDt',  type: 'date', required: false},
+        	{field: 'LeaseExpirationDt',    type: 'date', required: false},
+        	{field: 'TermRemainingOnLease', type: 'text', required: false},
+        	{field: 'ROLID',                type: 'int', required: false},
+        	{field: 'RSLID',                type: 'int', required: false},
+        	{field: 'Address',              type: 'text', required: false},
+        	{field: 'Address2',             type: 'text', required: false},
+        	{field: 'City',                 type: 'text', required: false},
+        	{field: 'State',                type: 'text', required: false},
+        	{field: 'PostalCode',           type: 'text', required: false},
+        	{field: 'Country',              type: 'text', required: false},
+        	{field: 'LLResponsibilities',   type: 'text', required: false},
+        	{field: 'NOI',                  type: 'text', required: false},
+        	{field: 'HQAddress',            type: 'text', required: false},
+        	{field: 'HQAddress2',           type: 'text', required: false},
+        	{field: 'HQCity',               type: 'text', required: false},
+        	{field: 'HQState',              type: 'text', required: false},
+        	{field: 'HQPostalCode',         type: 'text', required: false},
+        	{field: 'HQCountry',            type: 'text', required: false},
+            {field: 'CreateTime',           type: 'text', required: false},
+            {field: 'CreatedBy',            type: 'text', required: false},
+            {field: 'LastModTime',          type: 'text', required: false},
+            {field: 'LastModBy',            type: 'text', required: false},
         ],
         toolbar: {
             items: [
@@ -493,191 +518,13 @@ function buildPageElements() {
         },
    });
 
-    //------------------------------------------------------------------------
-    //          groupsGrid
-    //------------------------------------------------------------------------
-    $().w2grid({
-        name: 'groupsGrid',
-        url: '/v1/groups',
-        show: {
-            header: false,
-            toolbar: true,
-            footer: true,
-            lineNumbers: false,
-            selectColumn: false,
-            expandColumn: false
-        },
-        columns: [
-            {field: 'recid',            caption: 'recid',             size: '10px',  sortable: false, hidden: true},
-            {field: 'GID',              caption: 'GID',               size: '100px', sortable: true, hidden: true},
-            {field: 'GroupName',        caption: 'Group Name',        size: '100px', sortable: true, hidden: false},
-            {field: 'GroupDescription', caption: 'Group Description', size: '300px', sortable: true, hidden: false},
-            {field: 'LastModTime',      caption: 'LastModTime',       size: '100px', sortable: true, hidden: true},
-        ],
-        onClick: function(event) {
-            // var sel = this.getSelection(true);
-            event.onComplete = function() {
-                var sel = w2ui.groupsGrid.getSelection();
-                if (sel.length > 0) {
-                    var ob = w2ui.groupsGrid.get(sel[0]);
-                    if (ob === null ) { return; }
-                    w2ui.toplayout.show('right',true);
-                    w2ui.toplayout.load('right', '/html/groupdetail.html', null, function() {
-                        console.log('>>>>>>>>>> get data for Group: ' + ob.GID);
-                        var gid = ob.GID;
-                        $.get('/v1/groupstats/' + gid)
-                        .done(function(data) {
-                            if (typeof data == 'string') {  // it's weird, a successful data add gets parsed as an object, an error message does not
-                                var msg = JSON.parse(data);
-                                if (msg.status != "success") {
-                                    console.log('Response to groupcount: ' + msg.status);
-                                    return;
-                                }
-                                document.getElementById('mojoGroupName').innerHTML = '' + msg.record.GroupName;
-                                document.getElementById('mojoLastScrapeStart').innerHTML = '' + msg.record.LastScrapeStart;
-                                document.getElementById('mojoLastScrapeStop').innerHTML = '' + msg.record.LastScrapeStop;
-                                document.getElementById('mojoMemberCount').innerHTML = '' + msg.record.MemberCount;
-                                document.getElementById('mojoMailToCount').innerHTML = '' + msg.record.MailToCount;
-                                document.getElementById('mojoOptOutCount').innerHTML = '' + msg.record.OptOutCount;
-                                document.getElementById('mojoBouncedCount').innerHTML = '' + msg.record.BouncedCount;
-                                document.getElementById('mojoComplaintCount').innerHTML = '' + msg.record.ComplaintCount;
-                                document.getElementById('mojoSuppressedCount').innerHTML = '' + msg.record.SuppressedCount;
-                            }
-                        })
-                        .fail(function(data) {
-                            console.log('data = ' + data);
-                        });
-                    });
-                } // else {
-                   // console.log('*** NO SELECTION FOUND ***   So, select index 0');
-                    //this.select(1);
-                //}
-            };
-        },
-    });
-
-    //------------------------------------------------------------------------
-    //          queryGrid
-    //------------------------------------------------------------------------
-    $().w2grid({
-        name: 'queryGrid',
-        url: '/v1/query',
-        show: {
-            header: false,
-            toolbar: true,
-            footer: true,
-            lineNumbers: false,
-            selectColumn: false,
-            expandColumn: false
-        },
-        columns: [
-            {field: 'QID',        caption: 'QID',              size: '100px', sortable: true, hidden: true},
-            {field: 'QueryName',  caption: 'QueryName',        size: '100px', sortable: true, hidden: false},
-            {field: 'QueryDescr', caption: 'Query Description',size: '300px', sortable: true, hidden: false},
-            {field: 'QueryJSON',  caption: 'Query JSON',       size: '30%',   sortable: true, hidden: false},
-            {field: 'LastModTime',caption: 'LastModTime',      size: '100px', sortable: true, hidden: true},
-        ],
-    });
-
-    //------------------------------------------------------------------------
-    //          Group Detail
-    //------------------------------------------------------------------------
-    $().w2form({
-        name: 'asmInstForm',
-        style: 'border: 0px; background-color: transparent;',
-        header: app.sAssessment + ' Detail',
-        url: '/v1/asm',
-        fields: [
-            { field: 'recid',         type: 'int',    required: false },
-            { field: 'GID',           type: 'int',    required: false },
-            { field: 'GroupName',     type: 'text',   required: false },
-            { field: 'Last Scrape',   type: 'text',   required: false },
-            { field: 'Total Count',   type: 'w2int',  required: false },
-            { field: 'Opt out',       type: 'w2int',  required:  true },
-            { field: 'Bounced',       type: 'w2int',  required: false },
-            { field: 'Complaint',     type: 'w2int',  required: false },
-            { field: 'LastModTime',   type: 'hidden', required: false },
-            { field: 'LastModBy',     type: 'hidden', required: false },
-        ],
-        toolbar: {
-            items: [
-                { id: 'btnNotes', type: 'button', icon: 'fa fa-sticky-note-o' },
-                { id: 'bt3', type: 'spacer' },
-                { id: 'btnClose', type: 'button', icon: 'fa fa-times' },
-            ],
-            onClick: function (event) {
-                switch(event.target) {
-                case 'btnClose':
-                    w2ui.toplayout.hide('right',true);
-                    break;
-                }
-            },
-        },
-        actions: {
-            save: function () {
-                //var obj = this;
-                var tgrid = w2ui.asmsGrid;
-                var sel = tgrid.getSelection();
-                tgrid.unselect(sel);
-                this.save({}, function (data) {
-                    if (data.status == 'error') {
-                        console.log('ERROR: '+ data.message);
-                        return;
-                    }
-                    w2ui.toplayout.hide('right',true);
-                    tgrid.reload();
-                });
-
-            },
-            reset: function() {
-                var f = w2ui.asmInstForm;
-                console.log('reset: ASMID = ' + f.record.ASMID );
-            }
-        },
-        onRefresh: function(/*event*/) {
-            var f = w2ui.asmInstForm;
-            var r = f.record;
-            f.header = 'Edit ' + app.sAssessment + ' (' + r.ASMID + ')';
-            // r.epoch = app.epochInstance[  (r.RentCycle !== 'Norecur' && r.PASMID === 0) ? 0 : 1 ];
-            if (!String.prototype.format) {
-                String.prototype.format = function() {
-                    var args = arguments;
-                    return this.replace(/{(\d+)}/g, function(match, number) {
-                        return typeof args[number] != 'undefined'? args[number] : match;
-                    });
-                };
-            }
-            var hdr = '';
-            if (r.RentCycle !== 'Norecur' && r.PASMID === 0) {
-                // EPOCH
-                hdr = 'This is an epoch assessment, it defines a recurring series of assessment instances.';
-            } else {
-                // INSTANCE has 3 variables: ParentASM, RentCycle, Proration
-                hdr = app.asmInstanceHeader.format(''+r.PASMID, r.RentCycle, r.ProrationCycle);
-            }
-            document.getElementById("AssessmentEpochOrInstance").innerHTML = hdr;
-        }
-    });
-
-
+    buildLoginForm();
 }
-
-// // groupFilterSubmit is called when the user presses the Enter key while
-// // in the Group: input control in the People grid toolbar.
-// //
-// //--------------------------------------------------------------------------
-// function groupFilterSubmit() {
-//     var groupName = document.getElementById('mojoGroupFilter');
-//     app.groupFilter = groupName.value;
-//     w2ui.propertyGrid.postData.groupName = groupName.value;
-//     w2ui.propertyGrid.request('get');
-// }
-
 
 function finishInitialization() {
     defineDateFmts();
     buildPageElements();
-
+    launchSession();
 }
 
 // handleData is called with the return string from the ping command to the

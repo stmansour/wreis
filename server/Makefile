@@ -10,7 +10,7 @@ server: *.go config.json
 	@${COUNTOL} golint
 	go build
 	@rm -f fail
-	@echo "*** ${THISDIR}: completed mojosrv ***"
+	@echo "*** ${THISDIR}: completed ${THISDIR} ***"
 
 # you can update the config files as follows:
 # $ jfrog rt u[pload] confdev.json accord/misc/

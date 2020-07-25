@@ -12,19 +12,6 @@ const (
 	dbTxCtxKey    ctxKey = iota
 )
 
-// SetSessionContextKey set the session in the given context object
-// and returns new context with session
-func SetSessionContextKey(ctx context.Context, s *Session) context.Context {
-	return context.WithValue(ctx, sessionCtxKey, s)
-}
-
-// SessionFromContext extracts session from the given context
-// with flag indicating whether session found or not
-func SessionFromContext(ctx context.Context) (*Session, bool) {
-	sess, ok := ctx.Value(sessionCtxKey).(*Session)
-	return sess, ok
-}
-
 // SetDBTxContextKey set the session in the given context object
 // and returns new context with sql.Tx
 func SetDBTxContextKey(ctx context.Context, t *sql.Tx) context.Context {
