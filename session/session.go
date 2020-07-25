@@ -269,7 +269,7 @@ func CreateSession(ctx context.Context, a *ValidateCookieResponse) (*Session, er
 	//----------------------------------------------
 	// TODO: lookup username in address book data
 	//----------------------------------------------
-	util.Console("Calling GetDirectoryPerson with UID = %d\n", a.UID)
+	// util.Console("Calling GetDirectoryPerson with UID = %d\n", a.UID)
 	var c DirectoryPerson
 	// err := sessDB.PBsql.GetDirectoryPerson.QueryRow(a.UID).Scan(&c.UID, &c.UserName, &c.LastName, &c.MiddleName, &c.FirstName, &c.PreferredName, &c.PreferredName, &c.OfficePhone, &c.CellPhone)
 
@@ -277,7 +277,7 @@ func CreateSession(ctx context.Context, a *ValidateCookieResponse) (*Session, er
 		return nil, err
 	}
 
-	util.Console("Successfully read info from directory for UID = %d\n", c.UID)
+	// util.Console("Successfully read info from directory for UID = %d\n", c.UID)
 
 	RoleID := int64(0) // we haven't yet implemented Role
 	name := c.FirstName
@@ -319,7 +319,7 @@ func getUserInfo(uid int64) (DirectoryPerson, error) {
 	// the business portion of the URL is ignored.  We snap it to 0
 	//----------------------------------------------------------------------
 	url := fmt.Sprintf("%sv1/people/0/%d", appConfig.AuthNHost, uid)
-	util.Console("userInfo request: %s\n", url)
+	// util.Console("userInfo request: %s\n", url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
@@ -329,17 +329,17 @@ func getUserInfo(uid int64) (DirectoryPerson, error) {
 	}
 	defer resp.Body.Close()
 
-	util.Console("response Status: %s\n", resp.Status)
-	util.Console("response Headers: %s\n", resp.Header)
+	// util.Console("response Status: %s\n", resp.Status)
+	// util.Console("response Headers: %s\n", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
-	util.Console("response Body: %s\n", string(body))
+	// util.Console("response Body: %s\n", string(body))
 
 	var foo UserInfoResponse
 	if err := json.Unmarshal([]byte(body), &foo); err != nil {
 		return p, fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
 	}
 
-	util.Console("before migrate: foo.record = %#v\n", foo.Record)
+	// util.Console("before migrate: foo.record = %#v\n", foo.Record)
 	util.MigrateStructVals(&foo.Record, &p)
 
 	switch foo.Status {
@@ -457,105 +457,37 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request) (*S
 	var ok bool
 	var sess *Session
 
-	util.Console("GetSession 1\n")
-	util.Console("\nSession Table:\n")
+	// util.Console("GetSession 1\n")
+	// util.Console("\nSession Table:\n")
 	DumpSessions()
-	util.Console("\n")
+	// util.Console("\n")
 	cookie, err := r.Cookie(SessionCookieName)
 	if err != nil {
-		util.Console("GetSession 2\n")
+		// util.Console("GetSession 2\n")
 		if strings.Contains(err.Error(), "cookie not present") {
-			util.Console("GetSession 3\n")
+			// util.Console("GetSession 3\n")
 			return nil, nil
 		}
-		util.Console("GetSession 4\n")
+		// util.Console("GetSession 4\n")
 		return nil, err
 	}
-	util.Console("GetSession 5\n")
+	// util.Console("GetSession 5\n")
 	sess, ok = sessions[cookie.Value]
 	if !ok || sess == nil {
-		util.Console("GetSession 6\n")
-
-		// //--------------------------------------------------------
-		// // We have a cookie, but we don't have it in our
-		// // session table. So, the user could have logged in from
-		// // another AIR app.  Validate the cookie with the AUTH
-		// // server.
-		// //--------------------------------------------------------
-		// var a = ValidateCookieRequest{
-		// 	CookieVal: cookie.Value,
-		// 	IP:        r.RemoteAddr,
-		// 	UserAgent: r.UserAgent(),
-		// }
-		// //-----------------------------------------------------------------------
-		// // Marshal together a new request buffer...
-		// //-----------------------------------------------------------------------
-		// pbr, err := json.Marshal(&a)
-		// if err != nil {
-		// 	e := fmt.Errorf("Error marshaling json data: %s", err.Error())
-		// 	util.Ulog("%s: %s\n", funcname, err.Error())
-		// 	return nil, e
-		// }
-		// util.Console("Request to auth server:  %s\n", string(pbr))
-		//
-		// //-----------------------------------------------------------------------
-		// // Send to the authenication server
-		// //-----------------------------------------------------------------------
-		// url := appConfig.AuthNHost + "v1/validatecookie"
-		// util.Console("%s: posting request to: %s\n", funcname, url)
-		// util.Console("\tbody: %s\n", string(pbr))
-		// req, err := http.NewRequest("POST", url, bytes.NewBuffer(pbr))
-		// req.Header.Set("Content-Type", "application/json")
-		// client := &http.Client{}
-		// resp, err := client.Do(req)
-		// if err != nil {
-		// 	e := fmt.Errorf("%s: failed to execute client.Do:  %s", funcname, err.Error())
-		// 	return nil, e
-		// }
-		// defer resp.Body.Close()
-		//
-		// body, _ := ioutil.ReadAll(resp.Body)
-		// util.Console("response Body: %s\n", string(body))
-		//
-		// if err := json.Unmarshal([]byte(body), &b); err != nil {
-		// 	e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
-		// 	return nil, e
-		// }
-		// util.Console("Successfully unmarshaled response: %s\n", string(body))
-		// //-------------------------------------
-		// // build a session from this data...
-		// //-------------------------------------
-		// switch b.Status {
-		// case "success":
-		// 	util.Console("Authentication succeeded\n")
-		// case "failure":
-		// 	util.Console("Cookie was not found. Could be logged off by another app.\n")
-		// 	e := fmt.Errorf("%s", b.Message)
-		// 	return nil, e
-		// default:
-		// 	e := fmt.Errorf("%s", b.Message)
-		// 	return nil, e
-		// }
 		b, err := ValidateSessionCookie(r, 1)
 		if err != nil {
 			return sess, err
 		}
-		util.Console("ValidateSessionCookie returned b = %#v\n", b)
-		util.Console("Directory Service Expire time = %s\n", time.Time(b.Expire).Format(util.RRDATETIMEINPFMT))
+		// util.Console("ValidateSessionCookie returned b = %#v\n", b)
+		// util.Console("Directory Service Expire time = %s\n", time.Time(b.Expire).Format(util.RRDATETIMEINPFMT))
 		sess, err = CreateSession(ctx, &b)
 		if err != nil {
 			return nil, err
 		}
 		cookie := http.Cookie{Name: SessionCookieName, Value: b.Token, Expires: sess.Expire, Path: "/"}
 		http.SetCookie(w, &cookie) // a cookie cannot be set after writing anything to a response writer
-		util.Console("*** NEW SESSION CREATED ***\n")
+		// util.Console("*** NEW SESSION CREATED ***\n")
 	}
-	// util.Console("GetSession 7\n")
-	util.Console("sess.Username = %s\n", sess.Username)
-	util.Console("sess.UID = %d\n", sess.UID)
-	util.Console("sess.Token = %s\n", sess.Token)
-	util.Console("sess.Name = %s\n", sess.Name)
-	util.Console("sess.Expires = %s\n", sess.Expire.Format(util.RRDATETIMEINPFMT))
 	return sess, nil
 }
 

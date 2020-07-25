@@ -48,7 +48,8 @@ fi
 #------------------------------------------------------------------------------
 #  TEST b
 #
-#  Validate the property search command
+#  Validate that commands requiring a session will not operate without
+#  a session cookie
 #
 #  Scenario:
 #  Search
@@ -60,10 +61,7 @@ fi
 TFILES="b"
 STEP=0
 if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
-    # stopWsrv
     mysql --no-defaults wreis < x${TFILES}.sql
-    # startWsrv
-
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/property/" "request" "${TFILES}${STEP}"  "Property-Search"
 fi

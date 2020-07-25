@@ -920,7 +920,7 @@ startWsrv() {
 		${WSRV} > ${WSRVBIN}/wsrvlog 2>&1 &
 		sleep 1
 		rm -f wsrvlog
-		ln -s ${WSRVBIN}/slog
+		ln -s ${WSRVBIN}/wsrvlog slog
 	fi
 }
 

@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	db "wreis/db/lib"
 	"wreis/session"
 	util "wreis/util/lib"
 )
@@ -25,6 +26,11 @@ type SvcErrorResponse struct {
 type SvcStatusResponse struct {
 	Status string `json:"status"` // typically "success"
 	Recid  int64  `json:"recid"`  // set to id of newly inserted record
+}
+
+// SvcStatus is the general success return value when no data is required
+type SvcStatus struct {
+	Status string `json:"status"`
 }
 
 // GenSearch describes a search condition
@@ -109,6 +115,7 @@ type ServiceData struct { // position 0 is 'v1'
 	data          string               // the raw unparsed data as string
 	b             []byte               // the raw unparsed bytes
 	GetParams     map[string]string    // parameters when HTTP GET is used
+	sess          *session.Session     // user session
 }
 
 // ServiceHandler describes the handler for all services
@@ -123,6 +130,7 @@ var Svcs = []ServiceHandler{
 	{Cmd: "authn", AuthNRequired: false, Handler: SvcAuthenticate},
 	{Cmd: "discon", AuthNRequired: true, Handler: SvcDisableConsole},
 	{Cmd: "encon", AuthNRequired: true, Handler: SvcEnableConsole},
+	{Cmd: "logoff", AuthNRequired: false, Handler: SvcLogoff},
 	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 }
@@ -132,6 +140,36 @@ var Svcs = []ServiceHandler{
 func SvcHandlerPing(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	fmt.Fprintf(w, "WREIS - Version %s\n", GetVersionNo())
 }
+
+// // findSession does the following:
+// //
+// //-------------------------------------------------------------------------
+// func findSession(w http.ResponseWriter, r **http.Request, d *ServiceData) error {
+// 	var err error
+// 	util.Console("calling GetSession\n")
+// 	d.sess, err = session.GetSession((*r).Context(), w, (*r))
+// 	if err != nil {
+// 		util.Console("*** GetSession returned error: %s\n", err.Error())
+// 		return err
+// 	}
+// 	if d.sess != nil {
+// 		util.Console("E, d.sess.UID = %d, d.sess.Username = %s\n", d.sess.UID, d.sess.Username)
+// 		if d.sess.UID == 0 || len(d.sess.Username) == 0 {
+// 			return fmt.Errorf("SessionToken expired, please log in")
+// 		}
+// 		util.Console("*** GetSession found sess: %s\n", d.sess.Token)
+// 		util.Console("Session.Username: %s\n", d.sess.Username)
+// 		d.sess.Refresh(w, (*r)) // they actively tried to use the session, extend timeout
+// 	}
+//
+// 	//------------------------------------------------------------------------
+// 	// d.sess will either be set, or it will be nil. In either case, we need
+// 	// to update the Context variable with the current d.sess
+// 	//------------------------------------------------------------------------
+// 	ctx := session.SetSessionContextKey((*r).Context(), d.sess)
+// 	(*r) = (*r).WithContext(ctx)
+// 	return nil
+// }
 
 // V1ServiceHandler is the main dispatch point for WEB SERVICE requests
 //
@@ -178,14 +216,30 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	//-----------------------------------------------------------------------
 	// Is authentication required for this command?  If so validate that we
-	// have a cookie.  If not, just continue
+	// have a cookie.
 	//-----------------------------------------------------------------------
+	util.Console("SVC: A\n")
 	if Svcs[sid].AuthNRequired {
-		_, err := session.ValidateSessionCookie(r, 0) // this updates the expire time
+		util.Console("SVC: B\n")
+		c, err := session.ValidateSessionCookie(r, 0) // this updates the expire time
 		if err != nil {
 			SvcErrorReturn(w, err)
 			return
 		}
+		util.Console("SVC: C\n")
+		if c.Status != "success" {
+			//----------------------------------------------------------------------
+			// user needs to log in.  If the command was logoff, just return success.
+			// Otherwise return error that they need to login.
+			//----------------------------------------------------------------------
+			if Svcs[sid].Cmd == "logoff" {
+				SvcWriteSuccessResponse(w)
+				return
+			}
+			SvcErrorReturn(w, db.ErrSessionRequired)
+			return
+		}
+		util.Console("SVC: D\n")
 		//----------------------------------------------------------------------
 		// The air cookie is valid.  Create (or get) the internal session. This
 		// is needed to identify the person associated with the request. All
@@ -193,8 +247,13 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		// in the database writes/updates. We maintain info about this user
 		// so we don't have to look it up every time they make a db change.
 		//----------------------------------------------------------------------
-
+		if d.sess, err = session.GetSession(r.Context(), w, r); err != nil {
+			SvcErrorReturn(w, err)
+			return
+		}
+		util.Console("SVC: E\n")
 	}
+	util.Console("SVC: F\n")
 
 	svcDebugURL(r, &d)
 	showRequestHeaders(r)
@@ -445,7 +504,7 @@ func SvcWriteSuccessResponseWithID(w http.ResponseWriter, id int64) {
 
 // SvcFuncErrorReturn formats an error return to the grid widget and sends it
 func SvcFuncErrorReturn(w http.ResponseWriter, err error, funcname string) {
-	// rlib.Console("<Function>: %s | <Error Message>: <<begin>>\n%s\n<<end>>\n", funcname, err.Error())
+	// util.Console("<Function>: %s | <Error Message>: <<begin>>\n%s\n<<end>>\n", funcname, err.Error())
 	util.Console("%s: %s\n", funcname, err.Error())
 	var e SvcErrorResponse
 	e.Status = "error"
