@@ -384,7 +384,7 @@ func IsUnrecognizedCookieError(err error) bool {
 //-----------------------------------------------------------------------------
 func ValidateSessionCookie(r *http.Request, getData int) (ValidateCookieResponse, error) {
 	funcname := "ValidateSessionCookie"
-	// util.Console("Entered %s\n", funcname)
+	util.Console("Entered %s\n", funcname)
 	var vc ValidateCookieRequest
 	var vr ValidateCookieResponse
 	c, err := r.Cookie(SessionCookieName)
@@ -412,31 +412,31 @@ func ValidateSessionCookie(r *http.Request, getData int) (ValidateCookieResponse
 	// Send to the authenication server
 	//-----------------------------------------------------------------------
 	url := appConfig.AuthNHost + "v1/validatecookie"
-	// util.Console("posting request to: %s\n", url)
-	// util.Console("              data: %s\n", string(pbr))
+	util.Console("posting request to: %s\n", url)
+	util.Console("              data: %s\n", string(pbr))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(pbr))
 	req.Header.Set("Content-Type", "application/json")
-	// util.Console("\n*** req = %#v\n\n", req)
+	util.Console("\n*** req = %#v\n\n", req)
 	client := &http.Client{}
-	// util.Console("\n*** client = %#v\n\n", client)
+	util.Console("\n*** client = %#v\n\n", client)
 	resp, err := client.Do(req)
 	if err != nil {
 		return vr, fmt.Errorf("%s: failed to execute client.Do:  %s", funcname, err.Error())
 	}
 	defer resp.Body.Close()
 
-	// util.Console("Response status = %s, status code = %d\n", resp.Status, resp.StatusCode)
+	util.Console("Response status = %s, status code = %d\n", resp.Status, resp.StatusCode)
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	// util.Console("*** Directory Service *** response Body: %s\n", string(body))
+	util.Console("*** Directory Service *** response Body: %s\n", string(body))
 
 	if err := json.Unmarshal([]byte(body), &vr); err != nil {
 		return vr, fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
 	}
-	// util.Console("Successfully unmarshaled response: %s\n", string(body))
-	// if vr.Status != "success" {
-	// 	vr.CookieVal = ""
-	// }
+	util.Console("Successfully unmarshaled response: %s\n", string(body))
+	if vr.Status != "success" {
+		vr.Token = ""
+	}
 	return vr, nil
 }
 

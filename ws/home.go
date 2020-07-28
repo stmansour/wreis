@@ -36,7 +36,7 @@ func HomeUIHandler(w http.ResponseWriter, r *http.Request) {
 	ui.Language = lang
 	ui.Template = tmpl
 
-	t, err := template.New(appPage).ParseFiles("./html/" + appPage)
+	t, err := template.New(appPage).ParseFiles("./static/html/" + appPage)
 	if nil != err {
 		s := fmt.Sprintf("%s: error loading template: %v\n", funcname, err)
 		ui.ErrMsg += s

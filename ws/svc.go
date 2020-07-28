@@ -129,10 +129,12 @@ type ServiceHandler struct {
 var Svcs = []ServiceHandler{
 	{Cmd: "authn", AuthNRequired: false, Handler: SvcAuthenticate},
 	{Cmd: "discon", AuthNRequired: true, Handler: SvcDisableConsole},
+	{Cmd: "sessions", AuthNRequired: true, Handler: SvcDumpSessions},
 	{Cmd: "encon", AuthNRequired: true, Handler: SvcEnableConsole},
-	{Cmd: "logoff", AuthNRequired: false, Handler: SvcLogoff},
+	{Cmd: "logoff", AuthNRequired: true, Handler: SvcLogoff}, // it handles properly if session has already timed out
 	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
+	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},
 }
 
 // SvcHandlerPing is the most basic test that you can run against the server
@@ -140,36 +142,6 @@ var Svcs = []ServiceHandler{
 func SvcHandlerPing(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	fmt.Fprintf(w, "WREIS - Version %s\n", GetVersionNo())
 }
-
-// // findSession does the following:
-// //
-// //-------------------------------------------------------------------------
-// func findSession(w http.ResponseWriter, r **http.Request, d *ServiceData) error {
-// 	var err error
-// 	util.Console("calling GetSession\n")
-// 	d.sess, err = session.GetSession((*r).Context(), w, (*r))
-// 	if err != nil {
-// 		util.Console("*** GetSession returned error: %s\n", err.Error())
-// 		return err
-// 	}
-// 	if d.sess != nil {
-// 		util.Console("E, d.sess.UID = %d, d.sess.Username = %s\n", d.sess.UID, d.sess.Username)
-// 		if d.sess.UID == 0 || len(d.sess.Username) == 0 {
-// 			return fmt.Errorf("SessionToken expired, please log in")
-// 		}
-// 		util.Console("*** GetSession found sess: %s\n", d.sess.Token)
-// 		util.Console("Session.Username: %s\n", d.sess.Username)
-// 		d.sess.Refresh(w, (*r)) // they actively tried to use the session, extend timeout
-// 	}
-//
-// 	//------------------------------------------------------------------------
-// 	// d.sess will either be set, or it will be nil. In either case, we need
-// 	// to update the Context variable with the current d.sess
-// 	//------------------------------------------------------------------------
-// 	ctx := session.SetSessionContextKey((*r).Context(), d.sess)
-// 	(*r) = (*r).WithContext(ctx)
-// 	return nil
-// }
 
 // V1ServiceHandler is the main dispatch point for WEB SERVICE requests
 //
@@ -251,6 +223,13 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			SvcErrorReturn(w, err)
 			return
 		}
+		//----------------------------------------------------------------------
+		// If we make it here, we have a good session.  Add it to the request
+		// context
+		//----------------------------------------------------------------------
+		ctx := session.SetSessionContextKey(r.Context(), d.sess)
+		r = r.WithContext(ctx)
+
 		util.Console("SVC: E\n")
 	}
 	util.Console("SVC: F\n")
@@ -261,6 +240,9 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	svcDebugTxnEnd()
 }
 
+// svcGetPayload simply pulls the common data out of the request and puts it
+// into the expected locations.
+//------------------------------------------------------------------------------
 func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	var err error
 	//-----------------------------------------------------------------------
@@ -297,6 +279,7 @@ func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error
 // If it fails for any reason, it sends writes an error message back
 // to the caller and returns the error.  Otherwise, it returns an
 // int64 and returns nil
+//------------------------------------------------------------------------------
 func SvcGetInt64(s, errmsg string, w http.ResponseWriter) (int64, error) {
 	i, err := util.IntFromString(s, "not an integer number")
 	if err != nil {
@@ -307,33 +290,33 @@ func SvcGetInt64(s, errmsg string, w http.ResponseWriter) (int64, error) {
 	return i, nil
 }
 
-// SvcExtractIDFromURI extracts an int64 id value from position pos of the supplied uri.
-// The URI is of the form returned by http.Request.RequestURI .  In particular:
+// // SvcExtractIDFromURI extracts an int64 id value from position pos of the supplied uri.
+// // The URI is of the form returned by http.Request.RequestURI .  In particular:
+// //
+// //	pos:     0    1      2  3
+// //  uri:    /v1/rentable/34/421
+// //
+// // So, in the example uri above, a call where pos = 3 would return int64(421). errmsg
+// // is a string that will be used in the error message if the requested position had an
+// // error during conversion to int64. So in the example above, pos 3 is the RID, so
+// // errmsg would probably be set to "RID"
+// //-----------------------------------------------------------------------------
+// func SvcExtractIDFromURI(uri, errmsg string, pos int, w http.ResponseWriter) (int64, error) {
+// 	var ID = int64(0)
+// 	var err error
 //
-//	pos:     0    1      2  3
-//  uri:    /v1/rentable/34/421
-//
-// So, in the example uri above, a call where pos = 3 would return int64(421). errmsg
-// is a string that will be used in the error message if the requested position had an
-// error during conversion to int64. So in the example above, pos 3 is the RID, so
-// errmsg would probably be set to "RID"
-//-----------------------------------------------------------------------------
-func SvcExtractIDFromURI(uri, errmsg string, pos int, w http.ResponseWriter) (int64, error) {
-	var ID = int64(0)
-	var err error
-
-	sa := strings.Split(uri[1:], "/")
-	// util.Console("uri parts:  %v\n", sa)
-	if len(sa) < pos+1 {
-		err = fmt.Errorf("Expecting at least %d elements in URI: %s, but found only %d", pos+1, uri, len(sa))
-		// util.Console("err = %s\n", err)
-		SvcErrorReturn(w, err)
-		return ID, err
-	}
-	// util.Console("sa[pos] = %s\n", sa[pos])
-	ID, err = SvcGetInt64(sa[pos], errmsg, w)
-	return ID, err
-}
+// 	sa := strings.Split(uri[1:], "/")
+// 	// util.Console("uri parts:  %v\n", sa)
+// 	if len(sa) < pos+1 {
+// 		err = fmt.Errorf("Expecting at least %d elements in URI: %s, but found only %d", pos+1, uri, len(sa))
+// 		// util.Console("err = %s\n", err)
+// 		SvcErrorReturn(w, err)
+// 		return ID, err
+// 	}
+// 	// util.Console("sa[pos] = %s\n", sa[pos])
+// 	ID, err = SvcGetInt64(sa[pos], errmsg, w)
+// 	return ID, err
+// }
 
 // getPostData parses the posted data from the client and stores in d
 //-----------------------------------------------------------------------------

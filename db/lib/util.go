@@ -54,7 +54,7 @@ func Errcheck(err error) {
 // false otherwise
 //------------------------------------------------------------------------------
 func ValidateSession(ctx context.Context) bool {
-	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
+	if !(Wdb.Config.Env != extres.APPENVPROD) {
 		_, ok := session.GetSessionFromContext(ctx)
 		if !ok {
 			return false

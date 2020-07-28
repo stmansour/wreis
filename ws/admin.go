@@ -2,6 +2,7 @@ package ws
 
 import (
 	"net/http"
+	"wreis/session"
 	util "wreis/util/lib"
 )
 
@@ -14,5 +15,11 @@ func SvcDisableConsole(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // SvcEnableConsole enables console messages to print out
 func SvcEnableConsole(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	util.EnableConsole()
+	SvcWriteSuccessResponse(w)
+}
+
+// SvcDumpSessions enables console messages to print out
+func SvcDumpSessions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	session.DumpSessions()
 	SvcWriteSuccessResponse(w)
 }

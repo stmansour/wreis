@@ -6,7 +6,7 @@
     getUserInfo, startNewSession, popupLoginDialogBox, window, document
 */
 
-var loginURL = "/html/formlogin.html";
+var loginURL = "/static/html/formlogin.html";
 
 var loginSessionChecker = {};
 
@@ -177,12 +177,29 @@ window.startNewSession = function () {
 window.getUserInfo = function () {
     $.get('/v1/userprofile/')
     .done(function(data, textStatus, jqXHR) {
-        if (data.status == "success") {
+        if (typeof data === "string") {
+            var x = JSON.parse(data);
+            data = x;
+        }
+        switch (data.status){
+        case "success":
             app.uid = data.uid;
             app.username = data.username;
             app.name = data.Name;
             app.imageurl = data.ImageURL;
             userProfileToUI();
+            break;
+        case "error":
+            // something bad happened.  delete the cookie and make them log in again...
+            deleteCookie("air");
+            $("#blank_screen").hide();
+            w2popup.close();
+            console.log('Error on /v1/userprofile: ' + data.message);
+            ensureSession();
+            break;
+        default:
+            console.log('Unrecognized status from /v1/userprofile: ' + data.status);
+            break;
         }
     })
     .fail( function() {
@@ -265,7 +282,7 @@ window.ensureSession = function () {
     }
 
     handleBlankScreen(true);        // make sure we can see the interface
-    if (app.name.length === 0) {    // if we don't have user info
+    if (typeof app.name === "undefined" || typeof app.name.length === "undefined" || app.name.length === 0) {    // if we don't have user info
         getUserInfo();              // then get it
     }
 };

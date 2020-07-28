@@ -1,5 +1,6 @@
 TOP=..
 BINDIR=${TOP}/dist/wreis
+STATIC=${BINDIR}/static
 THISDIR="webui"
 COUNTOL=${TOP}/tools/bashtools/countol.sh
 
@@ -21,9 +22,12 @@ clean:
 package:
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
-	mkdir -p ${BINDIR}
-	cp -r html ${BINDIR}/
-	if [ -d "./js" ]; then mkdir -p ${BINDIR}/js;cp js/*.js ${BINDIR}/js/;cp js/elems/*.js ${BINDIR}/js; fi
+	mkdir -p ${STATIC}
+	cp -r html ${STATIC}/
+	mkdir -p ${STATIC}/js
+	cp js/*.js ${STATIC}/js/
+	cp js/*.css ${STATIC}/js/
+	cp js/elems/*.js ${STATIC}/js
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed package ***"
 

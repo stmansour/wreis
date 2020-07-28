@@ -44,7 +44,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 var Chttp = http.NewServeMux()
 
 func initHTTP() {
-	Chttp.Handle("/", http.FileServer(http.Dir("./")))
+	Chttp.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	http.HandleFunc("/", HomeHandler)
 	http.HandleFunc("/home/", ws.HomeUIHandler)
 	http.HandleFunc("/v1/", ws.V1ServiceHandler)

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="/js/w2ui-1.5.rc1.min.css" />
-    <link rel="stylesheet" href="/html/fa/css/font-awesome.min.css">
-    <link rel="icon" type="image/png" href="/html/images/favicon32x32.png">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/w2ui-1.5.rc1.js"></script>
-    <script src="/js/login.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/html/fa/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/w2ui-1.5.rc1.min.css" />
+    <link rel="icon" type="image/png" href="/static/html/images/favicon32x32.png">
 </head>
 <body>
 
 <!--  color Icon images:  icon-page, w2ui-icon-check, ... see below in toptoolbar -->
 
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/js/w2ui-1.5.rc1.js"></script>
+<script src="/static/js/login.js"></script>
 <script>
 /*global
     w2ui,$,console,
@@ -199,7 +199,7 @@ function buildPageElements() {
         items: [
              { type: 'html',  id: 'logo',
                 html: '<div style="padding: 4px 0px;">'+
-                      '<img src="/html/images/logo.png">'+
+                      '<img src="/static/html/images/logo.png">'+
                       '</div>'
             },
             { type: 'break', id: 'break1' },
@@ -227,7 +227,7 @@ function buildPageElements() {
                     w2ui.newsLayout.load('main', '/html/news.html', 'flip-down');
                     w2ui.toptoolbar.set('msgButton', {icon: 'fa fa-newspaper-o'});
                     break;
-                case "menuButton:Webdocs": openInNewTab('/doc/docs.html'); break;
+                case "menuButton:Webdocs": openInNewTab('/static/doc/docs.html'); break;
             }
         },
     }));
@@ -263,7 +263,7 @@ function buildPageElements() {
             console.log('event.target = ' + event.target);
             switch(event.target) {
                 case 'dashboard':
-                    w2ui.toplayout.load('main','/html/dashboard.html');
+                    w2ui.toplayout.load('main','/static/html/dashboard.html');
                     w2ui.toplayout.hide('right',true);
                     break;
                 case 'property':
@@ -421,7 +421,7 @@ function buildPageElements() {
         style: 'border: 0px; background-color: transparent;',
         header: 'Property Detail',
         url: '/v1/property',
-        formURL: '/html/formproperty.html',
+        formURL: '/static/html/formproperty.html',
         fields: [
             {field: 'recid',                type: 'int',  required: false },
             {field: 'PRID',                 type: 'int',  required: false},
@@ -542,7 +542,7 @@ function handleData(data,status) {
         console.log( '**** YIPES! ****  status on /v1/ping/ = ' + status);
     }
     finishInitialization();
-    w2ui.toplayout.load('main','/html/dashboard.html');
+    w2ui.toplayout.load('main','/static/html/dashboard.html');
 }
 
 // Ping the server. Call a handler when data is received.

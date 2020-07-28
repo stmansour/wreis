@@ -69,7 +69,7 @@ fi
 #------------------------------------------------------------------------------
 #  TEST c
 #
-#  Loging and Get a specific property
+#  Loging and Get a specific property then logoff.
 #
 #  Scenario:
 #  login
@@ -99,6 +99,17 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
 
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/property/" "request" "${TFILES}${STEP}"  "Property-Search"
+
+    encodeRequest '{"cmd":"get"}'
+    dojsonPOST "http://localhost:8276/v1/logoff/" "request" "${TFILES}${STEP}"  "logoff"
+
+    #-----------------------------------------------------------------------------
+    # At this point, the cookie is no longer valid.  But try to use it again to
+    # verify that the server won't let it be used, and it properly handles a
+    # terminated cookie value
+    #-----------------------------------------------------------------------------
+    encodeRequest '{"cmd":"get"}'
+    dojsonPOST "http://localhost:8276/v1/logoff/" "request" "${TFILES}${STEP}"  "logoff using invalid cookie token"
 fi
 
 stopWsrv

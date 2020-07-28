@@ -1,6 +1,8 @@
 package session
 
-import "mojo/util"
+import (
+	util "wreis/util/lib"
+)
 
 // AIRAuthenticateResponse is the reply structure from Accord Directory
 type AIRAuthenticateResponse struct {
