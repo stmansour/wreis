@@ -207,10 +207,20 @@ function buildPageElements() {
                 { text: 'Directory',          icon: 'fa fa-user' },
             ]},
             { type: 'break', id: 'break2' },
-            { type: 'button', id: 'msgButton', caption: 'News Flash', icon: 'fa fa-spinner fa-pulse fa-3x fa-fw'},
-            { type: 'menu',    id: 'menuButton', caption: 'Developer',    icon: 'fa fa-user-circle', items: [
-                { text: 'Webdocs', icon: 'fa fa-book' },
-            ]},
+            // { type: 'button', id: 'msgButton', caption: 'News Flash', icon: 'fa fa-spinner fa-pulse fa-3x fa-fw'},
+            { type: 'menu',    id: 'menuButton', caption: 'Developer',    icon: 'fa fa-user-circle',
+                    items: [ { text: 'Webdocs', icon: 'fa fa-book' }, ]},
+            { id: 'bt3', type: 'spacer' },
+            { type: 'menu',   id: 'userMenu',
+                caption: '<div id="user_menu_container">'+
+                      '<span id="username"></span>'+
+                      '<img src="" />'+
+                      '</div>',
+                items: [
+                    { id: 'Signout'  , text: 'Sign Out', icon: 'fa fa-sign-out' },
+                ],
+            },
+            { id: 'help', text: 'Help', type: 'button', icon: 'fa fa-info-circle' },
         ],
         onClick: function (event) {
             console.log('target = ' + event.target);

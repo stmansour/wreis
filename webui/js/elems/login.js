@@ -57,16 +57,8 @@ window.userProfileToUI = function() {
     var name = app.name;
     if (name.length === 0 || app.uid === 0) { name = "?";}
     $("#user_menu_container").find("#username").text(name);
-    $("#user_menu_container").find("img").attr("src", app.imageurl);
-
-    // *******************
-    // ONLY FOR ROV CLIENT
-    // -------------------
-    if (window.location.href.endsWith("/rhome/")) {
-        setTimeout(function() {
-            $('#node_receipts').trigger('click');
-        }, 500); // wait for some time meanwhile left sidebar render done!
-    }
+    // $("#user_menu_container").find("img").attr("src", app.imageurl);
+    // w2ui.mainlayout.refresh();
 };
 
 window.buildLoginForm = function() {
