@@ -384,7 +384,7 @@ func IsUnrecognizedCookieError(err error) bool {
 //-----------------------------------------------------------------------------
 func ValidateSessionCookie(r *http.Request, getData int) (ValidateCookieResponse, error) {
 	funcname := "ValidateSessionCookie"
-	util.Console("Entered %s\n", funcname)
+	// util.Console("Entered %s\n", funcname)
 	var vc ValidateCookieRequest
 	var vr ValidateCookieResponse
 	c, err := r.Cookie(SessionCookieName)
@@ -412,28 +412,28 @@ func ValidateSessionCookie(r *http.Request, getData int) (ValidateCookieResponse
 	// Send to the authenication server
 	//-----------------------------------------------------------------------
 	url := appConfig.AuthNHost + "v1/validatecookie"
-	util.Console("posting request to: %s\n", url)
-	util.Console("              data: %s\n", string(pbr))
+	// util.Console("posting request to: %s\n", url)
+	// util.Console("              data: %s\n", string(pbr))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(pbr))
 	req.Header.Set("Content-Type", "application/json")
-	util.Console("\n*** req = %#v\n\n", req)
+	// util.Console("\n*** req = %#v\n\n", req)
 	client := &http.Client{}
-	util.Console("\n*** client = %#v\n\n", client)
+	// util.Console("\n*** client = %#v\n\n", client)
 	resp, err := client.Do(req)
 	if err != nil {
 		return vr, fmt.Errorf("%s: failed to execute client.Do:  %s", funcname, err.Error())
 	}
 	defer resp.Body.Close()
 
-	util.Console("Response status = %s, status code = %d\n", resp.Status, resp.StatusCode)
+	// util.Console("Response status = %s, status code = %d\n", resp.Status, resp.StatusCode)
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	util.Console("*** Directory Service *** response Body: %s\n", string(body))
+	// util.Console("*** Directory Service *** response Body: %s\n", string(body))
 
 	if err := json.Unmarshal([]byte(body), &vr); err != nil {
 		return vr, fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
 	}
-	util.Console("Successfully unmarshaled response: %s\n", string(body))
+	// util.Console("Successfully unmarshaled response: %s\n", string(body))
 	if vr.Status != "success" {
 		vr.Token = ""
 	}
@@ -445,13 +445,18 @@ func ValidateSessionCookie(r *http.Request, getData int) (ValidateCookieResponse
 // existing session or create a new session.
 //
 // INPUT
+//  ctx database context
+//  w - http writer to client
 //  r - the request where we look for the cookie
+//  c - pointer to the validate cookie response.  If UID > 0 it means that
+//      the cookie has already been validated and that the other fields are
+//      valid -- we don't need to make another call to the directory server.
 //
 // RETURNS
 //  session - pointer to the new session
 //  error   - any error encountered
 //-----------------------------------------------------------------------------
-func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request) (*Session, error) {
+func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *ValidateCookieResponse) (*Session, error) {
 	// funcname := "GetSession"
 	// var b AIRAuthenticateResponse
 	var ok bool
@@ -474,16 +479,27 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request) (*S
 	// util.Console("GetSession 5\n")
 	sess, ok = sessions[cookie.Value]
 	if !ok || sess == nil {
-		b, err := ValidateSessionCookie(r, 1)
-		if err != nil {
-			return sess, err
+		var b ValidateCookieResponse
+		// util.Console("GetSession 6\n")
+		if c != nil && c.UID > 0 {
+			b = *c // just copy the data already loaded
+			// util.Console("Using existing cookie info: %#v\n", b)
+		} else {
+			b, err = ValidateSessionCookie(r, 0)
+			if err != nil {
+				// util.Console("GetSession 7\n")
+				return sess, err
+			}
+			// util.Console("ValidateSessionCookie returned b = %#v\n", b)
+			// util.Console("Directory Service Expire time = %s\n", time.Time(b.Expire).Format(util.RRDATETIMEINPFMT))
 		}
-		// util.Console("ValidateSessionCookie returned b = %#v\n", b)
-		// util.Console("Directory Service Expire time = %s\n", time.Time(b.Expire).Format(util.RRDATETIMEINPFMT))
 		sess, err = CreateSession(ctx, &b)
+		// util.Console("GetSession 8\n")
 		if err != nil {
+			// util.Console("GetSession 9\n")
 			return nil, err
 		}
+		// util.Console("GetSession 10\n")
 		cookie := http.Cookie{Name: SessionCookieName, Value: b.Token, Expires: sess.Expire, Path: "/"}
 		http.SetCookie(w, &cookie) // a cookie cannot be set after writing anything to a response writer
 		// util.Console("*** NEW SESSION CREATED ***\n")

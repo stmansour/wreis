@@ -193,7 +193,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	util.Console("SVC: A\n")
 	if Svcs[sid].AuthNRequired {
 		util.Console("SVC: B\n")
-		c, err := session.ValidateSessionCookie(r, 0) // this updates the expire time
+		c, err := session.ValidateSessionCookie(r, 0 /* get all user info */) // this updates the expire time
 		if err != nil {
 			SvcErrorReturn(w, err)
 			return
@@ -219,7 +219,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		// in the database writes/updates. We maintain info about this user
 		// so we don't have to look it up every time they make a db change.
 		//----------------------------------------------------------------------
-		if d.sess, err = session.GetSession(r.Context(), w, r); err != nil {
+		if d.sess, err = session.GetSession(r.Context(), w, r, &c); err != nil {
 			SvcErrorReturn(w, err)
 			return
 		}

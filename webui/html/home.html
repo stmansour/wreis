@@ -2,7 +2,8 @@
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/static/html/fa/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/js/w2ui-1.5.rc1.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/js/w2ui-1.5.rc1.css">
+    <link rel="stylesheet" type="text/css" href="/static/html/wreis.css" />
     <link rel="icon" type="image/png" href="/static/html/images/favicon32x32.png">
 </head>
 <body>
@@ -220,6 +221,7 @@ function buildPageElements() {
                     { id: 'Signout'  , text: 'Sign Out', icon: 'fa fa-sign-out' },
                 ],
             },
+            { id: 'break', type: 'break' },
             { id: 'help', text: 'Help', type: 'button', icon: 'fa fa-info-circle' },
         ],
         onClick: function (event) {
@@ -238,6 +240,7 @@ function buildPageElements() {
                     w2ui.toptoolbar.set('msgButton', {icon: 'fa fa-newspaper-o'});
                     break;
                 case "menuButton:Webdocs": openInNewTab('/static/doc/docs.html'); break;
+                case "userMenu:Signout": logoff(); break;
             }
         },
     }));
@@ -570,6 +573,7 @@ $(function () {
 </script>
 
 <div id="layout"style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px;"></div>
+<div id="blank_screen"></div>
 
 </body>
 </html>

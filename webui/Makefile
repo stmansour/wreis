@@ -24,6 +24,7 @@ package:
 	@touch fail
 	mkdir -p ${STATIC}
 	cp -r html ${STATIC}/
+	cp html/*.css ${STATIC}/html/
 	mkdir -p ${STATIC}/js
 	cp js/*.js ${STATIC}/js/
 	cp js/*.css ${STATIC}/js/
