@@ -12,7 +12,7 @@
 
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/w2ui-1.5.rc1.js"></script>
-<script src="/static/js/login.js"></script>
+<script src="/static/js/wreis.js"></script>
 <script>
 /*global
     w2ui,$,console,
@@ -497,6 +497,19 @@ function buildPageElements() {
                             w2ui.propertyGrid.render();
                 }
             },
+        },
+        onLoad: function(event) {
+            event.onComplete = function() {
+                var r = this.record;
+                var y = new Date(r.BuildDate);
+                r.BuildDate = dateFmtStr(y);
+                y = new Date(r.DeliveryDt);
+                r.DeliveryDt = dateFmtStr(y);
+                y = new Date(r.LeaseCommencementDt);
+                r.LeaseCommencementDt = dateFmtStr(y);
+                y = new Date(r.LeaseExpirationDt);
+                r.LeaseExpirationDt = dateFmtStr(y);
+            };
         },
         actions: {
             save: function () {

@@ -17,6 +17,7 @@ jshint:
 	@rm -rf fail
 
 clean:
+	rm -f js/wreis.js
 	@echo "*** ${THISDIR}: completed clean ***"
 
 package:
@@ -26,9 +27,9 @@ package:
 	cp -r html ${STATIC}/
 	cp html/*.css ${STATIC}/html/
 	mkdir -p ${STATIC}/js
+	cat js/elems/*.js >js/wreis.js
 	cp js/*.js ${STATIC}/js/
 	cp js/*.css ${STATIC}/js/
-	cp js/elems/*.js ${STATIC}/js
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed package ***"
 
