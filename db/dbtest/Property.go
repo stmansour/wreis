@@ -178,12 +178,24 @@ func TestRentSteps(ctx context.Context) {
 	for i := 0; i < len(rs.RS); i++ {
 		fmt.Printf("\t%d. RSID = %d\n", i, rs.RS[i].RSID)
 	}
+	if len(rs.RS) != 2 {
+		fmt.Printf("It should have loaded 2 RentStep items\n")
+		os.Exit(1)
+	}
+
+	// Get the rent step items by themselves...
+	fmt.Printf("B.2 GetRentStepsItems\n")
+	var rsi []db.RentStep
+	if rsi, err = db.GetRentStepsItems(ctx, rs.RSLID); err != nil {
+		fmt.Printf("Error loading RentStep items for RSLID = %d: %s\n", rs.RSLID, err.Error())
+		os.Exit(1)
+	}
+	if len(rsi) != 2 {
+		fmt.Printf("It should have loaded 2 RentStep items\n")
+		os.Exit(1)
+	}
 
 	fmt.Printf("C. DeleteRentSteps where RSLID = %d\n", delid)
-	// if err = db.DeleteRentSteps(ctx, delid); err != nil {
-	// 	fmt.Printf("Error deleting RentSteps: %s\n", err)
-	// 	os.Exit(1)
-	// }
 	err = db.DeleteRentSteps(ctx, delid)
 	fmt.Printf("Returned from DeleteRentSteps, RSLID=%d\n", delid)
 	if err != nil {

@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 	"wreis/session"
 )
@@ -70,23 +69,48 @@ func GetRentSteps(ctx context.Context, id int64, members bool) (RentSteps, error
 	}
 
 	if members {
-		stmt2, rows, err := getRowsFromDB(ctx, Wdb.Prepstmt.GetRentStepsItems, fields)
-		if err != nil {
+		if a.RS, err = GetRentStepsItems(ctx, id); err != nil {
 			return a, err
 		}
-		if stmt2 != nil {
-			defer stmt2.Close()
-		}
-		for i := 0; rows.Next(); i++ {
-			var x RentStep
-			if err = ReadRentStepItem(rows, &x); err != nil {
-				return a, err
-			}
-			a.RS = append(a.RS, x)
-		}
-		if err = rows.Err(); err != nil {
+	}
+	return a, nil
+}
+
+// GetRentStepsItems reads only the array of RentStep items associated with
+// the supplied id (an RSLID)
+//
+// INPUTS
+// ctx - db context
+// id - RSLID to which all the rent step items belong
+//
+// RETURNS
+// ErrSessionRequired if the session is invalid
+// nil if the session is valid
+//-----------------------------------------------------------------------------
+func GetRentStepsItems(ctx context.Context, id int64) ([]RentStep, error) {
+	var err error
+	var a []RentStep
+	if !ValidateSession(ctx) {
+		return a, ErrSessionRequired
+	}
+
+	fields := []interface{}{id}
+	stmt2, rows, err := getRowsFromDB(ctx, Wdb.Prepstmt.GetRentStepsItems, fields)
+	if err != nil {
+		return a, err
+	}
+	if stmt2 != nil {
+		defer stmt2.Close()
+	}
+	for i := 0; rows.Next(); i++ {
+		var x RentStep
+		if err = ReadRentStepItem(rows, &x); err != nil {
 			return a, err
 		}
+		a = append(a, x)
+	}
+	if err = rows.Err(); err != nil {
+		return a, err
 	}
 	return a, nil
 }
@@ -168,7 +192,6 @@ func InsertRentStepsWithList(ctx context.Context, a *RentSteps) (int64, error) {
 // nil if the session is valid
 //-----------------------------------------------------------------------------
 func ReadRentSteps(row *sql.Row, a *RentSteps) error {
-	fmt.Printf("ReadRentSteps: A\n")
 	err := row.Scan(
 		&a.RSLID,
 		&a.FLAGS,
@@ -176,10 +199,6 @@ func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 		&a.CreateBy,
 		&a.LastModTime,
 		&a.LastModBy)
-	fmt.Printf("ReadRentSteps: B\n")
-	if err != nil {
-		fmt.Printf("Error from row.Scan: %s\n", err.Error())
-	}
 	SkipSQLNoRowsError(&err)
 	return err
 }
