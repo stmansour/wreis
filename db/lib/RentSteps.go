@@ -33,12 +33,9 @@ type RentSteps struct {
 func DeleteRentSteps(ctx context.Context, id int64) error {
 	var err error
 
-	fmt.Printf("DeleteRentSteps: A\n")
 	if err = genericDelete(ctx, "RentStep", Wdb.Prepstmt.DeleteRentStepsMembers, id); err != nil {
-		fmt.Printf("DeleteRentSteps: B\n")
 		return err
 	}
-	fmt.Printf("DeleteRentSteps: C\n")
 	err = genericDelete(ctx, "RentSteps", Wdb.Prepstmt.DeleteRentSteps, id)
 	return err
 }
@@ -48,13 +45,16 @@ func DeleteRentSteps(ctx context.Context, id int64) error {
 // INPUTS
 // ctx - db context
 // id - RSLID of the record to read
+// members - bool - if true, get all the items
 //
 // RETURNS
 // ErrSessionRequired if the session is invalid
 // nil if the session is valid
 //-----------------------------------------------------------------------------
-func GetRentSteps(ctx context.Context, id int64) (RentSteps, error) {
+func GetRentSteps(ctx context.Context, id int64, members bool) (RentSteps, error) {
 	var a RentSteps
+	var err error
+
 	if !ValidateSession(ctx) {
 		return a, ErrSessionRequired
 	}
@@ -63,9 +63,32 @@ func GetRentSteps(ctx context.Context, id int64) (RentSteps, error) {
 	fields := []interface{}{id}
 	stmt, row := getRowFromDB(ctx, Wdb.Prepstmt.GetRentSteps, fields)
 	if stmt != nil {
-		defer stmt.Close()
+		defer stmt.Close() // it's a txn.  We need to close the statement
 	}
-	return a, ReadRentSteps(row, &a)
+	if err = ReadRentSteps(row, &a); err != nil {
+		return a, err
+	}
+
+	if members {
+		stmt2, rows, err := getRowsFromDB(ctx, Wdb.Prepstmt.GetRentStepsItems, fields)
+		if err != nil {
+			return a, err
+		}
+		if stmt2 != nil {
+			defer stmt2.Close()
+		}
+		for i := 0; rows.Next(); i++ {
+			var x RentStep
+			if err = ReadRentStepItem(rows, &x); err != nil {
+				return a, err
+			}
+			a.RS = append(a.RS, x)
+		}
+		if err = rows.Err(); err != nil {
+			return a, err
+		}
+	}
+	return a, nil
 }
 
 // InsertRentSteps writes a new RentSteps record to the database
@@ -145,6 +168,7 @@ func InsertRentStepsWithList(ctx context.Context, a *RentSteps) (int64, error) {
 // nil if the session is valid
 //-----------------------------------------------------------------------------
 func ReadRentSteps(row *sql.Row, a *RentSteps) error {
+	fmt.Printf("ReadRentSteps: A\n")
 	err := row.Scan(
 		&a.RSLID,
 		&a.FLAGS,
@@ -152,6 +176,10 @@ func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 		&a.CreateBy,
 		&a.LastModTime,
 		&a.LastModBy)
+	fmt.Printf("ReadRentSteps: B\n")
+	if err != nil {
+		fmt.Printf("Error from row.Scan: %s\n", err.Error())
+	}
 	SkipSQLNoRowsError(&err)
 	return err
 }
@@ -177,16 +205,11 @@ func UpdateRentSteps(ctx context.Context, a *RentSteps) error {
 		sess.UID,
 		a.RSLID,
 	}
-	fmt.Printf("UpdateRentSteps: A\n")
 	if a.RSLID > 0 {
-		fmt.Printf("UpdateRentSteps: B\n")
 		if err = DeleteRentSteps(ctx, a.RSLID); err != nil {
-			fmt.Printf("UpdateRentSteps: C\n")
 			return err
 		}
-		fmt.Printf("UpdateRentSteps: E\n")
 	}
-	fmt.Printf("UpdateRentSteps: F\n")
 	l := len(a.RS)
 	for i := 0; i < l; i++ {
 		a.RS[i].RSLID = a.RSLID // ensure it's the correct list

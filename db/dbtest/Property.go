@@ -166,6 +166,19 @@ func TestRentSteps(ctx context.Context) {
 	}
 	fmt.Printf("InsertRentSteps returned RSLID = %d\n", delid)
 
+	// Read the rentsteps and make sure there are 2...
+	fmt.Printf("B.1 GetRentSteps\n")
+	var rs db.RentSteps
+	rs, err = db.GetRentSteps(ctx, delid, true /*include items*/)
+	if err != nil {
+		fmt.Printf("Error getting RentSteps: %s\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("GetRentSteps returned RSLID = %d, with %d items\n", rs.RSLID, len(rs.RS))
+	for i := 0; i < len(rs.RS); i++ {
+		fmt.Printf("\t%d. RSID = %d\n", i, rs.RS[i].RSID)
+	}
+
 	fmt.Printf("C. DeleteRentSteps where RSLID = %d\n", delid)
 	// if err = db.DeleteRentSteps(ctx, delid); err != nil {
 	// 	fmt.Printf("Error deleting RentSteps: %s\n", err)
@@ -180,7 +193,7 @@ func TestRentSteps(ctx context.Context) {
 
 	fmt.Printf("D. GetRentSteps\n")
 	var rsl1 db.RentSteps
-	if rsl1, err = db.GetRentSteps(ctx, id); err != nil {
+	if rsl1, err = db.GetRentSteps(ctx, id, false); err != nil {
 		fmt.Printf("error in GetRentSteps: %s\n", err.Error())
 		os.Exit(1)
 	}

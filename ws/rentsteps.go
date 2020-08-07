@@ -14,11 +14,23 @@ import (
 //                        **** SEARCH ****
 //-------------------------------------------------------------------
 
+// RentStep is an individual member of the rent step list.
+type RentStep struct {
+	RSID  int64         // unique id for this record
+	RSLID int64         // id of RentStepList to which this record belongs
+	Count int64         // FIX THIS,  not sure what this is
+	Dt    util.JSONDate // date for the rent amount; valid when RSLID.FLAGS bit 0 = 1
+	Opt   int64         // option number, 1 .. n
+	Rent  float64       // amount of rent on the associated date
+	FLAGS uint64        // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
+}
+
 // RentStepsGrid is the structure of data for a RentSteps we send to the UI
 type RentStepsGrid struct {
 	Recid          int64 `json:"recid"`
-	PID            int64
+	PRID           int64
 	RSLID          int64 // unique id
+	RS             []RentStep
 	CreateTime     util.JSONDateTime
 	CreatedBy      int64
 	LastModifyTime util.JSONDateTime
@@ -247,7 +259,7 @@ func getRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "getRentSteps"
 	util.Console("entered %s\n", funcname)
 	var g GetRentSteps
-	a, err := db.GetRentSteps(r.Context(), d.ID)
+	a, err := db.GetRentSteps(r.Context(), d.ID, false)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return

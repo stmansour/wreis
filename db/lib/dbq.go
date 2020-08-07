@@ -15,6 +15,7 @@ type PrepSQL struct {
 	DeleteRentStep *sql.Stmt
 
 	GetRentSteps           *sql.Stmt
+	GetRentStepsItems      *sql.Stmt
 	InsertRentSteps        *sql.Stmt
 	UpdateRentSteps        *sql.Stmt
 	DeleteRentStepsMembers *sql.Stmt

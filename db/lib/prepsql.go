@@ -128,6 +128,8 @@ func BuildPreparedStatements() {
 	Wdb.DBFields["RentSteps"] = flds
 	Wdb.Prepstmt.GetRentSteps, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentSteps where RSLID=?")
 	Errcheck(err)
+	Wdb.Prepstmt.GetRentStepsItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["RentStep"] + " FROM RentStep where RSLID=?")
+	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertRentSteps, err = Wdb.DB.Prepare("INSERT INTO RentSteps (" + s1 + ") VALUES(" + s2 + ")")
 	Errcheck(err)

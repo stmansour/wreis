@@ -13,7 +13,7 @@ import (
 type RentStep struct {
 	RSID        int64     // unique id for this record
 	RSLID       int64     // id of RentStepList to which this record belongs
-	Count       int64     // valid when RSLID.FLAGS bit 0 = 0, a sequence number
+	Count       int64     // not sure what this is
 	Dt          time.Time // date for the rent amount; valid when RSLID.FLAGS bit 0 = 1
 	Opt         int64     // option number, 1 .. n
 	Rent        float64   // amount of rent on the associated date
@@ -105,6 +105,35 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 //-----------------------------------------------------------------------------
 func ReadRentStep(row *sql.Row, a *RentStep) error {
 	err := row.Scan(
+		&a.RSID,
+		&a.RSLID,
+		&a.Count,
+		&a.Dt,
+		&a.Opt,
+		&a.Rent,
+		&a.FLAGS,
+		&a.CreateTS,
+		&a.CreateBy,
+		&a.LastModTime,
+		&a.LastModBy)
+	SkipSQLNoRowsError(&err)
+	return err
+}
+
+// ReadRentStepItem reads a full RentStep structure of data from the database based
+// on the supplied Rows pointer.
+//
+// INPUTS
+// row - db Row pointer
+// a   - pointer to struct to fill
+//
+// RETURNS
+//
+// ErrSessionRequired if the session is invalid
+// nil if the session is valid
+//-----------------------------------------------------------------------------
+func ReadRentStepItem(rows *sql.Rows, a *RentStep) error {
+	err := rows.Scan(
 		&a.RSID,
 		&a.RSLID,
 		&a.Count,

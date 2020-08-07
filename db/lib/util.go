@@ -244,7 +244,8 @@ func genericDelete(ctx context.Context, s string, g *sql.Stmt, id int64) error {
 // fields     - the fields to supply to the prepared statement
 //
 // RETURNS
-// *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
+// *sql.Stmt  - the statement -- THIS NEEDS TO BE NIL UNLESS IT'S A TXN
+//				nil if not in transaction, non-nil otherwise
 // 				note that the caller needs to defer stmt.Close() when stmt is
 //              not nil.
 // *sql.Row   - the database row to read
@@ -258,6 +259,34 @@ func getRowFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*s
 	}
 	row = stmt.QueryRow(fields...)
 	return nil, row
+}
+
+// getRowsFromDB encapsulates about 6 or 7 lines of code to handle getting a
+// database row either in the context of a transaction or not.  These lines
+// appear in every Get call, so it simplifies the code a lot.
+//
+// INPUTS
+// ctx        - db context
+// stmt       - the prepared statement to execute
+// fields     - the fields to supply to the prepared statement
+//
+// RETURNS
+// *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
+// 				Note that the caller needs to defer stmt.Close() when stmt is
+//              not nil.
+// *sql.Row   - the database row to read
+// error      - any error encountered
+//-----------------------------------------------------------------------------
+func getRowsFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, *sql.Rows, error) {
+	var rows *sql.Rows
+	var err error
+	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
+		stmt := tx.Stmt(stmt)
+		rows, err = stmt.Query(fields...)
+		return stmt, rows, err
+	}
+	rows, err = stmt.Query(fields...)
+	return nil, rows, err
 }
 
 // insertRowToDB encapsulates about 6 or 7 lines of code to handle inserting a

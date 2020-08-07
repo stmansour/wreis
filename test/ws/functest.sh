@@ -94,7 +94,6 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     # Set the command line for cookies in ${COOKIES} and dojsonPOST will use them.
     #-----------------------------------------------------------------------------
     TOKEN=$(grep Token "${OUTFILE}" | awk '{print $2;}' | sed 's/[",]//g')
-    echo "Token = ${TOKEN}"
     COOKIES="-b air=${TOKEN}"
 
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
