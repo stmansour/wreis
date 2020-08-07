@@ -40,7 +40,7 @@ func TestProperty(ctx context.Context) {
 		LeaseCommencementDt:  dt,
 		LeaseExpirationDt:    dt,
 		TermRemainingOnLease: int64(dur),
-		ROLID:                 0,
+		ROLID:                0,
 		Address:              "1234 Elm Street",
 		Address2:             "",
 		City:                 "Corn Bluff",
@@ -132,26 +132,62 @@ func TestRentSteps(ctx context.Context) {
 	var err error
 	var rsl db.RentSteps
 	var delid, id int64
+
+	// create some rent steps
+	rsl.RS = append(rsl.RS, db.RentStep{
+		RSLID: 0,
+		Count: 1,
+		Dt:    time.Date(2019, time.January, 1, 0, 0, 0, 0, time.UTC),
+		Opt:   1,
+		Rent:  float64(2500),
+		FLAGS: 0,
+	})
+	// create some rent steps
+	rsl.RS = append(rsl.RS, db.RentStep{
+		RSLID: 0,
+		Count: 2,
+		Dt:    time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
+		Opt:   1,
+		Rent:  float64(2750),
+		FLAGS: 0,
+	})
+
+	fmt.Printf("A. InsertRentSteps\n")
 	if id, err = db.InsertRentSteps(ctx, &rsl); err != nil {
 		fmt.Printf("Error inserting RentSteps: %s\n", err)
 		os.Exit(1)
 	}
 
 	// Insert another for delete...
+	fmt.Printf("B. InsertRentSteps\n")
 	if delid, err = db.InsertRentSteps(ctx, &rsl); err != nil {
 		fmt.Printf("Error inserting RentSteps: %s\n", err)
 		os.Exit(1)
 	}
-	if err = db.DeleteRentSteps(ctx, delid); err != nil {
+	fmt.Printf("InsertRentSteps returned RSLID = %d\n", delid)
+
+	fmt.Printf("C. DeleteRentSteps where RSLID = %d\n", delid)
+	// if err = db.DeleteRentSteps(ctx, delid); err != nil {
+	// 	fmt.Printf("Error deleting RentSteps: %s\n", err)
+	// 	os.Exit(1)
+	// }
+	err = db.DeleteRentSteps(ctx, delid)
+	fmt.Printf("Returned from DeleteRentSteps, RSLID=%d\n", delid)
+	if err != nil {
 		fmt.Printf("Error deleting RentSteps: %s\n", err)
 		os.Exit(1)
 	}
 
+	fmt.Printf("D. GetRentSteps\n")
 	var rsl1 db.RentSteps
 	if rsl1, err = db.GetRentSteps(ctx, id); err != nil {
 		fmt.Printf("error in GetRentSteps: %s\n", err.Error())
 		os.Exit(1)
 	}
+	fmt.Printf("Got %d rentsteps\n", len(rsl1.RS))
+
+	fmt.Printf("E. UpdateRentSteps\n")
+	fmt.Printf("rsl1 = %#v\n", rsl1)
 	if err = db.UpdateRentSteps(ctx, &rsl1); err != nil {
 		fmt.Printf("Error updating RentSteps: %s\n", err)
 		os.Exit(1)

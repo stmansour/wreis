@@ -134,6 +134,7 @@ var Svcs = []ServiceHandler{
 	{Cmd: "logoff", AuthNRequired: true, Handler: SvcLogoff}, // it handles properly if session has already timed out
 	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
+	{Cmd: "rentsteps", AuthNRequired: true, Handler: SvcHandlerRentSteps},
 	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},
 }
 

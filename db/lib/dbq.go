@@ -14,18 +14,20 @@ type PrepSQL struct {
 	UpdateRentStep *sql.Stmt
 	DeleteRentStep *sql.Stmt
 
-	GetRentSteps    *sql.Stmt
-	InsertRentSteps *sql.Stmt
-	UpdateRentSteps *sql.Stmt
-	DeleteRentSteps *sql.Stmt
+	GetRentSteps           *sql.Stmt
+	InsertRentSteps        *sql.Stmt
+	UpdateRentSteps        *sql.Stmt
+	DeleteRentStepsMembers *sql.Stmt
+	DeleteRentSteps        *sql.Stmt
 
 	GetRenewOption    *sql.Stmt
 	InsertRenewOption *sql.Stmt
 	UpdateRenewOption *sql.Stmt
 	DeleteRenewOption *sql.Stmt
 
-	GetRenewOptions    *sql.Stmt
-	InsertRenewOptions *sql.Stmt
-	UpdateRenewOptions *sql.Stmt
-	DeleteRenewOptions *sql.Stmt
+	GetRenewOptions           *sql.Stmt
+	InsertRenewOptions        *sql.Stmt
+	UpdateRenewOptions        *sql.Stmt
+	DeleteRenewOptions        *sql.Stmt
+	DeleteRenewOptionsMembers *sql.Stmt
 }

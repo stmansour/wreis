@@ -1,7 +1,7 @@
 TOP=../..
 THISDIR="dbtest"
 
-dblib: *.go
+dbtest: *.go config.json
 	@touch fail
 	@go vet
 	@golint
@@ -10,7 +10,7 @@ dblib: *.go
 	@echo "*** Completed in ${THISDIR} ***"
 
 clean:
-	rm -f config.json log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? ${THISDIR} fail
+	rm -f conf*.json log llog *.g ./gold/*.g err.txt [a-z] [a-z][a-z1-9] qq? ${THISDIR} fail
 	@echo "*** CLEAN completed in ${THISDIR} ***"
 
 config.json:

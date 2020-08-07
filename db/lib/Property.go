@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"wreis/session"
 )
 
 // Property defines a date and a rent amount for a property. A Property record
@@ -111,6 +112,10 @@ func GetProperty(ctx context.Context, id int64) (Property, error) {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func InsertProperty(ctx context.Context, a *Property) (int64, error) {
+	sess, ok := session.GetSessionFromContext(ctx)
+	if !ok {
+		return a.PRID, ErrSessionRequired
+	}
 	fields := []interface{}{
 		a.Name,
 		a.YearsInBusiness,
@@ -153,7 +158,7 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.HQPostalCode,
 		a.HQCountry,
 		a.CreateBy,
-		a.LastModBy,
+		sess.UID,
 	}
 
 	var err error
@@ -327,6 +332,10 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func UpdateProperty(ctx context.Context, a *Property) error {
+	sess, ok := session.GetSessionFromContext(ctx)
+	if !ok {
+		return ErrSessionRequired
+	}
 	fields := []interface{}{
 		a.Name,
 		a.YearsInBusiness,
@@ -368,7 +377,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.HQState,
 		a.HQPostalCode,
 		a.HQCountry,
-		a.LastModBy,
+		sess.UID,
 		a.PRID,
 	}
 	var err error

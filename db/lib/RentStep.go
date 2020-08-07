@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"wreis/session"
 )
 
 // RentStep defines a date and a rent amount for a property. A RentStep record
@@ -12,7 +13,7 @@ import (
 type RentStep struct {
 	RSID        int64     // unique id for this record
 	RSLID       int64     // id of RentStepList to which this record belongs
-	Count       int64     // valid when RSLID.FLAGS bit 0 = 0
+	Count       int64     // valid when RSLID.FLAGS bit 0 = 0, a sequence number
 	Dt          time.Time // date for the rent amount; valid when RSLID.FLAGS bit 0 = 1
 	Opt         int64     // option number, 1 .. n
 	Rent        float64   // amount of rent on the associated date
@@ -71,6 +72,10 @@ func GetRentStep(ctx context.Context, id int64) (RentStep, error) {
 //-----------------------------------------------------------------------------
 func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 	// transaction... context
+	sess, ok := session.GetSessionFromContext(ctx)
+	if !ok {
+		return a.RSID, ErrSessionRequired
+	}
 	fields := []interface{}{
 		a.RSLID,
 		a.Count,
@@ -79,7 +84,7 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 		a.Rent,
 		a.FLAGS,
 		a.CreateBy,
-		a.LastModBy,
+		sess.UID,
 	}
 	var err error
 	a.CreateBy, a.LastModBy, a.RSID, err = genericInsert(ctx, "RentStep", Wdb.Prepstmt.InsertRentStep, fields, a)
@@ -126,6 +131,10 @@ func ReadRentStep(row *sql.Row, a *RentStep) error {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func UpdateRentStep(ctx context.Context, a *RentStep) error {
+	sess, ok := session.GetSessionFromContext(ctx)
+	if !ok {
+		return ErrSessionRequired
+	}
 	fields := []interface{}{
 		a.RSLID,
 		a.Count,
@@ -133,7 +142,7 @@ func UpdateRentStep(ctx context.Context, a *RentStep) error {
 		a.Opt,
 		a.Rent,
 		a.FLAGS,
-		a.LastModBy,
+		sess.UID,
 		a.RSID,
 	}
 

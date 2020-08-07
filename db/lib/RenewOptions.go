@@ -7,10 +7,10 @@ import (
 )
 
 // RenewOptions defines a date and a rent amount for a property. A RenewOptions record
-// is part of a group or list. The group is defined by the RSLID
+// is part of a group or list. The group is defined by the ROLID
 //-----------------------------------------------------------------------------
 type RenewOptions struct {
-	RSLID       int64         // id of RenewOptionsList to which this record belongs
+	ROLID       int64         // id of RenewOptionsList to which this record belongs
 	FLAGS       uint64        // 1<<0
 	LastModTime time.Time     // when was the record last written
 	LastModBy   int64         // id of user that did the modify
@@ -23,20 +23,24 @@ type RenewOptions struct {
 //
 // INPUTS
 // ctx - db context
-// id - RSLID of the record to read
+// id - ROLID of the record to read
 //
 // RETURNS
 // Any errors encountered, or nil if no errors
 //-----------------------------------------------------------------------------
 func DeleteRenewOptions(ctx context.Context, id int64) error {
-	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteRenewOptions, id)
+	var err error
+	if err = genericDelete(ctx, "RenewOption", Wdb.Prepstmt.DeleteRenewOptionsMembers, id); err != nil {
+		return err
+	}
+	return genericDelete(ctx, "RenewOptions", Wdb.Prepstmt.DeleteRenewOptions, id)
 }
 
 // GetRenewOptions reads and returns a RenewOptions structure
 //
 // INPUTS
 // ctx - db context
-// id - RSLID of the record to read
+// id - ROLID of the record to read
 //
 // RETURNS
 // ErrSessionRequired if the session is invalid
@@ -75,8 +79,8 @@ func InsertRenewOptions(ctx context.Context, a *RenewOptions) (int64, error) {
 	}
 
 	var err error
-	a.CreateBy, a.LastModBy, a.RSLID, err = genericInsert(ctx, "RenewOptions", Wdb.Prepstmt.InsertRenewOptions, fields, a)
-	return a.RSLID, err
+	a.CreateBy, a.LastModBy, a.ROLID, err = genericInsert(ctx, "RenewOptions", Wdb.Prepstmt.InsertRenewOptions, fields, a)
+	return a.ROLID, err
 }
 
 // InsertRenewOptionsWithList writes a new RenewOptions record to the database
@@ -120,7 +124,7 @@ func InsertRenewOptionsWithList(ctx context.Context, a *RenewOptions) (int64, er
 //-----------------------------------------------------------------------------
 func ReadRenewOptions(row *sql.Row, a *RenewOptions) error {
 	err := row.Scan(
-		&a.RSLID,
+		&a.ROLID,
 		&a.FLAGS,
 		&a.CreateTS,
 		&a.CreateBy,
@@ -144,10 +148,23 @@ func UpdateRenewOptions(ctx context.Context, a *RenewOptions) error {
 	fields := []interface{}{
 		a.FLAGS,
 		a.LastModBy,
-		a.RSLID,
+		a.ROLID,
 	}
 
 	var err error
+	if a.ROLID > 0 {
+		if err = DeleteRenewOptions(ctx, a.ROLID); err != nil {
+			return err
+		}
+	}
+	l := len(a.RO)
+	for i := 0; i < l; i++ {
+		a.RO[i].ROLID = a.ROLID // ensure it's the correct list
+		if _, err = InsertRenewOption(ctx, &a.RO[i]); err != nil {
+			return err
+		}
+	}
+
 	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateRenewOptions, fields)
 	return updateError(err, "RenewOptions", *a)
 }

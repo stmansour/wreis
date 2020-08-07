@@ -191,12 +191,12 @@ func insertError(err error, n string, a interface{}) error {
 //              not nil.
 // error      - any error encountered
 //-----------------------------------------------------------------------------
-func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, error) {
+func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interface{}) error {
 	var err error
 
 	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
 		stmt := tx.Stmt(stmt)
-		// defer stmt.Close()
+		defer stmt.Close()
 		_, err = stmt.Exec(fields...)
 	} else {
 		_, err = stmt.Exec(fields...)
@@ -205,7 +205,7 @@ func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interfa
 		util.Ulog("Error deleting %s fields[]=%#v, error: %v\n", s, fields, err)
 	}
 
-	return stmt, err
+	return err
 }
 
 // genericDelete encapsulates the most generic form of the database delete
@@ -222,15 +222,14 @@ func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interfa
 //-----------------------------------------------------------------------------
 func genericDelete(ctx context.Context, s string, g *sql.Stmt, id int64) error {
 	var err error
-	var stmt *sql.Stmt
 
 	if err = ValidateSessionForDBDelete(ctx); err != nil {
 		return err
 	}
 
 	fields := []interface{}{id}
-	if stmt, err = deleteDBRow(ctx, s, g, fields); stmt != nil {
-		defer stmt.Close()
+	if err = deleteDBRow(ctx, s, g, fields); err != nil {
+		return err
 	}
 	return err
 }

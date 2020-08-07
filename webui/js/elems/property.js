@@ -416,6 +416,12 @@ function buildPropertyUIElements() {
     });
 }
 
+// setPropertyLayout is used to display the property form in the UI and handle
+// the tab clicking.
+//
+// INPUTS
+//      PRID - int64, property id
+//      tab  - string, name of the tab that was pressed
 function setPropertyLayout(PRID,tab) {
     w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
 
@@ -440,55 +446,11 @@ function setPropertyLayout(PRID,tab) {
             w2ui.propertyLeaseOptionsGrid.url = '';
         } else {
             w2ui.propertyLeaseOptionsGrid.clear();
-            w2ui.propertyLeaseOptionsGrid.url = '/v1/rentsteps/' + PRID;
+            w2ui.propertyLeaseOptionsGrid.url = '/v1/leaseoptions/' + PRID;
         }
         w2ui.propertyFormLayout.content('main',w2ui.propertyLeaseOptionsGrid);
     }
-
-
-    if (PRID > 0) {
-        // Load the Rent Steps and Lesase Options
-        //rmrG.load('/v1/rmr/' + BID + '/' + PRID);
-        // w2ui.rmrGrid.url = '/v1/rmr/' + BID + '/' + PRID;
-
-        // change the text of form tab
-        // w2ui.propertyFormLayout.get("main").tabs.get("propertyForm").text = "Property Details (" + PRID + ")";
-        // w2ui.propertyFormLayout.get("main").tabs.refresh();
-
-        // // load form content from server
-        // f.request(function(event) {
-        //     if (event.status === "success") {
-        //         // only render the toplayout after server has sent down data
-        //         // so that w2ui can bind values with field's html control,
-        //         // otherwise it is unable to find html controls
-        //         showForm();
-        //         return true;
-        //     }
-        //     else {
-        //         showForm();
-        //         f.message("Could not get form data from server...!!");
-        //         return false;
-        //     }
-        // });
-        showForm();
-    }
-    else {
-        // Clear the grids
-
-        // // change the text of form tab
-        // w2ui.propertyFormLayout.get("main").tabs.get("propertyForm").text = "Rentable Type Details ({0})".format("new");
-        // w2ui.propertyFormLayout.get("main").tabs.refresh();
-        //
-        // // unselect the previous selected row
-        // var sel_recid = parseInt(rtG.last.sel_recid);
-        // if (sel_recid > -1) {
-        //     // if new record is being added then unselect {{the selected record}} from the grid
-        //     rtG.unselect(rtG.last.sel_recid);
-        // }
-
-        showForm();
-        return true;
-    }
+    showForm();
 }
 
 function showForm() {

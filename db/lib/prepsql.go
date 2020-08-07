@@ -135,6 +135,8 @@ func BuildPreparedStatements() {
 	Errcheck(err)
 	Wdb.Prepstmt.DeleteRentSteps, err = Wdb.DB.Prepare("DELETE from RentSteps WHERE RSLID=?")
 	Errcheck(err)
+	Wdb.Prepstmt.DeleteRentStepsMembers, err = Wdb.DB.Prepare("DELETE from RentStep WHERE RSLID=?")
+	Errcheck(err)
 
 	//==========================================
 	// Renew Option
@@ -164,6 +166,8 @@ func BuildPreparedStatements() {
 	Wdb.Prepstmt.UpdateRenewOptions, err = Wdb.DB.Prepare("UPDATE RenewOptions SET " + s3 + " WHERE ROLID=?")
 	Errcheck(err)
 	Wdb.Prepstmt.DeleteRenewOptions, err = Wdb.DB.Prepare("DELETE from RenewOptions WHERE ROLID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.DeleteRenewOptionsMembers, err = Wdb.DB.Prepare("DELETE from RenewOption WHERE ROLID=?")
 	Errcheck(err)
 
 }
