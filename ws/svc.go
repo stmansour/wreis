@@ -191,15 +191,15 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	// Is authentication required for this command?  If so validate that we
 	// have a cookie.
 	//-----------------------------------------------------------------------
-	util.Console("SVC: A\n")
+	// util.Console("SVC: A\n")
 	if Svcs[sid].AuthNRequired {
-		util.Console("SVC: B\n")
+		// util.Console("SVC: B\n")
 		c, err := session.ValidateSessionCookie(r, 0 /* get all user info */) // this updates the expire time
 		if err != nil {
 			SvcErrorReturn(w, err)
 			return
 		}
-		util.Console("SVC: C\n")
+		// util.Console("SVC: C\n")
 		if c.Status != "success" {
 			//----------------------------------------------------------------------
 			// user needs to log in.  If the command was logoff, just return success.
@@ -212,7 +212,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			SvcErrorReturn(w, db.ErrSessionRequired)
 			return
 		}
-		util.Console("SVC: D\n")
+		// util.Console("SVC: D\n")
 		//----------------------------------------------------------------------
 		// The air cookie is valid.  Create (or get) the internal session. This
 		// is needed to identify the person associated with the request. All
@@ -231,9 +231,9 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		ctx := session.SetSessionContextKey(r.Context(), d.sess)
 		r = r.WithContext(ctx)
 
-		util.Console("SVC: E\n")
+		// util.Console("SVC: E\n")
 	}
-	util.Console("SVC: F\n")
+	// util.Console("SVC: F\n")
 
 	svcDebugURL(r, &d)
 	showRequestHeaders(r)

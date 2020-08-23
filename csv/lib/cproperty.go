@@ -3,7 +3,6 @@ package wcsv
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 	db "wreis/db/lib"
@@ -249,15 +248,17 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 
 // HandleRenewOptions reads properties into the database from the supplied file
 //
-// The intput will be a string in the form:  [x;opt;amount[;]]...
+// The intput will be a string in the form:  [x;amount[;]]...
 //
-// x      = either a date or a number.  We try to parse it as a date first, if that
-//          fails we parse it as a number. If that fails we return an error.
-// opt    = a count, a number, 1, 2, ...
+// x      = either a date or a number.  We try to parse it as a date first
+//          and FLAGS bit 0 will be set to 1.
+//          If that fails then we accept the value as a string and put it in
+//          Opt mode (FLAGS bit 0 = 0)
 // amount = the amount for rent
 //
-// Example:
-//			7/4/2024;1;109709.45;7/4/2025;2;111903.63;7/4/2026;3;11295.34
+// Examples:
+//			7/4/2024;109709.45;7/4/2025;111903.63;7/4/2026;11295.34
+//			"Year 1";109709.45;"Year 2";111903.63;"Year 3";11295.34
 //
 // INPUTS
 // s       = semicolon-separated list of values
@@ -270,7 +271,7 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 //------------------------------------------------------------------------------
 func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption, []error) {
 	var RO []db.RenewOption
-	var ntuple = 3 // 3 items per entry: x, opt, amount
+	var ntuple = 2 // 3 items per entry: x, opt, amount
 
 	ss := strings.Split(s, ";")
 	lss := len(ss)
@@ -286,37 +287,23 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 		var ro db.RenewOption
 		var x time.Time
 		var el []error
-		var err error
-		var j int64
 		//--------------------------------------------------------------------
 		// First index can be either a date or a number, determine which...
 		//--------------------------------------------------------------------
 		x, el = ParseDate(ss[i], lineno, el) // index i -> "7/4/2024"
 		if len(el) > 0 {
-			j, err = strconv.ParseInt(ss[i], 10, 64)
-			if err != nil {
-				errlist = append(errlist, fmt.Errorf("Line %d: no valid date or number found: %q", lineno, ss[i]))
-				return RO, errlist
-			}
-		}
-		//--------------------------------------------------------------------
-		// If it was a date, then there will be no error from ParseDate..
-		//--------------------------------------------------------------------
-		if len(el) == 0 {
-			ro.Dt = x
-			ro.Count = j    // the number already parsed above
-			ro.FLAGS |= 0x1 // set bit 1, indicate Dt is valid
+			// we'll take this to be a string
+			ro.Opt = ss[i]
+			ro.FLAGS &= 0xfffffffe // set bit 1 to 0
 		} else {
-			// FLAGS bit 0 defaults to 0 -> Count is valid, no FLAGS updated needed
-			ro.Count = j
-		}
-		ro.Opt, err = strconv.ParseInt(ss[i+1], 10, 64) // index i+1 holds the opt number
-		if err != nil {
-			errlist = append(errlist, fmt.Errorf("Line %d: invalid opt number found: %q", lineno, ss[i+1]))
-			return RO, errlist
+			//--------------------------------------------------------------------
+			// If it was a date, then there will be no error from ParseDate..
+			//--------------------------------------------------------------------
+			ro.Dt = x
+			ro.FLAGS |= 0x1 // set bit 1, indicate Dt is valid
 		}
 
-		ro.Rent, el = ParseFloat64(ss[i+2], lineno, errlist) // index i+2 holds the Amount
+		ro.Rent, el = ParseFloat64(ss[i+1], lineno, errlist) // index i+1 holds the Amount
 		if len(el) > 0 {
 			errlist = append(errlist, el[0]) // add the error to the list we'll be returning
 			return RO, errlist
@@ -345,8 +332,10 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 // opt    = a count, a number, 1, 2, ...
 // amount = the amount for rent
 //
-// Example:
-//			7/4/2024;1;109709.45;7/4/2025;2;111903.63;7/4/2026;3;11295.34
+// Examples:
+//			7/4/2024;109709.45;7/4/2025;111903.63;7/4/2026;11295.34
+//			"Year 1";109709.45;"Year 2";111903.63;"Year 3";11295.34
+//
 //
 // INPUTS
 // s       = semicolon-separated list of values
@@ -359,7 +348,7 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 //------------------------------------------------------------------------------
 func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []error) {
 	var RS []db.RentStep
-	var ntuple = 3 // 3 items per entry: x, opt, amount
+	var ntuple = 2 // 2 items per entry: x, amount
 
 	ss := strings.Split(s, ";")
 	lss := len(ss)
@@ -375,37 +364,23 @@ func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []er
 		var rs db.RentStep
 		var x time.Time
 		var el []error
-		var err error
-		var j int64
 		//--------------------------------------------------------------------
 		// First index can be either a date or a number, determine which...
 		//--------------------------------------------------------------------
 		x, el = ParseDate(ss[i], lineno, el) // index i -> "7/4/2024"
 		if len(el) > 0 {
-			j, err = strconv.ParseInt(ss[i], 10, 64)
-			if err != nil {
-				errlist = append(errlist, fmt.Errorf("Line %d: no valid date or number found: %q", lineno, ss[i]))
-				return RS, errlist
-			}
-		}
-		//--------------------------------------------------------------------
-		// If it was a date, then there will be no error from ParseDate..
-		//--------------------------------------------------------------------
-		if len(el) == 0 {
-			rs.Dt = x
-			rs.Count = j    // the number already parsed above
-			rs.FLAGS |= 0x1 // set bit 1, indicate Dt is valid
+			// we'll take this to be a string
+			rs.Opt = ss[i]
+			rs.FLAGS &= 0xfffffffe // set bit 1 to 0
 		} else {
-			// FLAGS bit 0 defaults to 0 -> Count is valid, no FLAGS updated needed
-			rs.Count = j
-		}
-		rs.Opt, err = strconv.ParseInt(ss[i+1], 10, 64) // index i+1 holds the opt number
-		if err != nil {
-			errlist = append(errlist, fmt.Errorf("Line %d: invalid opt number found: %q", lineno, ss[i+1]))
-			return RS, errlist
+			//--------------------------------------------------------------------
+			// If it was a date, then there will be no error from ParseDate..
+			//--------------------------------------------------------------------
+			rs.Dt = x
+			rs.FLAGS |= 0x1 // set bit 1, indicate Dt is valid
 		}
 
-		rs.Rent, el = ParseFloat64(ss[i+2], lineno, errlist) // index i+2 holds the Amount
+		rs.Rent, el = ParseFloat64(ss[i+1], lineno, errlist) // index i+2 holds the Amount
 		if len(el) > 0 {
 			errlist = append(errlist, el[0]) // add the error to the list we'll be returning
 			return RS, errlist

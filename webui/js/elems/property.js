@@ -126,6 +126,7 @@ function buildPropertyUIElements() {
                 propData.bPropLoaded = false;
                 propData.bRentStepsLoaded = false;
                 propData.bLeaseOptsLoaded = false;
+                w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
                 setPropertyLayout(rec.PRID,'proptabGeneral');
             };
         },
@@ -142,7 +143,7 @@ function buildPropertyUIElements() {
             setToForm('propertyForm', '/v1/property/0',500);
         },
         onRefresh: function(/*event*/) {
-            console.log('propertyGrid.onRefresh')
+            // console.log('propertyGrid.onRefresh')
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
         onLoad: function(/*event*/) {
@@ -182,7 +183,8 @@ function buildPropertyUIElements() {
                     onClick: function (event) {
                         switch(event.target) {
                         case 'btnClose':
-                            // set back to the property grid
+                            w2ui.toplayout.hide('right', true);
+                            w2ui.propertyGrid.render();
                             break;
                         }
                     },
@@ -204,7 +206,7 @@ function buildPropertyUIElements() {
                     //  HANDLE THE TAB CLICKS...
                     //---------------------------------
                     onClick: function (event) {
-                        console.log('event.target = ' + event.target);
+                        // console.log('event.target = ' + event.target);
                         switch (event.target) {
                             case "proptabGeneral":
                             setPropertyLayout(propData.PRID,event.target);
@@ -355,36 +357,6 @@ function buildPropertyUIElements() {
    });
 
    $().w2grid({
-       name: 'propertyRentStepsGrid',
-       url: '/v1/rentsteps',
-       show: {
-           toolbar         : true,
-           footer          : false,
-           toolbarAdd      : true,   // indicates if toolbar add new button is visible
-           toolbarDelete   : true,   // indicates if toolbar delete button is visible
-           toolbarSave     : false,   // indicates if toolbar save button is visible
-           selectColumn    : false,
-           expandColumn    : false,
-           toolbarEdit     : false,
-           toolbarSearch   : false,
-           toolbarInput    : false,
-           searchAll       : false,
-           toolbarReload   : true,
-           toolbarColumns  : true,
-       },
-       //======================================================================
-       // FLAGS
-       //     1<<0  Drive Through?  0 = no, 1 = yes
-       //	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
-       //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
-       //======================================================================
-        columns: [
-            {field: 'Recid',                size: '60px', sortable: true, hidden: true},
-            {field: 'PRID',                 size: '60px', sortable: true, hidden: true},
-            {field: 'Name',                 size: '200px', sortable: true, hidden: false},
-        ],
-    });
-   $().w2grid({
        name: 'propertyLeaseOptionsGrid',
        url: '/v1/leaseoptions',
        show: {
@@ -440,7 +412,8 @@ function setPropertyLayout(PRID,tab) {
             w2ui.propertyRentStepsGrid.clear();
             w2ui.propertyRentStepsGrid.url = '/v1/rentsteps/' + PRID;
         }
-        w2ui.propertyFormLayout.content('main',w2ui.propertyRentStepsGrid);
+        w2ui.rentStepsLayout.content('main',w2ui.propertyRentStepsGrid);
+        w2ui.propertyFormLayout.content('main',w2ui.rentStepsLayout);
     } else if (tab == "proptabLeaseOptions") {
         if (propData.bLeaseOptsLoaded) {
             w2ui.propertyLeaseOptionsGrid.url = '';

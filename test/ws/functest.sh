@@ -21,7 +21,40 @@ if [ "${USER}x" = "x" -o "${PASS}x" = "x" ]; then
     exit 2
 fi
 
+#------------------------------------------------------------------------------
+#  login - will attempt to login to the wreis server. If it is successful
+#          it will set two environment variables:
+#
+#          TOKEN   - will contain the cookie value for AIR login
+#          COOKIES - contains the option for CURL to include the AIR cookie
+#                    in requests
+#
+#          dojsonPOST is setup to use ${COOKIES}
+#
+#  Scenario:
+#  Execute the url to ping the server
+#
+#  Expected Results:
+#   1.  It should return the server version
+#------------------------------------------------------------------------------
+
+login() {
+    if [ "x${COOKIES}" = "x" ]; then
+        encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASS}\"}"
+        OUTFILE="loginrequest"
+        dojsonPOST "http://localhost:8276/v1/authn/" "request" "${OUTFILE}"  "login"
+        #-----------------------------------------------------------------------------
+        # Now we need to add the token to the curl command for future calls to
+        # the server.  curl -b "air=${TOKEN}"  ...
+        # Set the command line for cookies in ${COOKIES} and dojsonPOST will use them.
+        #-----------------------------------------------------------------------------
+        TOKEN=$(grep Token "${OUTFILE}" | awk '{print $2;}' | sed 's/[",]//g')
+        COOKIES="-b air=${TOKEN}"
+    fi
+}
+
 startWsrv
+
 
 #------------------------------------------------------------------------------
 #  TEST a
@@ -69,7 +102,7 @@ fi
 #------------------------------------------------------------------------------
 #  TEST c
 #
-#  Loging and Get a specific property then logoff.
+#  Login and Get a specific property then logoff.
 #
 #  Scenario:
 #  login
@@ -84,23 +117,25 @@ STEP=0
 if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
     mysql --no-defaults wreis < xb.sql
 
-    encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASS}\"}"
-    OUTFILE="${TFILES}${STEP}"
-    dojsonPOST "http://localhost:8276/v1/authn/" "request" "${OUTFILE}"  "Property-Search"
-
-    #-----------------------------------------------------------------------------
-    # Now we need to add the token to the curl command for future calls to
-    # the server.  curl -b "air=${TOKEN}"  ...
-    # Set the command line for cookies in ${COOKIES} and dojsonPOST will use them.
-    #-----------------------------------------------------------------------------
-    TOKEN=$(grep Token "${OUTFILE}" | awk '{print $2;}' | sed 's/[",]//g')
-    COOKIES="-b air=${TOKEN}"
+    # encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASS}\"}"
+    # OUTFILE="${TFILES}${STEP}"
+    # dojsonPOST "http://localhost:8276/v1/authn/" "request" "${OUTFILE}"  "Property-Search"
+    #
+    # #-----------------------------------------------------------------------------
+    # # Now we need to add the token to the curl command for future calls to
+    # # the server.  curl -b "air=${TOKEN}"  ...
+    # # Set the command line for cookies in ${COOKIES} and dojsonPOST will use them.
+    # #-----------------------------------------------------------------------------
+    # TOKEN=$(grep Token "${OUTFILE}" | awk '{print $2;}' | sed 's/[",]//g')
+    # COOKIES="-b air=${TOKEN}"
+    login
 
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/property/" "request" "${TFILES}${STEP}"  "Property-Search"
 
     encodeRequest '{"cmd":"get"}'
     dojsonPOST "http://localhost:8276/v1/logoff/" "request" "${TFILES}${STEP}"  "logoff"
+    COOKIES=
 
     #-----------------------------------------------------------------------------
     # At this point, the cookie is no longer valid.  But try to use it again to
@@ -109,6 +144,28 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     #-----------------------------------------------------------------------------
     encodeRequest '{"cmd":"get"}'
     dojsonPOST "http://localhost:8276/v1/logoff/" "request" "${TFILES}${STEP}"  "logoff using invalid cookie token"
+fi
+
+#------------------------------------------------------------------------------
+#  TEST d
+#
+#  Read the rentsteps for RSLID 4
+#
+#  Scenario:
+#  login
+#  rentsteps
+#
+#  Expected Results:
+#   1. Expecting 3 rent step items
+#   2.
+#------------------------------------------------------------------------------
+TFILES="d"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xb.sql
+    login
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/rentsteps/4" "request" "${TFILES}${STEP}"  "RentSteps"
 fi
 
 stopWsrv

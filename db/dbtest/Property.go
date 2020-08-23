@@ -136,18 +136,16 @@ func TestRentSteps(ctx context.Context) {
 	// create some rent steps
 	rsl.RS = append(rsl.RS, db.RentStep{
 		RSLID: 0,
-		Count: 1,
 		Dt:    time.Date(2019, time.January, 1, 0, 0, 0, 0, time.UTC),
-		Opt:   1,
+		Opt:   "Year 1",
 		Rent:  float64(2500),
 		FLAGS: 0,
 	})
 	// create some rent steps
 	rsl.RS = append(rsl.RS, db.RentStep{
 		RSLID: 0,
-		Count: 2,
 		Dt:    time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
-		Opt:   1,
+		Opt:   "Year 1",
 		Rent:  float64(2750),
 		FLAGS: 0,
 	})

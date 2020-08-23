@@ -75,14 +75,14 @@ CREATE TABLE RenewOptions (
     **          a count of years past commencement.  Examples:
     **
     **    ----------- bit 0 = 0 -----------     ----------- bit 0 = 1 -----------
-    **
-    **                 Option     Annual        Option       Option     Annual
-    **    Count        Period     Rent          Year         Period     Rent
+    **     String
+    **     Option                 Annual        Option       Option     Annual
+    **     Period                 Rent          Year         Period     Rent
     **    ---------------------------------     ------------------------------------
-    **    16           1          183,568.85    7/4/2024     1          109,709.45
-    **    21           2          201,925.74    7/4/2025     1          111,903.63
-    **    26           3          222,118.32    7/4/2026     2          116.424.54
-    **    ...                                   ...
+    **     Year 1-4               183,568.85    7/4/2024     1          109,709.45
+    **     Year 5-9               201,925.74    7/4/2025     1          111,903.63
+    **     Year 10                222,118.32    7/4/2026     2          116.424.54
+    **                                          ...
     */
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
@@ -96,8 +96,7 @@ CREATE TABLE RenewOption (
     ROID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Renew Option, part of a list
     ROLID BIGINT NOT NULL DEFAULT 0,                        -- Renew Options List ID to which this RO belongs
     Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
-    Count BIGINT NOT NULL DEFAULT 0,                        -- count - valid only win ROLID FLAGS bit 0 = 0
-    Opt BIGINT NOT NULL DEFAULT 0,                          -- option period
+    Opt VARCHAR(128) NOT NULL DEFAULT '',                   -- option period comment
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
@@ -121,10 +120,9 @@ CREATE TABLE RentStep (
     RSID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Rent Step, part of a list
     RSLID BIGINT NOT NULL DEFAULT 0,                        -- RentStep List ID to which this RS belongs
     Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
-    Count BIGINT NOT NULL DEFAULT 0,                        -- count - valid only win ROLID FLAGS bit 0 = 0
-    Opt BIGINT NOT NULL DEFAULT 0,                          -- option period
-    Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
+    Opt VARCHAR(128) NOT NULL DEFAULT '',                   -- option period comment
+    Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Rent commencement date
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = options, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created

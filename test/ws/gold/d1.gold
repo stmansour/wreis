@@ -1,0 +1,32 @@
+{
+    "records": [
+        {
+            "Dt": "1/1/2018",
+            "FLAGS": 0,
+            "Opt": "Year 1",
+            "RSID": 6,
+            "RSLID": 4,
+            "Rent": 3100,
+            "recid": 6
+        },
+        {
+            "Dt": "1/1/2019",
+            "FLAGS": 0,
+            "Opt": "Year 2",
+            "RSID": 7,
+            "RSLID": 4,
+            "Rent": 3200,
+            "recid": 7
+        },
+        {
+            "Dt": "1/1/2020",
+            "FLAGS": 0,
+            "Opt": "Year 3",
+            "RSID": 8,
+            "RSLID": 4,
+            "Rent": 3300,
+            "recid": 8
+        }
+    ],
+    "status": "success"
+}

@@ -40,6 +40,7 @@ var app = {
     stdfmt: 'font-family: "Open Sans","Roboto",sans-serif; font-size: 8pt; border: 1px solid #dfdfdf; border-spacing:0px; padding: 3px; color: #777777;',
     gid: 0, // last selected group id
     groupFilter: "",
+    dateFormatRegex : /^(0?[1-9]|1[0-2])\/(0?[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/,
 };
 
 function openInNewTab(url) {
@@ -233,7 +234,7 @@ function buildPageElements() {
         ],
         onClick: function (event) {
             var grid;
-            console.log('event.target = ' + event.target);
+            // console.log('event.target = ' + event.target);
             switch(event.target) {
                 case 'dashboard':
                     w2ui.toplayout.load('main','/static/html/dashboard.html');
@@ -250,12 +251,32 @@ function buildPageElements() {
     }));
 
     buildPropertyUIElements();
+    buildRentStepsUIElements();
     buildLoginForm();
 }
 
 function finishInitialization() {
     defineDateFmts();
     buildPageElements();
+
+    var t = w2ui.propertyRentStepsGrid.toolbar;
+    t.add([
+        { id: 'bt3', type: 'spacer' },
+        { id: 'rsListType', type: 'menu-radio', icon: 'fa fa-star',
+            text: function (item) {
+                var text = item.selected;
+                var el   = this.get('rsListType:' + item.selected);
+                return 'Step Type: ' + el.text;
+            },
+            selected: 'rsListOpt',
+            items: [
+                { id: 'rsListOpt', text: 'Period', icon: 'fa fa-tachometer' },
+                { id: 'rsListDate', text: 'Date', icon: 'fa fa-tachometer' },
+            ]
+        },
+    ]);
+    t.on('*', RentStepTypeChange);
+
     launchSession();
 }
 

@@ -13,11 +13,10 @@ import (
 type RentStep struct {
 	RSID        int64     // unique id for this record
 	RSLID       int64     // id of RentStepList to which this record belongs
-	Count       int64     // not sure what this is
 	Dt          time.Time // date for the rent amount; valid when RSLID.FLAGS bit 0 = 1
-	Opt         int64     // option number, 1 .. n
+	Opt         string    // option comment:  "years 1 - 2" etc.
 	Rent        float64   // amount of rent on the associated date
-	FLAGS       uint64    // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
+	FLAGS       uint64    // 1<<0 :  0 -> use Opt text, 1 -> use date
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
 	CreateTS    time.Time // when was this record created
@@ -78,7 +77,6 @@ func InsertRentStep(ctx context.Context, a *RentStep) (int64, error) {
 	}
 	fields := []interface{}{
 		a.RSLID,
-		a.Count,
 		a.Dt,
 		a.Opt,
 		a.Rent,
@@ -107,7 +105,6 @@ func ReadRentStep(row *sql.Row, a *RentStep) error {
 	err := row.Scan(
 		&a.RSID,
 		&a.RSLID,
-		&a.Count,
 		&a.Dt,
 		&a.Opt,
 		&a.Rent,
@@ -136,7 +133,6 @@ func ReadRentStepItem(rows *sql.Rows, a *RentStep) error {
 	err := rows.Scan(
 		&a.RSID,
 		&a.RSLID,
-		&a.Count,
 		&a.Dt,
 		&a.Opt,
 		&a.Rent,
@@ -166,7 +162,6 @@ func UpdateRentStep(ctx context.Context, a *RentStep) error {
 	}
 	fields := []interface{}{
 		a.RSLID,
-		a.Count,
 		a.Dt,
 		a.Opt,
 		a.Rent,
