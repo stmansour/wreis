@@ -29,6 +29,8 @@ package: server
 	cp server ${BINDIR}/wsrv
 	cp confdev.json ${BINDIR}/config.json
 
+build: server package
+
 ver.go:
 	./mkver.sh
 

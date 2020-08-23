@@ -194,7 +194,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	// util.Console("SVC: A\n")
 	if Svcs[sid].AuthNRequired {
 		// util.Console("SVC: B\n")
-		c, err := session.ValidateSessionCookie(r, 0 /* get all user info */) // this updates the expire time
+		c, err := session.ValidateSessionCookie(w, r, 0 /* get all user info */) // this updates the expire time
 		if err != nil {
 			SvcErrorReturn(w, err)
 			return
@@ -224,6 +224,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			SvcErrorReturn(w, err)
 			return
 		}
+		// util.Console("\n\n**** %s: d.CookieUpdated = %t ****\n\n", funcname, d.CookieUpdated)
 		//----------------------------------------------------------------------
 		// If we make it here, we have a good session.  Add it to the request
 		// context

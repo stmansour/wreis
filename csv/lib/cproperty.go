@@ -364,7 +364,7 @@ func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []er
 		var rs db.RentStep
 		var x time.Time
 		var el []error
-		//--------------------------------------------------------------------
+ 		//--------------------------------------------------------------------
 		// First index can be either a date or a number, determine which...
 		//--------------------------------------------------------------------
 		x, el = ParseDate(ss[i], lineno, el) // index i -> "7/4/2024"

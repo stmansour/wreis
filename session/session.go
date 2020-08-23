@@ -372,9 +372,11 @@ func IsUnrecognizedCookieError(err error) bool {
 // If the cookie token is valid, its expire time will be updated.
 //
 // INPUTS
+//  w  - where responses to this http request will be written - updated cookie
+//       is maintained here.
 //  r  - pointer to the http request, which may be updated after we add the
 //       context value to it.
-//  d  - our service data struct
+//  getData       - 0 means get lots of data, 1 means just validate session
 //
 // RETURNS
 //  cookie - the http cookie or nil if it doesn't exist
@@ -382,7 +384,7 @@ func IsUnrecognizedCookieError(err error) bool {
 //            if 1 the all the data associated with the directory service
 //            cookie is returned -- this includes the UID, the expire time, ...
 //-----------------------------------------------------------------------------
-func ValidateSessionCookie(r *http.Request, getData int) (ValidateCookieResponse, error) {
+func ValidateSessionCookie(w http.ResponseWriter, r *http.Request, getData int) (ValidateCookieResponse, error) {
 	funcname := "ValidateSessionCookie"
 	// util.Console("Entered %s\n", funcname)
 	var vc ValidateCookieRequest
@@ -485,7 +487,7 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *
 			b = *c // just copy the data already loaded
 			// util.Console("Using existing cookie info: %#v\n", b)
 		} else {
-			b, err = ValidateSessionCookie(r, 0)
+			b, err = ValidateSessionCookie(w, r, 0)
 			if err != nil {
 				// util.Console("GetSession 7\n")
 				return sess, err
@@ -499,11 +501,9 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *
 			// util.Console("GetSession 9\n")
 			return nil, err
 		}
-		// util.Console("GetSession 10\n")
-		cookie := http.Cookie{Name: SessionCookieName, Value: b.Token, Expires: sess.Expire, Path: "/"}
-		http.SetCookie(w, &cookie) // a cookie cannot be set after writing anything to a response writer
 		// util.Console("*** NEW SESSION CREATED ***\n")
 	}
+	sess.Refresh(w, r)
 	return sess, nil
 }
 
@@ -514,18 +514,22 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *
 //  r - the request where w should look for the cookie
 //
 // RETURNS
-//  session - pointer to the new session
+//  0 if session cookie was updated
+//  1 if error or cookie not found
 //-----------------------------------------------------------------------------
 func (s *Session) Refresh(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie(SessionCookieName)
 	if nil != cookie && err == nil {
+		cookie.Name = SessionCookieName
 		cookie.Expires = time.Now().Add(SessionTimeout)
+		cookie.MaxAge = 15 * 60   // max # of seconds
 		ReqSessionMem <- 1        // ask to access the shared mem, blocks until granted
 		<-ReqSessionMemAck        // make sure we got it
 		s.Expire = cookie.Expires // update the Session information
 		ReqSessionMemAck <- 1     // tell Dispatcher we're done with the data
 		cookie.Path = "/"
 		http.SetCookie(w, cookie)
+		util.Console("\n\n**** session.Refresh UPDATED COOKIE ****   cookie name: %s, value = %s\n\n", cookie.Name, cookie.Value)
 		return 0
 	}
 	return 1

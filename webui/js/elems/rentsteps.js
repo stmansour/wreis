@@ -3,19 +3,31 @@
 */
 
 "use strict";
+
+var RentStepModule = {
+    id: 0,
+};
+
+function getNextRentStepID() {
+    RentStepModule.id -= 1;
+    return RentStepModule.id;
+}
+
 function newRentStepRecord() {
+    var id = getNextRentStepID();
     var rs = {
+        recid: id,
         RSLID: 0,
-        RSID: 0,
+        RSID: id,
         Opt: 0,
         Dt: new Date(),
         Rent: 0,
-        FLAGS: 0,
-    }
+        FLAGS: GetOptionTextMode(),
+    };
+    return rs;
 }
 
 function buildRentStepsUIElements() {
-
     $().w2grid({
         name: 'propertyRentStepsGrid',
         url: '/v1/rentsteps',
@@ -23,7 +35,7 @@ function buildRentStepsUIElements() {
             toolbar         : true,
             footer          : false,
             toolbarAdd      : true,   // indicates if toolbar add new button is visible
-            toolbarDelete   : true,   // indicates if toolbar delete button is visible
+            toolbarDelete   : false,   // indicates if toolbar delete button is visible
             toolbarSave     : false,   // indicates if toolbar save button is visible
             selectColumn    : false,
             expandColumn    : false,
@@ -41,6 +53,7 @@ function buildRentStepsUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
         columns: [
+            {field: 'recid',       caption: 'recid',      size: '60px', sortable: true, hidden: true},
             {field: 'RSID',        caption: 'RSID',       size: '60px', sortable: true, hidden: true},
             {field: 'RSLID',       caption: 'RSLID',      size: '60px', sortable: true, hidden: true},
             {field: 'FLAGS',       caption: 'FLAGS',      size: '60px', sortable: true, hidden: true},
@@ -55,14 +68,23 @@ function buildRentStepsUIElements() {
          onLoad: function(event) {
             event.onComplete = function() {
                 propData.bRentStepsLoaded = true;
+                w2ui.propertyRentStepsGrid.url = ''; // don't go back to the server until we're ready to save
+                for (var i = 0; i < w2ui.propertyRentStepsGrid.records.length; i++) {
+                    w2ui.propertyRentStepsGrid.records[i].recid = w2ui.propertyRentStepsGrid.records[i].RSID;
+                }
                 SetRentStepColumns(GetOptionTextMode());  // since all records are the same in BIT 0, just look at first
             };
         },
         onAdd: function(event) {
-
+            w2ui.propertyRentStepForm.record = newRentStepRecord();
+            w2ui.propertyRentStepsGrid.add(w2ui.propertyRentStepForm.record);
+            showRentStepForm();
         },
         onClick: function(event) {
             event.onComplete = function(event) {
+                // if (typeof w2ui.propertyRentStepForm.record === "undefined") {
+                //     w2ui.propertyRentStepForm.record = newRentStepRecord();
+                // }
                 var r = w2ui.propertyRentStepForm.record;
                 var x = this.getSelection();
                 if (x.length < 1) {return;}
@@ -74,9 +96,7 @@ function buildRentStepsUIElements() {
                 r.Dt = fr.Dt;
                 r.Rent = fr.Rent;
                 r.FLAGS = fr.FLAGS;
-                w2ui.rentStepsLayout.content('right',w2ui.propertyRentStepForm);
-                w2ui.rentStepsLayout.sizeTo('right',400);
-                w2ui.rentStepsLayout.show('right',true);
+                showRentStepForm();
             }
         }
     });
@@ -111,17 +131,12 @@ function buildRentStepsUIElements() {
                 }
             },
         },
-        onClick: function(event) {
-            event.onComplete = function() {
-                var r = this.record;
-            };
-        },
         onRefresh: function(event) {
             event.onComplete = function(event) {
                 console.log('propertyRentStepForm: Refresh completed');
                 EnableRentStepFormFields();
-            }
-        }
+            };
+        },
     });
 
 
@@ -137,7 +152,26 @@ function buildRentStepsUIElements() {
             { type: 'right',   size: 0,     hidden: true,  content: 'right' }
         ],
     });
+}
 
+function RentStepDelete() {
+    var r = w2ui.propertyRentStepForm.record;
+    var g = w2ui.propertyRentStepsGrid;
+    var i = g.get(r.recid,true);
+    if (i >= 0) {
+        var removed = g.records.splice(i,1);
+        console.log('removed = ' + removed);
+    }
+    w2ui.rentStepsLayout.hide('right',true);
+    g.render();
+}
+
+function RentStepSave() {
+    var r = w2ui.propertyRentStepForm.record;
+    var g = w2ui.propertyRentStepsGrid;
+    g.set(r.recid,r);
+    w2ui.rentStepsLayout.hide('right',true);
+    g.render();
 }
 
 function RentStepTypeChange(event) {
@@ -192,4 +226,10 @@ function GetOptionTextMode() {
         FLAGS = w2ui.propertyRentStepsGrid.records[0].FLAGS;  // since all records are the same in BIT 0, just look at first
     }
     return FLAGS & 0x1;
+}
+
+function showRentStepForm() {
+    w2ui.rentStepsLayout.content('right',w2ui.propertyRentStepForm);
+    w2ui.rentStepsLayout.sizeTo('right',400);
+    w2ui.rentStepsLayout.show('right',true);
 }
