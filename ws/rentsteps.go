@@ -156,6 +156,16 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
 	// util.Console("read %d RentSteps\n", len(foo.Records))
 
 	//------------------------------------------------------------------------
@@ -165,9 +175,10 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var a []db.RentStep
 
 	if d.ID > 0 {
-		a, err = db.GetRentStepsItems(r.Context(), d.ID)
+		a, err = db.GetRentStepsItems(ctx, d.ID)
 		if err != nil {
 			util.Console("%s: B\n", funcname)
+			tx.Rollback()
 			SvcErrorReturn(w, err)
 			return
 		}
@@ -181,7 +192,8 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			util.MigrateStructVals(&foo.Records[i], &x)
 			x.RSLID = d.ID
 			// util.Console("\tx = %#v\n", x)
-			if _, err = db.InsertRentStep(r.Context(), &x); err != nil {
+			if _, err = db.InsertRentStep(ctx, &x); err != nil {
+				tx.Rollback()
 				SvcErrorReturn(w, err)
 				return
 			}
@@ -202,7 +214,8 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 						a[j].Opt = foo.Records[i].Opt
 						a[j].Dt = time.Time(foo.Records[i].Dt)
 						a[j].FLAGS = foo.Records[i].FLAGS
-						if err = db.UpdateRentStep(r.Context(), &a[j]); err != nil {
+						if err = db.UpdateRentStep(ctx, &a[j]); err != nil {
+							tx.Rollback()
 							SvcErrorReturn(w, err)
 							return
 						}
@@ -225,13 +238,22 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		}
 		if !found {
 			// util.Console("DEL: a[i].RSID = %d\n", a[i].RSID)
-			if err = db.DeleteRentStep(r.Context(), a[i].RSID); err != nil {
+			if err = db.DeleteRentStep(ctx, a[i].RSID); err != nil {
+				tx.Rollback()
 				SvcErrorReturn(w, err)
 				return
 			}
 		}
 	}
 
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
 	SvcWriteSuccessResponse(w)
 }
 
