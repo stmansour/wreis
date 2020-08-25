@@ -244,7 +244,7 @@ func deleteProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // SaveProperty returns the requested assessment
 // wsdoc {
 //  @Title  Save Property
-//	@URL /v1/Propertye/PID
+//	@URL /v1/Property/PRID
 //  @Method  GET
 //	@Synopsis Update the information on a Property with the supplied data, create if necessary.
 //  @Description  This service creates a Property if PID == 0 or updates a Property if PID > 0 with
@@ -257,6 +257,7 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveProperty"
 	util.Console("Entered %s\n", funcname)
 	util.Console("record data = %s\n", d.data)
+	util.Console("PRID = %d\n", d.ID)
 
 	// var foo PropertyGridSave
 	// data := []byte(d.data)

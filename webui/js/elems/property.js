@@ -70,53 +70,53 @@ function buildPropertyUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
          columns: [
-            {field: 'PRID',                 size: '60px', sortable: true, hidden: true},
-            {field: 'Recid',                size: '60px', sortable: true, hidden: true},
-            {field: 'PRID',                 size: '60px', sortable: true, hidden: true},
-            {field: 'Name',                 size: '200px', sortable: true, hidden: false},
-            {field: 'YearsInBusiness',      size: '60px', sortable: true, hidden: true},
-            {field: 'ParentCompany',        size: '60px', sortable: true, hidden: true},
-            {field: 'URL',                  size: '60px', sortable: true, hidden: true},
-            {field: 'Symbol',               size: '60px', sortable: true, hidden: true},
-            {field: 'Price',                size: '60px', sortable: true, hidden: true},
-            {field: 'DownPayment',          size: '60px', sortable: true, hidden: true},
-            {field: 'RentableArea',         size: '60px', sortable: true, hidden: true},
-            {field: 'RentableAreaUnits',    size: '60px', sortable: true, hidden: true},
-            {field: 'LotSize',              size: '60px', sortable: true, hidden: true},
-            {field: 'LotSizeUnits',         size: '60px', sortable: true, hidden: true},
-            {field: 'CapRate',              size: '60px', sortable: true, hidden: true},
-            {field: 'AvgCap',               size: '60px', sortable: true, hidden: true},
-            {field: 'BuildDate',            size: '60px', sortable: true, hidden: true},
-            {field: 'FLAGS',                size: '60px', sortable: true, hidden: true},
-            {field: 'Ownership',            size: '60px', sortable: true, hidden: true},
-            {field: 'TenantTradeName',      size: '60px', sortable: true, hidden: true},
-            {field: 'LeaseGuarantor',       size: '60px', sortable: true, hidden: true},
-            {field: 'LeaseType',            size: '60px', sortable: true, hidden: true},
-            {field: 'DeliveryDt',           size: '60px', sortable: true, hidden: true},
-            {field: 'OriginalLeaseTerm',    size: '60px', sortable: true, hidden: true},
-            {field: 'LeaseCommencementDt',  size: '60px', sortable: true, hidden: true},
-            {field: 'LeaseExpirationDt',    size: '60px', sortable: true, hidden: true},
-            {field: 'TermRemainingOnLease', size: '60px', sortable: true, hidden: true},
-            {field: 'ROLID',                size: '60px', sortable: true, hidden: true},
-            {field: 'RSLID',                size: '60px', sortable: true, hidden: true},
-            {field: 'Address',              size: '60px', sortable: true, hidden: true},
-            {field: 'Address2',             size: '60px', sortable: true, hidden: true},
-            {field: 'City',                 size: '100px', sortable: true, hidden: false},
-            {field: 'State',                size: '60px', sortable: true, hidden: false},
-            {field: 'PostalCode',           size: '60px', sortable: true, hidden: false},
-            {field: 'Country',              size: '60px', sortable: true, hidden: true},
-            {field: 'LLResponsibilities',   size: '60px', sortable: true, hidden: true},
-            {field: 'NOI',                  size: '60px', sortable: true, hidden: true},
-            {field: 'HQAddress',            size: '60px', sortable: true, hidden: true},
-            {field: 'HQAddress2',           size: '60px', sortable: true, hidden: true},
-            {field: 'HQCity',               size: '60px', sortable: true, hidden: true},
-            {field: 'HQState',              size: '60px', sortable: true, hidden: true},
-            {field: 'HQPostalCode',         size: '60px', sortable: true, hidden: true},
-            {field: 'HQCountry',            size: '60px', sortable: true, hidden: true},
-            {field: 'CreateTime',           size: '60px', sortable: true, hidden: true},
-            {field: 'CreatedBy',            size: '60px', sortable: true, hidden: true},
-            {field: 'LastModTime',          size: '60px', sortable: true, hidden: true},
-            {field: 'LastModBy',            size: '60px', sortable: true, hidden: true},
+            {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
+            {field: 'Recid',                size: '60px', caption: 'Recid', sortable: true, hidden: true},
+            {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
+            {field: 'Name',                 size: '200px', caption: 'Name', sortable: true, hidden: false},
+            {field: 'YearsInBusiness',      size: '60px', caption: 'YearsInBusiness', sortable: true, hidden: true},
+            {field: 'ParentCompany',        size: '60px', caption: 'ParentCompany', sortable: true, hidden: true},
+            {field: 'URL',                  size: '60px', caption: 'URL', sortable: true, hidden: true},
+            {field: 'Symbol',               size: '60px', caption: 'Symbol', sortable: true, hidden: true},
+            {field: 'Price',                size: '60px', caption: 'Price', sortable: true, hidden: true},
+            {field: 'DownPayment',          size: '60px', caption: 'DownPayment', sortable: true, hidden: true},
+            {field: 'RentableArea',         size: '60px', caption: 'RentableArea', sortable: true, hidden: true},
+            {field: 'RentableAreaUnits',    size: '60px', caption: 'RentableAreaUnits', sortable: true, hidden: true},
+            {field: 'LotSize',              size: '60px', caption: 'LotSize', sortable: true, hidden: true},
+            {field: 'LotSizeUnits',         size: '60px', caption: 'LotSizeUnits', sortable: true, hidden: true},
+            {field: 'CapRate',              size: '60px', caption: 'CapRate', sortable: true, hidden: true},
+            {field: 'AvgCap',               size: '60px', caption: 'AvgCap', sortable: true, hidden: true},
+            {field: 'BuildDate',            size: '60px', caption: 'BuildDate', sortable: true, hidden: true},
+            {field: 'FLAGS',                size: '60px', caption: 'FLAGS', sortable: true, hidden: true},
+            {field: 'Ownership',            size: '60px', caption: 'Ownership', sortable: true, hidden: true},
+            {field: 'TenantTradeName',      size: '60px', caption: 'TenantTradeName', sortable: true, hidden: true},
+            {field: 'LeaseGuarantor',       size: '60px', caption: 'LeaseGuarantor', sortable: true, hidden: true},
+            {field: 'LeaseType',            size: '60px', caption: 'LeaseType', sortable: true, hidden: true},
+            {field: 'DeliveryDt',           size: '60px', caption: 'DeliveryDt', sortable: true, hidden: true},
+            {field: 'OriginalLeaseTerm',    size: '60px', caption: 'OriginalLeaseTerm', sortable: true, hidden: true},
+            {field: 'LeaseCommencementDt',  size: '60px', caption: 'LeaseCommencementDt', sortable: true, hidden: true},
+            {field: 'LeaseExpirationDt',    size: '60px', caption: 'LeaseExpirationDt', sortable: true, hidden: true},
+            {field: 'TermRemainingOnLease', size: '60px', caption: 'TermRemainingOnLease', sortable: true, hidden: true},
+            {field: 'ROLID',                size: '60px', caption: 'ROLID', sortable: true, hidden: true},
+            {field: 'RSLID',                size: '60px', caption: 'RSLID', sortable: true, hidden: true},
+            {field: 'Address',              size: '60px', caption: 'Address', sortable: true, hidden: true},
+            {field: 'Address2',             size: '60px', caption: 'Address2', sortable: true, hidden: true},
+            {field: 'City',                 size: '100px', caption: 'City', sortable: true, hidden: false},
+            {field: 'State',                size: '60px', caption: 'State', sortable: true, hidden: false},
+            {field: 'PostalCode',           size: '60px', caption: 'PostalCode', sortable: true, hidden: false},
+            {field: 'Country',              size: '60px', caption: 'Country', sortable: true, hidden: true},
+            {field: 'LLResponsibilities',   size: '60px', caption: 'LLResponsibilities', sortable: true, hidden: true},
+            {field: 'NOI',                  size: '60px', caption: 'NOI', sortable: true, hidden: true},
+            {field: 'HQAddress',            size: '60px', caption: 'HQAddress', sortable: true, hidden: true},
+            {field: 'HQAddress2',           size: '60px', caption: 'HQAddress2', sortable: true, hidden: true},
+            {field: 'HQCity',               size: '60px', caption: 'HQCity', sortable: true, hidden: true},
+            {field: 'HQState',              size: '60px', caption: 'HQState', sortable: true, hidden: true},
+            {field: 'HQPostalCode',         size: '60px', caption: 'HQPostalCode', sortable: true, hidden: true},
+            {field: 'HQCountry',            size: '60px', caption: 'HQCountry', sortable: true, hidden: true},
+            {field: 'CreateTime',           size: '60px', caption: 'CreateTime', sortable: true, hidden: true},
+            {field: 'CreatedBy',            size: '60px', caption: 'CreatedBy', sortable: true, hidden: true},
+            {field: 'LastModTime',          size: '60px', caption: 'LastModTime', sortable: true, hidden: true},
+            {field: 'LastModBy',            size: '60px', caption: 'LastModBy', sortable: true, hidden: true},
         ],
         onClick: function(event) {
             event.onComplete = function (event) {
@@ -323,15 +323,18 @@ function buildPropertyUIElements() {
 
         actions: {
             save: function () {
-                this.save({}, function (data) {
-                    if (data.status == 'error') {
-                        console.log('ERROR: '+ data.message);
-                        return;
-                    }
-                    w2ui.toplayout.hide('right',true);
-                    w2ui.propertyGrid.reload();
-                });
-
+                    $.when(
+                        savePropertyForm(),
+                        saveRentSteps()
+                    )
+                    .done( function() {
+                        propertySaveDoneCB();
+                    })
+                    .fail( function() {
+                        var s = 'Save Property encountered an error';
+                        w2ui.propertyGrid.error(s);
+                        propertySaveDoneCB();
+                    });
             },
             delete: function() {
                 var request={cmd:"delete",selected: [w2ui.propertyForm.record.PRID]};
@@ -386,6 +389,34 @@ function buildPropertyUIElements() {
             {field: 'Name',                 size: '200px', sortable: true, hidden: false},
         ],
     });
+}
+
+function savePropertyForm() {
+    var rec = w2ui.propertyForm.record;
+    var params = {
+        cmd: "save",
+        record: rec
+    };
+    var dat = JSON.stringify(params);
+    var url = '/v1/property/' + rec.PRID;
+
+    return $.post(url, dat, null, "json")
+    .done(function(data) {
+        // if (data.status === "success") {
+        // }
+        if (data.status === "error") {
+            w2ui.propertyGrid.error('ERROR: '+ data.message);
+        }
+    })
+    .fail(function(data){
+            w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
+    });
+
+}
+
+function propertySaveDoneCB() {
+    w2ui.toplayout.hide('right',true);
+    w2ui.propertyGrid.reload();
 }
 
 // setPropertyLayout is used to display the property form in the UI and handle

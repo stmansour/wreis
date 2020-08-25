@@ -1,5 +1,5 @@
 /*global
-    w2ui, app, $, console, dateFmtStr, propData,
+    w2ui, app, $, console, dateFmtStr, propData, Promise,
 */
 
 "use strict";
@@ -170,6 +170,7 @@ function RentStepSave() {
     var r = w2ui.propertyRentStepForm.record;
     var g = w2ui.propertyRentStepsGrid;
     g.set(r.recid,r);
+
     w2ui.rentStepsLayout.hide('right',true);
     g.render();
 }
@@ -232,4 +233,47 @@ function showRentStepForm() {
     w2ui.rentStepsLayout.content('right',w2ui.propertyRentStepForm);
     w2ui.rentStepsLayout.sizeTo('right',400);
     w2ui.rentStepsLayout.show('right',true);
+}
+
+
+function saveRentSteps() {
+    //-----------------------------------------------------------------------
+    // If we never loaded the rentsteps, then they weren't changed, so just
+    // return success.
+    //-----------------------------------------------------------------------
+    if (!propData.bRentStepsLoaded) {
+        return new Promise( function(resolve,reject) {
+            if (true) {
+                resolve("success");
+            } else {
+                reject("error");
+            }
+        });
+    }
+
+    //-----------------------------------------------------------------------
+    // We have loaded the rentsteps, so we need to go through the save...
+    //-----------------------------------------------------------------------
+    var params = {
+        cmd: "save",
+        records: w2ui.propertyRentStepsGrid.records
+    };
+    for (var i = 0; i < params.records.length; i++) {
+        var d = new Date(params.records[i].Dt);
+        params.records[i].Dt = d.toUTCString();
+    }
+    var dat = JSON.stringify(params);
+    var url = '/v1/rentsteps/' + w2ui.propertyForm.record.RSLID;
+
+    return $.post(url, dat, null, "json")
+    .done(function(data) {
+        // if (data.status === "success") {
+        // }
+        if (data.status === "error") {
+            w2ui.propertyGrid.error('ERROR: '+ data.message);
+        }
+    })
+    .fail(function(data){
+            w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
+    });
 }

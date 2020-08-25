@@ -54,7 +54,7 @@ var xjson = string("XJSON")
 func XJSONprocess(a, b *reflect.Value) error {
 	at := (*a).Type().String()
 	bt := (*b).Type().String()
-	fmt.Printf("XJSONprocess: map from %s to %s\n", at, bt)
+	// fmt.Printf("XJSONprocess: map from %s to %s\n", at, bt)
 	for i := 0; i < len(assignmap); i++ {
 		if strings.Contains(at, assignmap[i].a) && strings.Contains(bt, assignmap[i].b) {
 			assignmap[i].mapper(a, b, assignmap[i].valmap)
