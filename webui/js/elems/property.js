@@ -6,6 +6,8 @@
 
 var propData = {
     PRID: 0,                    // which property is currently being edited
+    RSLID: 0,
+    ROLID: 0,
     bPropLoaded: false,         // false -> either it's new or user clicked property in the propertyGrid, true -> just switching tabls
     bRentStepsLoaded: false,    // "  same as above for RentSteps
     bLeaseOptsLoaded: false,    // "  same as above for LeaseOptions
@@ -123,6 +125,8 @@ function buildPropertyUIElements() {
                 var rec = w2ui.propertyGrid.get(event.recid);
                 w2ui.propertyForm.recid = rec.PRID;
                 propData.PRID = rec.PRID;
+                propData.RSLID = rec.RSLID;
+                propData.ROLID = rec.ROLID;
                 propData.bPropLoaded = false;
                 propData.bRentStepsLoaded = false;
                 propData.bLeaseOptsLoaded = false;
@@ -441,7 +445,7 @@ function setPropertyLayout(PRID,tab) {
             w2ui.propertyRentStepsGrid.url = '';
         } else {
             w2ui.propertyRentStepsGrid.clear();
-            w2ui.propertyRentStepsGrid.url = '/v1/rentsteps/' + PRID;
+            w2ui.propertyRentStepsGrid.url = '/v1/rentsteps/' + propData.RSLID;
         }
         w2ui.rentStepsLayout.content('main',w2ui.propertyRentStepsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.rentStepsLayout);
@@ -450,7 +454,7 @@ function setPropertyLayout(PRID,tab) {
             w2ui.propertyLeaseOptionsGrid.url = '';
         } else {
             w2ui.propertyLeaseOptionsGrid.clear();
-            w2ui.propertyLeaseOptionsGrid.url = '/v1/leaseoptions/' + PRID;
+            w2ui.propertyLeaseOptionsGrid.url = '/v1/leaseoptions/' + propData.ROLID;
         }
         w2ui.propertyFormLayout.content('main',w2ui.propertyLeaseOptionsGrid);
     }
