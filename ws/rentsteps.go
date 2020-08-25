@@ -200,7 +200,8 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		} else {
 			for j := 0; j < len(a); j++ {
 				if foo.Records[i].RSID == a[j].RSID {
-					t := foo.Records[i].Rent != a[j].Rent // check for rent change
+					t := foo.Records[i].Rent != a[j].Rent       // check for rent change
+					t = t || foo.Records[i].FLAGS != a[j].FLAGS // check for FLAGS change
 					switch foo.Records[i].FLAGS & 0x1 {
 					case 0: // Opt
 						t = t || (foo.Records[i].Opt != a[j].Opt) // check for Opt change

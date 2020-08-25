@@ -168,7 +168,12 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/rentsteps/4" "request" "${TFILES}${STEP}"  "RentSteps"
 
+    # Add one, remove one, and change one...
     encodeRequest '{"cmd":"save","records":[{"recid":6,"RSID":6,"RSLID":4,"Dt":"1/1/2018","Opt":"Year 1","Rent":3500,"FLAGS":0},{"recid":8,"RSID":8,"RSLID":4,"Dt":"1/1/2020","Opt":"Year 3","Rent":3300,"FLAGS":0},{"recid":-1,"RSLID":0,"RSID":-1,"Opt":"asdfasdf","Dt":"Wed, 01 Jan 2020 08:00:00 GMT","Rent":3333,"FLAGS":0}]}'
+    dojsonPOST "http://localhost:8276/v1/rentsteps/4" "request" "${TFILES}${STEP}"  "RentSteps"
+
+    # Change all of them to DATE based, and change 1 date
+    encodeRequest '{"cmd":"save","records":[{"recid":6,"RSID":6,"RSLID":4,"Dt":"1/1/2018","Opt":"Year 1","Rent":3500,"FLAGS":1},{"recid":8,"RSID":8,"RSLID":4,"Dt":"1/1/2020","Opt":"Year 3","Rent":3300,"FLAGS":1},{"recid":-1,"RSLID":0,"RSID":-1,"Opt":"asdfasdf","Dt":"Wed, 15 Jan 2020 08:00:00 GMT","Rent":3333,"FLAGS":1}]}'
     dojsonPOST "http://localhost:8276/v1/rentsteps/4" "request" "${TFILES}${STEP}"  "RentSteps"
 fi
 
