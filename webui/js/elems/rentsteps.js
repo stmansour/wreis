@@ -96,6 +96,7 @@ function buildRentStepsUIElements() {
                 r.Dt = fr.Dt;
                 r.Rent = fr.Rent;
                 r.FLAGS = fr.FLAGS;
+                r.recid = fr.RSID;
                 showRentStepForm();
             }
         }
@@ -194,13 +195,17 @@ function RentStepTypeChange(event) {
 
 function SetRentStepColumns(FLAGS) {
     var b = FLAGS & 0x1;
+    var t = w2ui.propertyRentStepsGrid.toolbar.get("rsListType");
     if (b == 0) {
         w2ui.propertyRentStepsGrid.hideColumn("Dt");
         w2ui.propertyRentStepsGrid.showColumn("Opt");
+        t.selected = "rsListOpt";
     } else {
         w2ui.propertyRentStepsGrid.hideColumn("Opt");
         w2ui.propertyRentStepsGrid.showColumn("Dt");
+        t.selected = "rsListDate";
     }
+    w2ui.propertyRentStepsGrid.toolbar.refresh();
 }
 
 function SetRentStepFLAGs(FLAGS) {
