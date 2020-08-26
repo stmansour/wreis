@@ -94,7 +94,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Property
 	//==========================================
-	flds = "PRID,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,LeaseCommencementDt,LeaseExpirationDt,TermRemainingOnLease,ROLID,RSLID,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "PRID,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,TermRemainingOnLease,TermRemainingOnLeaseUnits,ROLID,RSLID,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,CreateTS,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["Property"] = flds
 	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property where PRID=?")
 	Errcheck(err)

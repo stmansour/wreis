@@ -30,38 +30,39 @@ type Property struct {
 	//     1<<0  Drive Through?  0 = no, 1 = yes
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
-	FLAGS                uint64
-	Ownership            int
-	TenantTradeName      string
-	LeaseGuarantor       int64
-	LeaseType            int64
-	DeliveryDt           time.Time
-	OriginalLeaseTerm    int64
-	LeaseCommencementDt  time.Time
-	LeaseExpirationDt    time.Time
-	TermRemainingOnLease int64
-	ROLID                int64
-	RSLID                int64
-	Address              string
-	Address2             string
-	City                 string
-	State                string
-	PostalCode           string
-	Country              string
-	LLResponsibilities   string
-	NOI                  float64
-	HQAddress            string
-	HQAddress2           string
-	HQCity               string
-	HQState              string
-	HQPostalCode         string
-	HQCountry            string
-	LastModTime          time.Time    // when was the record last written
-	LastModBy            int64        // id of user that did the modify
-	CreateTS             time.Time    // when was this record created
-	CreateBy             int64        // id of user that created it
-	RO                   RenewOptions // contains the list of RenewOptions and context
-	RS                   RentSteps    // contains the list of RentSteps and context
+	FLAGS                     uint64
+	Ownership                 int
+	TenantTradeName           string
+	LeaseGuarantor            int64
+	LeaseType                 int64
+	DeliveryDt                time.Time
+	OriginalLeaseTerm         int64
+	RentCommencementDt        time.Time
+	LeaseExpirationDt         time.Time
+	TermRemainingOnLease      int64
+	TermRemainingOnLeaseUnits int64
+	ROLID                     int64
+	RSLID                     int64
+	Address                   string
+	Address2                  string
+	City                      string
+	State                     string
+	PostalCode                string
+	Country                   string
+	LLResponsibilities        string
+	NOI                       float64
+	HQAddress                 string
+	HQAddress2                string
+	HQCity                    string
+	HQState                   string
+	HQPostalCode              string
+	HQCountry                 string
+	LastModTime               time.Time    // when was the record last written
+	LastModBy                 int64        // id of user that did the modify
+	CreateTS                  time.Time    // when was this record created
+	CreateBy                  int64        // id of user that created it
+	RO                        RenewOptions // contains the list of RenewOptions and context
+	RS                        RentSteps    // contains the list of RentSteps and context
 }
 
 // DeleteProperty deletes the Property with the specified id from the database
@@ -138,9 +139,10 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.LeaseType,
 		a.DeliveryDt,
 		a.OriginalLeaseTerm,
-		a.LeaseCommencementDt,
+		a.RentCommencementDt,
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
+		a.TermRemainingOnLeaseUnits,
 		a.ROLID,
 		a.RSLID,
 		a.Address,
@@ -229,9 +231,10 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.LeaseType,
 		&a.DeliveryDt,
 		&a.OriginalLeaseTerm,
-		&a.LeaseCommencementDt,
+		&a.RentCommencementDt,
 		&a.LeaseExpirationDt,
 		&a.TermRemainingOnLease,
+		&a.TermRemainingOnLeaseUnits,
 		&a.ROLID,
 		&a.RSLID,
 		&a.Address,
@@ -293,9 +296,10 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.LeaseType,
 		&a.DeliveryDt,
 		&a.OriginalLeaseTerm,
-		&a.LeaseCommencementDt,
+		&a.RentCommencementDt,
 		&a.LeaseExpirationDt,
 		&a.TermRemainingOnLease,
+		&a.TermRemainingOnLeaseUnits,
 		&a.ROLID,
 		&a.RSLID,
 		&a.Address,
@@ -358,9 +362,10 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LeaseType,
 		a.DeliveryDt,
 		a.OriginalLeaseTerm,
-		a.LeaseCommencementDt,
+		a.RentCommencementDt,
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
+		a.TermRemainingOnLeaseUnits,
 		a.ROLID,
 		a.RSLID,
 		a.Address,

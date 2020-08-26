@@ -96,7 +96,7 @@ function buildPropertyUIElements() {
             {field: 'LeaseType',            size: '60px', caption: 'LeaseType', sortable: true, hidden: true},
             {field: 'DeliveryDt',           size: '60px', caption: 'DeliveryDt', sortable: true, hidden: true},
             {field: 'OriginalLeaseTerm',    size: '60px', caption: 'OriginalLeaseTerm', sortable: true, hidden: true},
-            {field: 'LeaseCommencementDt',  size: '60px', caption: 'LeaseCommencementDt', sortable: true, hidden: true},
+            {field: 'RentCommencementDt',  size: '60px', caption: 'RentCommencementDt', sortable: true, hidden: true},
             {field: 'LeaseExpirationDt',    size: '60px', caption: 'LeaseExpirationDt', sortable: true, hidden: true},
             {field: 'TermRemainingOnLease', size: '60px', caption: 'TermRemainingOnLease', sortable: true, hidden: true},
             {field: 'ROLID',                size: '60px', caption: 'ROLID', sortable: true, hidden: true},
@@ -131,7 +131,7 @@ function buildPropertyUIElements() {
                 propData.bRentStepsLoaded = false;
                 propData.bLeaseOptsLoaded = false;
                 w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
-                setPropertyLayout(rec.PRID,'proptabGeneral');
+                setPropertyLayout('proptabGeneral');
             };
         },
         onRequest: function(event) {
@@ -213,15 +213,15 @@ function buildPropertyUIElements() {
                         // console.log('event.target = ' + event.target);
                         switch (event.target) {
                             case "proptabGeneral":
-                            setPropertyLayout(propData.PRID,event.target);
+                            setPropertyLayout(event.target);
                             break;
 
                             case 'proptabRentSteps':
-                            setPropertyLayout(propData.PRID,event.target);
+                            setPropertyLayout(event.target);
                             break;
 
                             case 'proptabLeaseOptions':
-                            setPropertyLayout(propData.PRID,event.target);
+                            setPropertyLayout(event.target);
                             break;
                         }
                     }
@@ -253,11 +253,11 @@ function buildPropertyUIElements() {
             {field: 'Price',                type: 'money', required: false},
             {field: 'DownPayment',          type: 'money', required: false},
             {field: 'RentableArea',         type: 'int',   required: false},
-            {field: 'RentableAreaUnits',    type: 'text', required: false},
-            {field: 'LotSize',              type: 'int',  required: false},
-            {field: 'LotSizeUnits',         type: 'text', required: false},
-            {field: 'CapRate',              type: 'float', required: false},
-            {field: 'AvgCap',               type: 'float', required: false},
+            {field: 'RentableAreaUnits',    type: 'hidden', required: false},
+            {field: 'LotSize',              type: 'int',    required: false},
+            {field: 'LotSizeUnits',         type: 'hidden', required: false},
+            {field: 'CapRate',              type: 'float',  required: false},
+            {field: 'AvgCap',               type: 'float',  required: false},
             {field: 'BuildDate',            type: 'date', required: false},
             {field: 'FLAGS',                type: 'text', required: false},
             {field: 'Ownership',            type: 'text', required: false},
@@ -266,11 +266,11 @@ function buildPropertyUIElements() {
             {field: 'LeaseType',            type: 'text', required: false},
             {field: 'DeliveryDt',           type: 'date', required: false},
             {field: 'OriginalLeaseTerm',    type: 'text', required: false},
-            {field: 'LeaseCommencementDt',  type: 'date', required: false},
+            {field: 'RentCommencementDt',  type: 'date', required: false},
             {field: 'LeaseExpirationDt',    type: 'date', required: false},
             {field: 'TermRemainingOnLease', type: 'text', required: false},
-            {field: 'ROLID',                type: 'int', required: false},
-            {field: 'RSLID',                type: 'int', required: false},
+            {field: 'ROLID',                type: 'hidden', required: false},
+            {field: 'RSLID',                type: 'hidden', required: false},
             {field: 'Address',              type: 'text', required: false},
             {field: 'Address2',             type: 'text', required: false},
             {field: 'City',                 type: 'text', required: false},
@@ -278,7 +278,7 @@ function buildPropertyUIElements() {
             {field: 'PostalCode',           type: 'text', required: false},
             {field: 'Country',              type: 'text', required: false},
             {field: 'LLResponsibilities',   type: 'text', required: false},
-            {field: 'NOI',                  type: 'text', required: false},
+            {field: 'NOI',                  type: 'text', required: false, render: 'money'},
             {field: 'HQAddress',            type: 'text', required: false},
             {field: 'HQAddress2',           type: 'text', required: false},
             {field: 'HQCity',               type: 'text', required: false},
@@ -310,8 +310,8 @@ function buildPropertyUIElements() {
                 r.BuildDate = dateFmtStr(y);
                 y = new Date(r.DeliveryDt);
                 r.DeliveryDt = dateFmtStr(y);
-                y = new Date(r.LeaseCommencementDt);
-                r.LeaseCommencementDt = dateFmtStr(y);
+                y = new Date(r.RentCommencementDt);
+                r.RentCommencementDt = dateFmtStr(y);
                 y = new Date(r.LeaseExpirationDt);
                 r.LeaseExpirationDt = dateFmtStr(y);
 
@@ -429,14 +429,14 @@ function propertySaveDoneCB() {
 // INPUTS
 //      PRID - int64, property id
 //      tab  - string, name of the tab that was pressed
-function setPropertyLayout(PRID,tab) {
+function setPropertyLayout(tab) {
     w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
 
     if ( tab == "proptabGeneral") {
         if (propData.bPropLoaded) {
             w2ui.propertyForm.url = '';
         } else {
-            w2ui.propertyForm.url = '/v1/property/' + PRID;
+            w2ui.propertyForm.url = '/v1/property/' + propData.PRID;
         }
         w2ui.propertyFormLayout.content('main', w2ui.propertyForm);
 

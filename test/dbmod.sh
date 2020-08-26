@@ -4,7 +4,7 @@
 #  This script performs SQL schema changes on the test databases that are
 #  saved as SQL files in the test directory. It loads them, performs the
 #  ALTER commands, then saves the sql file.
-# 
+#
 #  If the test file uses its own database saved as a .sql file, make sure
 #  it is listed in the dbs array
 #==========================================================================
@@ -12,28 +12,27 @@
 MODFILE="dbqqqmods.sql"
 MYSQL="mysql --no-defaults"
 MYSQLDUMP="mysqldump --no-defaults"
-DBNAME="mojo"
+DBNAME="wreis"
+
+#=====================================================
+#  Retain prior changes as comments below
+#=====================================================
+# ALTER TABLE Property CHANGE LeaseCommencementDt RentCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00';
+# ALTER TABLE Property ADD TermRemainingOnLeaseUnits SMALLINT NOT NULL DEFAULT 0 AFTER TermRemainingOnLease;
 
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
-cat >${MODFILE} <<EOF
-ALTER TABLE People ADD Email2 varchar(5) NOT NULL DEFAULT '' AFTER Email1;
-EOF
+
+cat > "${MODFILE}" << LEOF
+LEOF
 
 #=====================================================
 #  Put dir/sqlfilename in the list below
 #=====================================================
 declare -a dbs=(
-	'../scrapers/faa/faa.sql'
-	'testdb/bigdb.sql'
-	'csv2/smalldb.sql'
-	'ws/restore.sql'
+	'ws/xb.sql'
 )
-
-pushd testdb
-gunzip bigdb.sql.gz
-popd
 
 for f in "${dbs[@]}"
 do
@@ -45,7 +44,3 @@ do
 	${MYSQLDUMP} ${DBNAME} > ${f}
 	echo "done"
 done
-
-pushd testdb
-gzip bigdb.sql
-popd

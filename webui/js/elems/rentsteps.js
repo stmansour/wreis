@@ -161,7 +161,7 @@ function RentStepDelete() {
     var i = g.get(r.recid,true);
     if (i >= 0) {
         var removed = g.records.splice(i,1);
-        console.log('removed = ' + removed);
+        // console.log('removed = ' + removed);
     }
     w2ui.rentStepsLayout.hide('right',true);
     g.render();

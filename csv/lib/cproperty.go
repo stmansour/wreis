@@ -13,49 +13,50 @@ import (
 // PRName, et al, are indeces into the canonical PropertyList
 //------------------------------------------------------------------------------
 const (
-	PRName                 = 0
-	PRYearsInBusiness      = iota
-	PRParentCompany        = iota
-	PRURL                  = iota
-	PRSymbol               = iota
-	PRPrice                = iota
-	PRDownPayment          = iota
-	PRRentableArea         = iota
-	PRRentableAreaUnits    = iota
-	PRLotSize              = iota
-	PRLotSizeUnits         = iota
-	PRCapRate              = iota
-	PRAvgCap               = iota
-	PRBuildDate            = iota
-	PROwnership            = iota
-	PRTenantTradeName      = iota
-	PRLeaseGuarantor       = iota
-	PRLeaseType            = iota
-	PRDeliveryDt           = iota
-	PROriginalLeaseTerm    = iota
-	PRLeaseCommencementDt  = iota
-	PRLeaseExpirationDt    = iota
-	PRTermRemainingOnLease = iota
-	PRROLID                = iota
-	PRAddress              = iota
-	PRAddress2             = iota
-	PRCity                 = iota
-	PRState                = iota
-	PRPostalCode           = iota
-	PRCountry              = iota
-	PRLLResponsibilities   = iota
-	PRNOI                  = iota
-	PRHQAddress            = iota
-	PRHQAddress2           = iota
-	PRHQCity               = iota
-	PRHQState              = iota
-	PRHQPostalCode         = iota
-	PRHQCountry            = iota
-	PRDriveThrough         = iota
-	PRRoofStructResp       = iota
-	PRFirstRightofRefusal  = iota
-	PRRenewOptions         = iota
-	PRRentSteps            = iota
+	PRName                      = 0
+	PRYearsInBusiness           = iota
+	PRParentCompany             = iota
+	PRURL                       = iota
+	PRSymbol                    = iota
+	PRPrice                     = iota
+	PRDownPayment               = iota
+	PRRentableArea              = iota
+	PRRentableAreaUnits         = iota
+	PRLotSize                   = iota
+	PRLotSizeUnits              = iota
+	PRCapRate                   = iota
+	PRAvgCap                    = iota
+	PRBuildDate                 = iota
+	PROwnership                 = iota
+	PRTenantTradeName           = iota
+	PRLeaseGuarantor            = iota
+	PRLeaseType                 = iota
+	PRDeliveryDt                = iota
+	PROriginalLeaseTerm         = iota
+	PRRentCommencementDt        = iota
+	PRLeaseExpirationDt         = iota
+	PRTermRemainingOnLease      = iota
+	PRTermRemainingOnLeaseUnits = iota
+	PRROLID                     = iota
+	PRAddress                   = iota
+	PRAddress2                  = iota
+	PRCity                      = iota
+	PRState                     = iota
+	PRPostalCode                = iota
+	PRCountry                   = iota
+	PRLLResponsibilities        = iota
+	PRNOI                       = iota
+	PRHQAddress                 = iota
+	PRHQAddress2                = iota
+	PRHQCity                    = iota
+	PRHQState                   = iota
+	PRHQPostalCode              = iota
+	PRHQCountry                 = iota
+	PRDriveThrough              = iota
+	PRRoofStructResp            = iota
+	PRFirstRightofRefusal       = iota
+	PRRenewOptions              = iota
+	PRRentSteps                 = iota
 )
 
 // CanonicalPropertyList defines the cannonical array of ColumnDefs for the CSV
@@ -82,9 +83,10 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"LeaseType"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseType, Index: -1, FlagBit: 0},
 	{Name: []string{"DeliveryDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRDeliveryDt, Index: -1, FlagBit: 0},
 	{Name: []string{"OriginalLeaseTerm"}, Required: false, CaseSensitive: false, CanonicalIndex: PROriginalLeaseTerm, Index: -1, FlagBit: 0},
-	{Name: []string{"LeaseCommencementDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseCommencementDt, Index: -1, FlagBit: 0},
+	{Name: []string{"RentCommencementDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRentCommencementDt, Index: -1, FlagBit: 0},
 	{Name: []string{"LeaseExpirationDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseExpirationDt, Index: -1, FlagBit: 0},
 	{Name: []string{"TermRemainingOnLease"}, Required: false, CaseSensitive: false, CanonicalIndex: PRTermRemainingOnLease, Index: -1, FlagBit: 0},
+	{Name: []string{"TermRemainingOnLeaseUnits"}, Required: false, CaseSensitive: false, CanonicalIndex: PRTermRemainingOnLease, Index: -1, FlagBit: 0},
 	{Name: []string{"ROLID"}, Required: false, CaseSensitive: false, CanonicalIndex: PRROLID, Index: -1, FlagBit: 0},
 	{Name: []string{"Address"}, Required: false, CaseSensitive: false, CanonicalIndex: PRAddress, Index: -1, FlagBit: 0},
 	{Name: []string{"Address2"}, Required: false, CaseSensitive: false, CanonicalIndex: PRAddress2, Index: -1, FlagBit: 0},
@@ -121,6 +123,9 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 	var u uint64
 
 	for i := 0; i < len(csvctx.Order); i++ {
+		if csvctx.Order[i] < 0 {
+			continue // don't try to handle it if we didn't find it
+		}
 		switch i {
 		case PRName:
 			p.Name = ss[csvctx.Order[PRName]]
@@ -162,12 +167,14 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			p.DeliveryDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
 		case PROriginalLeaseTerm:
 			p.OriginalLeaseTerm, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
-		case PRLeaseCommencementDt:
-			p.LeaseCommencementDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
+		case PRRentCommencementDt:
+			p.RentCommencementDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
 		case PRLeaseExpirationDt:
 			p.LeaseExpirationDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
 		case PRTermRemainingOnLease:
 			p.TermRemainingOnLease, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
+		case PRTermRemainingOnLeaseUnits:
+			p.TermRemainingOnLeaseUnits, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRAddress:
 			p.Address = ss[csvctx.Order[i]]
 		case PRAddress2:
@@ -364,7 +371,7 @@ func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []er
 		var rs db.RentStep
 		var x time.Time
 		var el []error
- 		//--------------------------------------------------------------------
+		//--------------------------------------------------------------------
 		// First index can be either a date or a number, determine which...
 		//--------------------------------------------------------------------
 		x, el = ParseDate(ss[i], lineno, el) // index i -> "7/4/2024"

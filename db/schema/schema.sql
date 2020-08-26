@@ -32,13 +32,14 @@ CREATE TABLE Property (
                                                             */
     Ownership SMALLINT NOT NULL DEFAULT 0,                  -- 0 = fee simple, 1 = leasehold
     TenantTradeName VARCHAR(256) NOT NULL DEFAULT '',       -- trade name of business
-    LeaseGuarantor SMALLINT NOT NULL DEFAULT 0,             -- 0 = corporate, 1 = franchise
+    LeaseGuarantor SMALLINT NOT NULL DEFAULT 0,             -- 0 = corporate, 1 = franchise, 2 = individual
     LeaseType SMALLINT NOT NULL DEFAULT 0,                  -- 0 = Absolute NNN, 1 = Double Net, ...
-    DeliveryDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',             -- GMT datetime
+    DeliveryDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',  -- GMT datetime
     OriginalLeaseTerm BIGINT NOT NULL DEFAULT 0,            -- Duration
-    LeaseCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',    -- GMT datetime
+    RentCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',    -- GMT datetime
     LeaseExpirationDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',      -- GMT datetime
     TermRemainingOnLease BIGINT NOT NULL DEFAULT 0,         -- Duration
+    TermRemainingOnLeaseUnits SMALLINT NOT NULL DEFAULT 0,  -- 0 = months, 1 = Years 
     ROLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Renew Options
     RSLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Rent Steps
 

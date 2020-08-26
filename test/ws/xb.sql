@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.22, for osx10.12 (x86_64)
 --
--- Host: localhost    Database: wreis
+-- Host: localhost    Database: mojo
 -- ------------------------------------------------------
 -- Server version	5.7.22
 
@@ -14,6 +14,131 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `DataUpdate`
+--
+
+DROP TABLE IF EXISTS `DataUpdate`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `DataUpdate` (
+  `DUID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GID` bigint(20) NOT NULL DEFAULT '0',
+  `DtStart` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+  `DtStop` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`DUID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `DataUpdate`
+--
+
+LOCK TABLES `DataUpdate` WRITE;
+/*!40000 ALTER TABLE `DataUpdate` DISABLE KEYS */;
+/*!40000 ALTER TABLE `DataUpdate` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `EGroup`
+--
+
+DROP TABLE IF EXISTS `EGroup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `EGroup` (
+  `GID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GroupName` varchar(50) NOT NULL DEFAULT '',
+  `GroupDescription` varchar(1000) NOT NULL DEFAULT '',
+  `DtStart` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+  `DtStop` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`GID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `EGroup`
+--
+
+LOCK TABLES `EGroup` WRITE;
+/*!40000 ALTER TABLE `EGroup` DISABLE KEYS */;
+INSERT INTO `EGroup` VALUES (1,'smanmusic','','2020-08-26 06:58:12','2020-08-26 06:58:12','2020-08-26 06:58:11',0);
+/*!40000 ALTER TABLE `EGroup` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `PGroup`
+--
+
+DROP TABLE IF EXISTS `PGroup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `PGroup` (
+  `PID` bigint(20) NOT NULL DEFAULT '0',
+  `GID` bigint(20) NOT NULL DEFAULT '0',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint(20) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `PGroup`
+--
+
+LOCK TABLES `PGroup` WRITE;
+/*!40000 ALTER TABLE `PGroup` DISABLE KEYS */;
+INSERT INTO `PGroup` VALUES (1,1,'2020-07-05 18:29:18',0),(2,1,'2020-07-05 18:29:18',0);
+/*!40000 ALTER TABLE `PGroup` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `People`
+--
+
+DROP TABLE IF EXISTS `People`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `People` (
+  `PID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `FirstName` varchar(100) DEFAULT '',
+  `MiddleName` varchar(100) DEFAULT '',
+  `LastName` varchar(100) DEFAULT '',
+  `PreferredName` varchar(100) DEFAULT '',
+  `JobTitle` varchar(100) DEFAULT '',
+  `OfficePhone` varchar(100) DEFAULT '',
+  `OfficeFax` varchar(100) DEFAULT '',
+  `Email1` varchar(50) DEFAULT '',
+  `Email2` varchar(50) NOT NULL DEFAULT '',
+  `MailAddress` varchar(50) DEFAULT '',
+  `MailAddress2` varchar(50) DEFAULT '',
+  `MailCity` varchar(100) DEFAULT '',
+  `MailState` varchar(50) DEFAULT '',
+  `MailPostalCode` varchar(50) DEFAULT '',
+  `MailCountry` varchar(50) DEFAULT '',
+  `RoomNumber` varchar(50) DEFAULT '',
+  `MailStop` varchar(100) DEFAULT '',
+  `Status` smallint(6) DEFAULT '0',
+  `OptOutDate` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`PID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `People`
+--
+
+LOCK TABLES `People` WRITE;
+/*!40000 ALTER TABLE `People` DISABLE KEYS */;
+INSERT INTO `People` VALUES (1,'Shannon','CornDog','Kodiak','','','','','shannonkodiak1964@gmail.com','','','','','','','','','',0,'0000-00-00 00:00:00','2020-08-26 06:58:11',0),(2,'Debbie','','Van Compernolle  Conway','','','','','2cdeb650@gmail.com','','30101 East Hanna','','Buckner','MO','64016','','','',0,'0000-00-00 00:00:00','2020-07-05 18:29:18',0);
+/*!40000 ALTER TABLE `People` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `Property`
@@ -45,9 +170,10 @@ CREATE TABLE `Property` (
   `LeaseType` smallint(6) NOT NULL DEFAULT '0',
   `DeliveryDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `OriginalLeaseTerm` bigint(20) NOT NULL DEFAULT '0',
-  `LeaseCommencementDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+  `RentCommencementDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `LeaseExpirationDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `TermRemainingOnLease` bigint(20) NOT NULL DEFAULT '0',
+  `TermRemainingOnLeaseUnits` smallint(6) NOT NULL DEFAULT '0',
   `ROLID` bigint(20) NOT NULL DEFAULT '0',
   `RSLID` bigint(20) NOT NULL DEFAULT '0',
   `Address` varchar(100) NOT NULL DEFAULT '',
@@ -78,8 +204,35 @@ CREATE TABLE `Property` (
 
 LOCK TABLES `Property` WRITE;
 /*!40000 ALTER TABLE `Property` DISABLE KEYS */;
-INSERT INTO `Property` VALUES (1,'Bill\'s Boar Emporium',8,'','http://bbb.com/','BBE',12345.6700,40000.0000,30000,1,40000,1,0.7,0.6,'2020-03-23 00:00:00',0,0,'Bill\'s Boar Emporium',0,0,'2020-03-23 00:00:00',630720000000000000,'2020-03-23 00:00:00','2020-03-23 00:00:00',630720000000000000,4,0,'1234 Elm Street','','Corn Bluff','AK','98765','USA','roof leaks',30000.0000,'1234 Elm Street','','Corn Bluff','AK','98765','USA','2020-07-25 05:52:47',197,'2020-07-16 08:34:53',190),(3,'Bill\'s Bungalo Emporium',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-01 00:00:00',5,0,'Bill\'s Bungalo Emporium',0,1,'1975-01-01 00:00:00',30,'2018-06-15 00:00:00','2020-06-15 00:00:00',70,1,0,'1234 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1234 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',198,'2020-07-16 08:36:02',191),(4,'Sally\'s Sludge Salon',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-02 00:00:00',2,0,'Sally\'s Sludge Salon',0,1,'1975-01-02 00:00:00',31,'2018-06-16 00:00:00','2020-06-16 00:00:00',71,0,3,'1235 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1235 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',199,'2020-07-16 08:36:02',192),(5,'Mungo\'s Mud',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-03 00:00:00',5,0,'Mungo\'s Mud',1,1,'1975-01-03 00:00:00',32,'2018-06-17 00:00:00','2020-06-17 00:00:00',72,2,0,'1236 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1236 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',200,'2020-07-16 08:36:02',193),(6,'Jimbo\'s Junk Yard',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-04 00:00:00',2,0,'Jimbo\'s Junk Yard',1,1,'1975-01-04 00:00:00',33,'2018-06-18 00:00:00','2020-06-18 00:00:00',73,0,4,'1237 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1237 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',201,'2020-07-16 08:36:02',194),(7,'Rosita\'s Taco Town',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-05 00:00:00',5,0,'Rosita\'s Taco Town',0,1,'1975-01-05 00:00:00',34,'2018-06-19 00:00:00','2020-06-19 00:00:00',74,0,0,'1238 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1238 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',202,'2020-07-16 08:36:02',195),(8,'Wings \'n Such',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-06 00:00:00',2,0,'Wings \'n Such',0,1,'1975-01-06 00:00:00',35,'2018-06-20 00:00:00','2020-06-20 00:00:00',75,0,0,'1239 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1239 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',203,'2020-07-16 08:36:02',196);
+INSERT INTO `Property` VALUES (1,'Bill\'s Boar Emporium',8,'','http://bbb.com/','BBE',12345.6700,40000.0000,30000,1,40000,1,0.7,0.6,'2020-03-23 00:00:00',0,0,'Bill\'s Boar Emporium',0,0,'2020-03-23 00:00:00',630720000000000000,'2020-03-23 00:00:00','2020-03-23 00:00:00',630720000000000000,0,4,0,'1234 Elm Street','','Corn Bluff','AK','98765','USA','roof leaks',30000.0000,'1234 Elm Street','','Corn Bluff','AK','98765','USA','2020-07-25 05:52:47',197,'2020-07-16 08:34:53',190),(3,'Bill\'s Bungalo Emporium',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-01 00:00:00',5,0,'Bill\'s Bungalo Emporium',0,1,'1975-01-01 00:00:00',30,'2018-06-15 00:00:00','2020-06-15 00:00:00',70,0,1,0,'1234 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1234 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',198,'2020-07-16 08:36:02',191),(4,'Sally\'s Sludge Salon',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-02 00:00:00',2,0,'Sally\'s Sludge Salon',0,1,'1975-01-02 00:00:00',31,'2018-06-16 00:00:00','2020-06-16 00:00:00',71,0,0,3,'1235 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1235 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',199,'2020-07-16 08:36:02',192),(5,'Mungo\'s Mud',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-03 00:00:00',5,0,'Mungo\'s Mud',1,1,'1975-01-03 00:00:00',32,'2018-06-17 00:00:00','2020-06-17 00:00:00',72,0,2,0,'1236 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1236 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',200,'2020-07-16 08:36:02',193),(6,'Jimbo\'s Junk Yard',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-04 00:00:00',2,0,'Jimbo\'s Junk Yard',1,1,'1975-01-04 00:00:00',33,'2018-06-18 00:00:00','2020-06-18 00:00:00',73,0,0,4,'1237 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1237 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',201,'2020-07-16 08:36:02',194),(7,'Rosita\'s Taco Town',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-05 00:00:00',5,0,'Rosita\'s Taco Town',0,1,'1975-01-05 00:00:00',34,'2018-06-19 00:00:00','2020-06-19 00:00:00',74,0,0,0,'1238 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1238 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',202,'2020-07-16 08:36:02',195),(8,'Wings \'n Such',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000,0,0.3,0.27,'1975-01-06 00:00:00',2,0,'Wings \'n Such',0,1,'1975-01-06 00:00:00',35,'2018-06-20 00:00:00','2020-06-20 00:00:00',75,0,0,0,'1239 Elm Street','','Goober','AK','12345','USA','',25000.0000,'1239 Elm Street','','Goober','AK','12345','USA','2020-07-25 05:52:47',203,'2020-07-16 08:36:02',196);
 /*!40000 ALTER TABLE `Property` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Query`
+--
+
+DROP TABLE IF EXISTS `Query`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Query` (
+  `QID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `QueryName` varchar(50) DEFAULT '',
+  `QueryDescr` varchar(1000) DEFAULT '',
+  `QueryJSON` varchar(3000) DEFAULT '',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`QID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Query`
+--
+
+LOCK TABLES `Query` WRITE;
+/*!40000 ALTER TABLE `Query` DISABLE KEYS */;
+/*!40000 ALTER TABLE `Query` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -212,4 +365,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-08-25 14:04:20
+-- Dump completed on 2020-08-26 12:20:08

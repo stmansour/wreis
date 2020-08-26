@@ -168,10 +168,13 @@ func GetContext(dbctx context.Context, fname string, h HandlerFunc) (Context, er
 		}
 	}
 
-	dbg := false
-	if dbg {
-		for i := 0; i < len(ctx.Order); i++ {
+	dbg := true
+	for i := 0; i < len(ctx.Order); i++ {
+		if dbg {
 			util.Console("%s is in col %d\n", CanonicalPropertyList[i].Name, ctx.Order[i])
+		}
+		if ctx.Order[i] < 0 {
+			fmt.Printf("\n\n**** WARNING ****   column for %s was not found\n\n", CanonicalPropertyList[i].Name)
 		}
 	}
 	return ctx, nil
