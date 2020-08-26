@@ -6,6 +6,8 @@
     <div class="w2ui-field"><input type="hidden" name="FLAGS" /></div>
     <div class="w2ui-field"><input type="hidden" name="RentableAreaUnits" /></div>
     <div class="w2ui-field"><input type="hidden" name="LotSizeUnits" /></div>
+    <div class="w2ui-field"><input type="hidden" name="LeaseGuarantor" /></div>
+    <div class="w2ui-field"><input type="hidden" name="Ownership" /></div>
     <div class="w2ui-field"><input type="hidden" name="LastModTime" /></div>
     <div class="w2ui-field"><input type="hidden" name="LastModBy" /></div>
     <div class="w2ui-field"><input type="hidden" name="CreateTime" /></div>
@@ -15,15 +17,15 @@
         <div><input name="Name" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>YearsInBusiness:</label>
+        <label>Years In Business:</label>
         <div><input name="YearsInBusiness" type="int" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>ParentCompany:</label>
+        <label>Parent Company:</label>
         <div><input name="ParentCompany" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>URL:</label>
+        <label>Website:</label>
         <div><input name="URL" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
@@ -35,20 +37,15 @@
         <div><input name="Price" type="float" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>DownPayment:</label>
+        <label>Down Payment:</label>
         <div><input name="DownPayment" type="float" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>RentableArea:</label>
-        <div><input name="RentableArea" type="int" maxlength="100" style="width: 25%"/>  sq ft
-            <!-- <select name="RentableAreaUnits" onchange="propertyRentableAreaUnitsChange();">
-                <option value="0" name="sqft">sq ft</option>
-                <option value="1" name="hectares">hectares</option>
-            </select> -->
-        </div>
+        <label>Rentable Area:</label>
+        <div><input name="RentableArea" type="int" maxlength="100" style="width: 25%"/>  sq ft</div>
     </div>
     <div class="w2ui-field">
-        <label>LotSize:</label>
+        <label>Lot Size:</label>
         <div><input name="LotSize" type="int" maxlength="100" style="width: 25%"/>
             <select name="LotSizeUnits" onchange="propertyLotSizeUnitsChange();">
                 <option value="0" name="sqft">sq ft</option>
@@ -57,39 +54,52 @@
         </div>
     </div>
     <div class="w2ui-field">
-        <label>CapRate:</label>
+        <label>Cap Rate:</label>
         <div><input name="CapRate" type="float" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>AvgCap:</label>
+        <label>Avg Cap:</label>
         <div><input name="AvgCap" type="float" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>BuildDate:</label>
+        <label>Build Date:</label>
         <div><input name="BuildDate" type="us-date1" size="11"/></div>
     </div>
     <div class="w2ui-field">
         <label>Ownership:</label>
-        <div><input name="Ownership" type="text" maxlength="100" style="width: 100%"/></div>
+        <div>
+            <!-- <input name="Ownership" type="text" maxlength="100" style="width: 100%"/> -->
+            <select name="OwnershipDD" id="OwnershipDD">
+                <option value="0" name="feesimple" selected='selected'>fee simple</option>
+                <option value="1" name="leasehold">leasehold</option>
+            </select>
+        </div>
     </div>
     <div class="w2ui-field">
-        <label>TenantTradeName:</label>
+        <label>Tenant Trade Name:</label>
         <div><input name="TenantTradeName" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>LeaseGuarantor:</label>
-        <div><input name="LeaseGuarantor" type="text" maxlength="100" style="width: 100%"/></div>
+        <label>Lease Guarantor:</label>
+        <div>
+            <!-- <input name="LeaseGuarantor" type="text" maxlength="100" style="width: 100%"/> -->
+            <select name="LeaseGuarantorDD" id="LeaseGuarantorDD">
+                <option value="0" name="corporate" selected='selected'>corporate</option>
+                <option value="1" name="franchise">franchise</option>
+                <option value="2" name="individual">individual</option>
+            </select>
+        </div>
     </div>
     <div class="w2ui-field">
-        <label>LeaseType:</label>
+        <label>Lease Type:</label>
         <div><input name="LeaseType" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>DeliveryDt:</label>
+        <label>Delivery Dt:</label>
         <div><input name="DeliveryDt" type="us-date1" size="11" /></div>
     </div>
     <div class="w2ui-field">
-        <label>OriginalLeaseTerm:</label>
+        <label>Original Lease Term:</label>
         <div><input name="OriginalLeaseTerm" type="text" size="3" maxlength="100" style="width: 25%"/> years</div>
     </div>
     <div class="w2ui-field">
@@ -97,12 +107,18 @@
         <div><input name="RentCommencementDt" type="us-date1" size="11" /></div>
     </div>
     <div class="w2ui-field">
-        <label>LeaseExpirationDt:</label>
+        <label>Lease Expiration Dt:</label>
         <div><input name="LeaseExpirationDt" type="us-date1" size="11"/></div>
     </div>
     <div class="w2ui-field">
-        <label>TermRemainingOnLease:</label>
-        <div><input name="TermRemainingOnLease" type="text" maxlength="100" style="width: 100%"/></div>
+        <label>Lease Term Remaining:</label>
+        <div>
+            <input name="TermRemainingOnLease" type="int" min="0" max="101" style="width: 25%"/>
+            <select name="TermRemainingOnLeaseUnitsDD" id="TermRemainingOnLeaseUnitsDD">
+                <option value="0" name="months">months</option>
+                <option value="1" name="years" selected='selected'>years</option>
+            </select>
+        </div>
     </div>
     <div class="w2ui-field">
         <label>Address:</label>
@@ -121,7 +137,7 @@
         <div><input name="State" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>PostalCode:</label>
+        <label>Postal Code:</label>
         <div><input name="PostalCode" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
@@ -134,30 +150,30 @@
     </div>
     <div class="w2ui-field">
         <label>NOI:</label>
-        <div><input name="NOI" type="text" maxlength="100" style="width: 100%"/></div>
+        <div><input name="NOI" type="float" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>HQAddress:</label>
+        <label>HQ Address:</label>
         <div><input name="HQAddress" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>HQAddress2:</label>
+        <label>HQ Address2:</label>
         <div><input name="HQAddress2" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>HQCity:</label>
+        <label>HQ City:</label>
         <div><input name="HQCity" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>HQState:</label>
+        <label>HQ State:</label>
         <div><input name="HQState" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>HQPostalCode:</label>
+        <label>HQ Postal Code:</label>
         <div><input name="HQPostalCode" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
     <div class="w2ui-field">
-        <label>HQCountry:</label>
+        <label>HQ Country:</label>
         <div><input name="HQCountry" type="text" maxlength="100" style="width: 100%"/></div>
     </div>
 </div>  <!-- end of page 0, Property -->

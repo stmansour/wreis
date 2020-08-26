@@ -1,5 +1,6 @@
 /*global
-    w2ui, app, $, console, dateFmtStr,
+    w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
+    setDropDownSelectedIndex,
 */
 
 "use strict";
@@ -108,7 +109,7 @@ function buildPropertyUIElements() {
             {field: 'PostalCode',           size: '60px', caption: 'PostalCode', sortable: true, hidden: false},
             {field: 'Country',              size: '60px', caption: 'Country', sortable: true, hidden: true},
             {field: 'LLResponsibilities',   size: '60px', caption: 'LLResponsibilities', sortable: true, hidden: true},
-            {field: 'NOI',                  size: '60px', caption: 'NOI', sortable: true, hidden: true},
+            {field: 'NOI',                  size: '60px', caption: 'NOI', sortable: true, hidden: true, render: 'money'},
             {field: 'HQAddress',            size: '60px', caption: 'HQAddress', sortable: true, hidden: true},
             {field: 'HQAddress2',           size: '60px', caption: 'HQAddress2', sortable: true, hidden: true},
             {field: 'HQCity',               size: '60px', caption: 'HQCity', sortable: true, hidden: true},
@@ -256,19 +257,19 @@ function buildPropertyUIElements() {
             {field: 'RentableAreaUnits',    type: 'hidden', required: false},
             {field: 'LotSize',              type: 'int',    required: false},
             {field: 'LotSizeUnits',         type: 'hidden', required: false},
-            {field: 'CapRate',              type: 'float',  required: false},
-            {field: 'AvgCap',               type: 'float',  required: false},
+            {field: 'CapRate',              type: 'percent',  required: false},
+            {field: 'AvgCap',               type: 'percent',  required: false},
             {field: 'BuildDate',            type: 'date', required: false},
             {field: 'FLAGS',                type: 'text', required: false},
-            {field: 'Ownership',            type: 'text', required: false},
+            {field: 'Ownership',            type: 'hidden', required: false},
             {field: 'TenantTradeName',      type: 'text', required: false},
             {field: 'LeaseGuarantor',       type: 'text', required: false},
             {field: 'LeaseType',            type: 'text', required: false},
             {field: 'DeliveryDt',           type: 'date', required: false},
             {field: 'OriginalLeaseTerm',    type: 'text', required: false},
-            {field: 'RentCommencementDt',  type: 'date', required: false},
+            {field: 'RentCommencementDt',   type: 'date', required: false},
             {field: 'LeaseExpirationDt',    type: 'date', required: false},
-            {field: 'TermRemainingOnLease', type: 'text', required: false},
+            {field: 'TermRemainingOnLease', type: 'hidden', required: false},
             {field: 'ROLID',                type: 'hidden', required: false},
             {field: 'RSLID',                type: 'hidden', required: false},
             {field: 'Address',              type: 'text', required: false},
@@ -278,7 +279,7 @@ function buildPropertyUIElements() {
             {field: 'PostalCode',           type: 'text', required: false},
             {field: 'Country',              type: 'text', required: false},
             {field: 'LLResponsibilities',   type: 'text', required: false},
-            {field: 'NOI',                  type: 'text', required: false, render: 'money'},
+            {field: 'NOI',                  type: 'money', required: false},
             {field: 'HQAddress',            type: 'text', required: false},
             {field: 'HQAddress2',           type: 'text', required: false},
             {field: 'HQCity',               type: 'text', required: false},
@@ -314,6 +315,9 @@ function buildPropertyUIElements() {
                 r.RentCommencementDt = dateFmtStr(y);
                 y = new Date(r.LeaseExpirationDt);
                 r.LeaseExpirationDt = dateFmtStr(y);
+                r.CapRate *= 100;
+                r.AvgCap *= 100;
+                setDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD",r.TermRemainingOnLeaseUnits);
 
                 propData.bPropLoaded = true;
             };
@@ -395,8 +399,25 @@ function buildPropertyUIElements() {
     });
 }
 
+// savePropertyForm grabs all the data that is associated with the propertForm,
+//      converts anything that needs attention and calls the server's save
+//      function.
+//------------------------------------------------------------------------------
 function savePropertyForm() {
     var rec = w2ui.propertyForm.record;
+
+    //-----------------------------------------
+    // Handle any conversions necessary...
+    //-----------------------------------------
+    rec.AvgCap /= 100;  // convert back to decimal number
+    rec.CapRate /= 100; // convert back to decimal number
+
+    rec.TermRemainingOnLeaseUnits = getDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD");
+
+
+    //-----------------------------------------
+    // Now send it to the server
+    //-----------------------------------------
     var params = {
         cmd: "save",
         record: rec
