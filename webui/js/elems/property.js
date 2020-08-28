@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
-    setDropDownSelectedIndex,
+    setDropDownSelectedIndex,saveRentSteps,saveRenewOptions
 */
 
 "use strict";
@@ -336,7 +336,8 @@ function buildPropertyUIElements() {
             save: function () {
                     $.when(
                         savePropertyForm(),
-                        saveRentSteps()
+                        saveRentSteps(),
+                        saveRenewOptions()
                     )
                     .done( function() {
                         propertySaveDoneCB();

@@ -30,7 +30,7 @@ function newRenewOptionRecord() {
 function buildRenewOptionsUIElements() {
     $().w2grid({
         name: 'propertyRenewOptionsGrid',
-        url: '/v1/rentoptions',
+        url: '/v1/renewoptions',
         show: {
             toolbar         : true,
             footer          : false,
@@ -82,9 +82,6 @@ function buildRenewOptionsUIElements() {
         },
         onClick: function(event) {
             event.onComplete = function(event) {
-                // if (typeof w2ui.propertyRenewOptionForm.record === "undefined") {
-                //     w2ui.propertyRenewOptionForm.record = newRenewOptionRecord();
-                // }
                 var r = w2ui.propertyRenewOptionForm.record;
                 var x = this.getSelection();
                 if (x.length < 1) {return;}
@@ -263,7 +260,7 @@ function showRenewOptionForm() {
 
 function saveRenewOptions() {
     //-----------------------------------------------------------------------
-    // If we never loaded the rentoptions, then they weren't changed, so just
+    // If we never loaded the renewoptions, then they weren't changed, so just
     // return success.
     //-----------------------------------------------------------------------
     if (!propData.bRenewOptionsLoaded) {
@@ -277,7 +274,7 @@ function saveRenewOptions() {
     }
 
     //-----------------------------------------------------------------------
-    // We have loaded the rentoptions, so we need to go through the save...
+    // We have loaded the renewoptions, so we need to go through the save...
     //-----------------------------------------------------------------------
     var params = {
         cmd: "save",
@@ -288,7 +285,7 @@ function saveRenewOptions() {
         params.records[i].Dt = d.toUTCString();
     }
     var dat = JSON.stringify(params);
-    var url = '/v1/rentoptions/' + w2ui.propertyForm.record.ROLID;
+    var url = '/v1/renewoptions/' + w2ui.propertyForm.record.ROLID;
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
