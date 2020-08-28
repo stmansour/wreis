@@ -177,6 +177,37 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     dojsonPOST "http://localhost:8276/v1/rentsteps/4" "request" "${TFILES}${STEP}"  "RentSteps"
 fi
 
+#------------------------------------------------------------------------------
+#  TEST e
+#
+#  Read the renewoptions for ROLID 4
+#  Write renewoptions
+#
+#  Scenario:
+#  login
+#  read renewoptions
+#
+#  Expected Results:
+#   1. Expecting 3 rent step items
+#   2. Write 4 rent steps back.  Only 1 change (added a new one)
+#------------------------------------------------------------------------------
+TFILES="e"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xb.sql
+    login
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/renewoptions/1" "request" "${TFILES}${STEP}"  "RenewOption"
+
+    # Add one, remove one, and change one...
+    encodeRequest '{"cmd":"save","records":[{"recid":1,"ROID":1,"ROLID":1,"Dt":"7/4/2024","Opt":"1","Rent":109709.45,"FLAGS":1},{"recid":3,"ROID":3,"ROLID":1,"Dt":"11/4/2026","Opt":"3","Rent":114141.71,"FLAGS":1},{"recid":-1,"ROID":-1,"ROLID":1,"Dt":"12/15/2027","Opt":"3","Rent":20000.00,"FLAGS":1}]}'
+    dojsonPOST "http://localhost:8276/v1/renewoptions/1" "request" "${TFILES}${STEP}"  "RenewOptions"
+
+    # Change all of them to DATE based, and change 1 date
+    encodeRequest '{"cmd":"save","records":[{"recid":1,"ROID":1,"ROLID":1,"Dt":"7/4/2024","Opt":"Year 1","Rent":109709.45,"FLAGS":0},{"recid":3,"ROID":3,"ROLID":1,"Dt":"11/4/2026","Opt":"Year 2","Rent":114141.71,"FLAGS":0},{"recid":-1,"ROID":-1,"ROLID":1,"Dt":"12/15/2027","Opt":"Year 3","Rent":20000.00,"FLAGS":0}]}'
+    dojsonPOST "http://localhost:8276/v1/renewoptions/1" "request" "${TFILES}${STEP}"  "RenewOptions"
+fi
+
 stopWsrv
 echo "WREIS SERVER STOPPED"
 

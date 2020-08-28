@@ -11,7 +11,7 @@ var propData = {
     ROLID: 0,
     bPropLoaded: false,         // false -> either it's new or user clicked property in the propertyGrid, true -> just switching tabls
     bRentStepsLoaded: false,    // "  same as above for RentSteps
-    bLeaseOptsLoaded: false,    // "  same as above for LeaseOptions
+    bRenewOptionsLoaded: false,    // "  same as above for RenewOptions
 };
 
 function initializePropertyRecord() {
@@ -130,7 +130,7 @@ function buildPropertyUIElements() {
                 propData.ROLID = rec.ROLID;
                 propData.bPropLoaded = false;
                 propData.bRentStepsLoaded = false;
-                propData.bLeaseOptsLoaded = false;
+                propData.bRenewOptionsLoaded = false;
                 w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
                 setPropertyLayout('proptabGeneral');
             };
@@ -205,7 +205,7 @@ function buildPropertyUIElements() {
                     tabs: [
                         { id: 'proptabGeneral', caption: 'General' },
                         { id: 'proptabRentSteps', caption: 'Rent Steps' },
-                        { id: 'proptabLeaseOptions', caption: 'Lease Options' },
+                        { id: 'proptabRenewOptions', caption: 'Renew Options' },
                     ],
                     //---------------------------------
                     //  HANDLE THE TAB CLICKS...
@@ -221,7 +221,7 @@ function buildPropertyUIElements() {
                             setPropertyLayout(event.target);
                             break;
 
-                            case 'proptabLeaseOptions':
+                            case 'proptabRenewOptions':
                             setPropertyLayout(event.target);
                             break;
                         }
@@ -264,7 +264,7 @@ function buildPropertyUIElements() {
             {field: 'Ownership',            type: 'hidden', required: false},
             {field: 'TenantTradeName',      type: 'text', required: false},
             {field: 'LeaseGuarantor',       type: 'text', required: false},
-            {field: 'LeaseType',            type: 'text', required: false},
+            {field: 'LeaseType',            type: 'hidden', required: false},
             {field: 'DeliveryDt',           type: 'date', required: false},
             {field: 'OriginalLeaseTerm',    type: 'text', required: false},
             {field: 'RentCommencementDt',   type: 'date', required: false},
@@ -317,7 +317,10 @@ function buildPropertyUIElements() {
                 r.LeaseExpirationDt = dateFmtStr(y);
                 r.CapRate *= 100;
                 r.AvgCap *= 100;
+                setDropDownSelectedIndex("LotSizeUnitsDD",r.LotSizeUnits);
+                setDropDownSelectedIndex("OwnershipDD",r.Ownership);
                 setDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD",r.TermRemainingOnLeaseUnits);
+                setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
 
                 propData.bPropLoaded = true;
             };
@@ -367,36 +370,6 @@ function buildPropertyUIElements() {
         },
    });
 
-   $().w2grid({
-       name: 'propertyLeaseOptionsGrid',
-       url: '/v1/leaseoptions',
-       show: {
-           toolbar         : true,
-           footer          : false,
-           toolbarAdd      : true,   // indicates if toolbar add new button is visible
-           toolbarDelete   : true,   // indicates if toolbar delete button is visible
-           toolbarSave     : false,   // indicates if toolbar save button is visible
-           selectColumn    : false,
-           expandColumn    : false,
-           toolbarEdit     : false,
-           toolbarSearch   : false,
-           toolbarInput    : false,
-           searchAll       : false,
-           toolbarReload   : true,
-           toolbarColumns  : true,
-       },
-       //======================================================================
-       // FLAGS
-       //     1<<0  Drive Through?  0 = no, 1 = yes
-       //	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
-       //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
-       //======================================================================
-        columns: [
-            {field: 'Recid',                size: '60px', sortable: true, hidden: true},
-            {field: 'PRID',                 size: '60px', sortable: true, hidden: true},
-            {field: 'Name',                 size: '200px', sortable: true, hidden: false},
-        ],
-    });
 }
 
 // savePropertyForm grabs all the data that is associated with the propertForm,
@@ -412,8 +385,10 @@ function savePropertyForm() {
     rec.AvgCap /= 100;  // convert back to decimal number
     rec.CapRate /= 100; // convert back to decimal number
 
+    rec.LotSizeUnits = getDropDownSelectedIndex("LotSizeUnitsDD");
+    rec.Ownership = getDropDownSelectedIndex("OwnershipDD");
     rec.TermRemainingOnLeaseUnits = getDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD");
-
+    rec.LeaseType = getDropDownSelectedIndex("LeaseTypeDD");
 
     //-----------------------------------------
     // Now send it to the server
@@ -470,14 +445,15 @@ function setPropertyLayout(tab) {
         }
         w2ui.rentStepsLayout.content('main',w2ui.propertyRentStepsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.rentStepsLayout);
-    } else if (tab == "proptabLeaseOptions") {
-        if (propData.bLeaseOptsLoaded) {
-            w2ui.propertyLeaseOptionsGrid.url = '';
+    } else if (tab == "proptabRenewOptions") {
+        if (propData.bRenewOptionsLoaded) {
+            w2ui.propertyRenewOptionsGrid.url = '';
         } else {
-            w2ui.propertyLeaseOptionsGrid.clear();
-            w2ui.propertyLeaseOptionsGrid.url = '/v1/leaseoptions/' + propData.ROLID;
+            w2ui.propertyRenewOptionsGrid.clear();
+            w2ui.propertyRenewOptionsGrid.url = '/v1/renewoptions/' + propData.ROLID;
         }
-        w2ui.propertyFormLayout.content('main',w2ui.propertyLeaseOptionsGrid);
+        w2ui.renewOptionsLayout.content('main',w2ui.propertyRenewOptionsGrid);
+        w2ui.propertyFormLayout.content('main',w2ui.renewOptionsLayout);
     }
     showForm();
 }

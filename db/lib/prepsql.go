@@ -162,6 +162,8 @@ func BuildPreparedStatements() {
 	Wdb.DBFields["RenewOptions"] = flds
 	Wdb.Prepstmt.GetRenewOptions, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOptions where ROLID=?")
 	Errcheck(err)
+	Wdb.Prepstmt.GetRenewOptionsItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["RenewOption"] + " FROM RenewOption where ROLID=?")
+	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertRenewOptions, err = Wdb.DB.Prepare("INSERT INTO RenewOptions (" + s1 + ") VALUES(" + s2 + ")")
 	Errcheck(err)

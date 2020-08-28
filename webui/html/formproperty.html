@@ -8,6 +8,8 @@
     <div class="w2ui-field"><input type="hidden" name="LotSizeUnits" /></div>
     <div class="w2ui-field"><input type="hidden" name="LeaseGuarantor" /></div>
     <div class="w2ui-field"><input type="hidden" name="Ownership" /></div>
+    <div class="w2ui-field"><input type="hidden" name="LeaseType" /></div>
+    <div class="w2ui-field"><input type="hidden" name="LotSizeUnits" /></div>
     <div class="w2ui-field"><input type="hidden" name="LastModTime" /></div>
     <div class="w2ui-field"><input type="hidden" name="LastModBy" /></div>
     <div class="w2ui-field"><input type="hidden" name="CreateTime" /></div>
@@ -46,8 +48,9 @@
     </div>
     <div class="w2ui-field">
         <label>Lot Size:</label>
-        <div><input name="LotSize" type="int" maxlength="100" style="width: 25%"/>
-            <select name="LotSizeUnits" onchange="propertyLotSizeUnitsChange();">
+        <div>
+            <input name="LotSize" type="int" maxlength="100" style="width: 25%"/>
+            <select name="LotSizeUnitsDD" id="LotSizeUnitsDD">
                 <option value="0" name="sqft">sq ft</option>
                 <option value="1" name="acres">acres</option>
             </select>
@@ -92,7 +95,15 @@
     </div>
     <div class="w2ui-field">
         <label>Lease Type:</label>
-        <div><input name="LeaseType" type="text" maxlength="100" style="width: 100%"/></div>
+        <div>
+            <!-- <input name="LeaseType" type="text" maxlength="100" style="width: 100%"/> -->
+            <select name="LeaseTypeDD" id="LeaseTypeDD">
+                <option value="0" name="AbsoluteNNN" selected='selected'>Absolute NNN</option>
+                <option value="1" name="DoubleNet">Double Net</option>
+                <option value="2" name="TripleNet">Triple Net</option>
+                <option value="3" name="Gross">Gross</option>
+            </select>
+        </div>
     </div>
     <div class="w2ui-field">
         <label>Delivery Dt:</label>

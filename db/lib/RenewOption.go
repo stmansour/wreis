@@ -112,6 +112,34 @@ func ReadRenewOption(row *sql.Row, a *RenewOption) error {
 	return err
 }
 
+// ReadRenewOptionItem reads a full RenewOption structure of data from the database based
+// on the supplied Rows pointer.
+//
+// INPUTS
+// row - db Row pointer
+// a   - pointer to struct to fill
+//
+// RETURNS
+//
+// ErrSessionRequired if the session is invalid
+// nil if the session is valid
+//-----------------------------------------------------------------------------
+func ReadRenewOptionItem(rows *sql.Rows, a *RenewOption) error {
+	err := rows.Scan(
+		&a.ROID,
+		&a.ROLID,
+		&a.Dt,
+		&a.Opt,
+		&a.Rent,
+		&a.FLAGS,
+		&a.CreateTS,
+		&a.CreateBy,
+		&a.LastModTime,
+		&a.LastModBy)
+	SkipSQLNoRowsError(&err)
+	return err
+}
+
 // UpdateRenewOption updates an existing RenewOption record in the database
 //
 // INPUTS

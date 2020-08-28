@@ -183,8 +183,7 @@ function buildPageElements() {
             ]},
             { type: 'break', id: 'break2' },
             // { type: 'button', id: 'msgButton', caption: 'News Flash', icon: 'fa fa-spinner fa-pulse fa-3x fa-fw'},
-            { type: 'menu',    id: 'menuButton', caption: 'Developer',    icon: 'fa fa-user-circle',
-                    items: [ { text: 'Webdocs', icon: 'fa fa-book' }, ]},
+            // { type: 'menu',    id: 'menuButton', caption: 'Developer',    icon: 'fa fa-user-circle', items: [ { text: 'Webdocs', icon: 'fa fa-book' }, ]},
             { id: 'bt3', type: 'spacer' },
             { type: 'menu',   id: 'userMenu',
                 caption: '<div id="user_menu_container">'+
@@ -252,31 +251,17 @@ function buildPageElements() {
 
     buildPropertyUIElements();
     buildRentStepsUIElements();
+    buildRenewOptionsUIElements();
+
     buildLoginForm();
+
+    finishRentStepsGridToolbar();
+    finishRenewOptionsGridToolbar();
 }
 
 function finishInitialization() {
     defineDateFmts();
     buildPageElements();
-
-    var t = w2ui.propertyRentStepsGrid.toolbar;
-    t.add([
-        { id: 'bt3', type: 'spacer' },
-        { id: 'rsListType', type: 'menu-radio', icon: 'fa fa-star',
-            text: function (item) {
-                var text = item.selected;
-                var el   = this.get('rsListType:' + item.selected);
-                return 'Step Type: ' + el.text;
-            },
-            selected: 'rsListOpt',
-            items: [
-                { id: 'rsListOpt', text: 'Period', icon: 'fa fa-tachometer' },
-                { id: 'rsListDate', text: 'Date', icon: 'fa fa-tachometer' },
-            ]
-        },
-    ]);
-    t.on('*', RentStepTypeChange);
-
     launchSession();
 }
 

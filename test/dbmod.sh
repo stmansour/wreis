@@ -17,14 +17,16 @@ DBNAME="wreis"
 #=====================================================
 #  Retain prior changes as comments below
 #=====================================================
-# ALTER TABLE Property CHANGE LeaseCommencementDt RentCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00';
+# ALTER TABLE Property MODIFY LeaseCommencementDt RentCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00';
 # ALTER TABLE Property ADD TermRemainingOnLeaseUnits SMALLINT NOT NULL DEFAULT 0 AFTER TermRemainingOnLease;
+# ALTER TABLE RenewOption DROP COLUMN Count;
 
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
+ALTER TABLE RenewOption MODIFY Opt VARCHAR(100) NOT NULL DEFAULT '';
 LEOF
 
 #=====================================================

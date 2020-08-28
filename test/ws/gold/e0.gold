@@ -1,0 +1,32 @@
+{
+    "records": [
+        {
+            "Dt": "7/4/2024",
+            "FLAGS": 1,
+            "Opt": "1",
+            "ROID": 1,
+            "ROLID": 1,
+            "Rent": 109709.45,
+            "recid": 1
+        },
+        {
+            "Dt": "7/4/2025",
+            "FLAGS": 1,
+            "Opt": "2",
+            "ROID": 2,
+            "ROLID": 1,
+            "Rent": 111903.63,
+            "recid": 2
+        },
+        {
+            "Dt": "7/4/2026",
+            "FLAGS": 1,
+            "Opt": "3",
+            "ROID": 3,
+            "ROLID": 1,
+            "Rent": 114141.71,
+            "recid": 3
+        }
+    ],
+    "status": "success"
+}

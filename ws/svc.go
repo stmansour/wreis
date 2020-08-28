@@ -135,6 +135,7 @@ var Svcs = []ServiceHandler{
 	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 	{Cmd: "rentsteps", AuthNRequired: true, Handler: SvcHandlerRentSteps},
+	{Cmd: "renewoptions", AuthNRequired: true, Handler: SvcHandlerRenewOptions},
 	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},
 }
 

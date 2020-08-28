@@ -61,6 +61,46 @@ func GetRenewOptions(ctx context.Context, id int64) (RenewOptions, error) {
 	return a, ReadRenewOptions(row, &a)
 }
 
+// GetRenewOptionsItems reads only the array of RenewOption items associated with
+// the supplied id (an ROLID)
+//
+// INPUTS
+// ctx - db context
+// id - ROLID to which all the rent step items belong
+//
+// RETURNS
+// ErrSessionRequired if the session is invalid
+// nil if the session is valid
+//-----------------------------------------------------------------------------
+func GetRenewOptionsItems(ctx context.Context, id int64) ([]RenewOption, error) {
+	var err error
+	var a []RenewOption
+	if !ValidateSession(ctx) {
+		return a, ErrSessionRequired
+	}
+
+	fields := []interface{}{id}
+	stmt2, rows, err := getRowsFromDB(ctx, Wdb.Prepstmt.GetRenewOptionsItems, fields)
+	if err != nil {
+		return a, err
+	}
+	if stmt2 != nil {
+		defer stmt2.Close()
+	}
+	for i := 0; rows.Next(); i++ {
+		var x RenewOption
+		if err = ReadRenewOptionItem(rows, &x); err != nil {
+			return a, err
+		}
+		a = append(a, x)
+	}
+	if err = rows.Err(); err != nil {
+		return a, err
+	}
+	return a, nil
+}
+
+
 // InsertRenewOptions writes a new RenewOptions record to the database
 //
 // INPUTS
