@@ -97,9 +97,9 @@ CREATE TABLE RenewOption (
     ROID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Renew Option, part of a list
     ROLID BIGINT NOT NULL DEFAULT 0,                        -- Renew Options List ID to which this RO belongs
     Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
-    Opt VARCHAR(128) NOT NULL DEFAULT '',                   -- option period comment
+    Opt VARCHAR(128) NOT NULL DEFAULT '',                   -- option period comment (valid when FLAGS bit 0 = 0)
     Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = options (Opt), 1 = dates (Dt) (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
