@@ -11,6 +11,11 @@
 //                   TIMEZONE CONVERSION  UTILITIES
 //
 //-----------------------------------------------------------------------------
+function varToUTCString(r) {
+    var x = new Date(r);
+    return x.toUTCString();
+}
+
 window.UTCstringToLocaltimeString = function(u) {
     var x = new Date(u);
     return x.toString();  // this will be a localtime value

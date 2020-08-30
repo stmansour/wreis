@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
-    setDropDownSelectedIndex,saveRentSteps,saveRenewOptions
+    setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
 */
 
 "use strict";
@@ -385,6 +385,11 @@ function savePropertyForm() {
     //-----------------------------------------
     rec.AvgCap /= 100;  // convert back to decimal number
     rec.CapRate /= 100; // convert back to decimal number
+    rec.BuildDate = varToUTCString(rec.BuildDate);
+    rec.DeliveryDt = varToUTCString(rec.DeliveryDt);
+    rec.RentCommencementDt = varToUTCString(rec.RentCommencementDt);
+    rec.LeaseExpirationDt = varToUTCString(rec.LeaseExpirationDt);
+
 
     rec.LotSizeUnits = getDropDownSelectedIndex("LotSizeUnitsDD");
     rec.Ownership = getDropDownSelectedIndex("OwnershipDD");

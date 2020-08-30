@@ -208,6 +208,36 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     dojsonPOST "http://localhost:8276/v1/renewoptions/1" "request" "${TFILES}${STEP}"  "RenewOptions"
 fi
 
+#------------------------------------------------------------------------------
+#  TEST f
+#
+#  Save property form
+#
+#  Scenario:
+#  login
+#  save an updated version of the entry where we remove the apostrophe from
+#  the name
+#
+#  Expected Results:
+#   1. Expecting 3 rent step items
+#   2. Write 4 rent steps back.  Only 1 change (added a new one)
+#------------------------------------------------------------------------------
+TFILES="f"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xb.sql
+    login
+
+    # write it
+    encodeRequest '{"cmd":"save","record":{"recid":4,"PID":0,"PRID":4,"Name":"Sallys Sludge Salon","YearsInBusiness":5,"ParentCompany":"","URL":"https://bbe.com/","Symbol":"","Price":77777.88,"DownPayment":510000,"RentableArea":16000,"RentableAreaUnits":0,"LotSize":26,"LotSizeUnits":1,"CapRate":0.28,"AvgCap":0.35,"BuildDate":"Wed, 01 Jan 1975 08:00:00 GMT","FLAGS":2,"Ownership":1,"TenantTradeName":"Sallys Sludge Salon","LeaseGuarantor":1,"LeaseType":2,"DeliveryDt":"Wed, 01 Jan 1975 08:00:00 GMT","OriginalLeaseTerm":31,"RentCommencementDt":"Fri, 15 Jun 2018 07:00:00 GMT","LeaseExpirationDt":"Mon, 15 Jun 2020 07:00:00 GMT","TermRemainingOnLease":71,"TermRemainingOnLeaseUnits":0,"ROLID":2,"RSLID":3,"Address":"1235 Elm Street","Address2":"","City":"Goober","State":"AK","PostalCode":"12345","Country":"USA","LLResponsibilities":"","NOI":25000,"HQAddress":"1235 Elm Street","HQAddress2":"","HQCity":"Goober","HQState":"AK","HQPostalCode":"12345","HQCountry":"USA","CreateTime":"1900-01-01 00:00:00 UTC","CreatedBy":0,"LastModifyTime":"1900-01-01 00:00:00 UTC","LastModifyBy":0}}'
+    dojsonPOST "http://localhost:8276/v1/property/4" "request" "${TFILES}${STEP}"  "Property-save"
+
+    # read it back to make sure the changes stuck
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/property/4" "request" "${TFILES}${STEP}"  "Read_property"
+
+fi
+
 stopWsrv
 echo "WREIS SERVER STOPPED"
 

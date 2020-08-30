@@ -1,9 +1,9 @@
 package ws
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 	db "wreis/db/lib"
 	util "wreis/util/lib"
 )
@@ -33,7 +33,7 @@ type PropertyGrid struct {
 	LotSizeUnits      int64
 	CapRate           float64
 	AvgCap            float64
-	BuildDate         time.Time
+	BuildDate         util.JSONDateTime
 	//======================================================================
 	// FLAGS
 	//     1<<0  Drive Through?  0 = no, 1 = yes
@@ -45,10 +45,10 @@ type PropertyGrid struct {
 	TenantTradeName           string
 	LeaseGuarantor            int64
 	LeaseType                 int64
-	DeliveryDt                time.Time
+	DeliveryDt                util.JSONDateTime
 	OriginalLeaseTerm         int64
-	RentCommencementDt        time.Time
-	LeaseExpirationDt         time.Time
+	RentCommencementDt        util.JSONDateTime
+	LeaseExpirationDt         util.JSONDateTime
 	TermRemainingOnLease      int64
 	TermRemainingOnLeaseUnits int64
 	ROLID                     int64
@@ -250,26 +250,41 @@ func deleteProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 //	@Synopsis Update the information on a Property with the supplied data, create if necessary.
 //  @Description  This service creates a Property if PID == 0 or updates a Property if PID > 0 with
 //  @Description  the information supplied. All fields must be supplied.
-//	@Input PropertyGridSave
+//	@Input SaveProperty
 //  @Response SvcStatusResponse
 // wsdoc }
 //-----------------------------------------------------------------------------
 func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveProperty"
 	util.Console("Entered %s\n", funcname)
-	util.Console("record data = %s\n", d.data)
-	util.Console("PRID = %d\n", d.ID)
+	// util.Console("record data = %s\n", d.data)
+	// util.Console("PRID = %d\n", d.ID)
 
-	// var foo PropertyGridSave
-	// data := []byte(d.data)
-	// err := json.Unmarshal(data, &foo)
-	//
-	// if err != nil {
-	// 	e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
-	// 	SvcErrorReturn(w, e)
-	// 	return
-	// }
+	var foo SaveProperty
+	data := []byte(d.data)
+	err := json.Unmarshal(data, &foo)
 
+	if err != nil {
+		e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	// util.Console("read foo.  foo.Record.PRID = %d, foo.Record.Name = %s\n", foo.Record.PRID, foo.Record.Name)
+	var p db.Property
+	if err = util.MigrateStructVals(&foo.Record, &p); err != nil {
+		e := fmt.Errorf("%s: Error with MigrateStructVals:  %s", funcname, err.Error())
+		SvcErrorReturn(w, e)
+		return
+	}
+	// util.Console("After Migrate:  p.Name = %s\n", p.Name)
+
+	if err = db.UpdateProperty(r.Context(), &p); err != nil {
+		e := fmt.Errorf("%s: Error with db.UpdateProperty:  %s", funcname, err.Error())
+		SvcErrorReturn(w, e)
+		return
+	}
+	// util.Console("UpdateProperty completed successfully\n")
 	SvcWriteSuccessResponse(w)
 }
 
