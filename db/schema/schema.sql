@@ -15,6 +15,16 @@ CREATE TABLE Property (
     ROLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Renew Options
     RSLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Rent Steps
 
+    -- FLOWSTATE  Description
+    --         0  New record entry
+    --         1  First Task List
+    --         2  Marketing Package
+    --         3  Ready to List
+    --         4  Listed
+    --         5  Under contract
+    --         6  Closed
+    FlowState BIGINT NOT NULL DEFAULT 0,                    -- what state is this property in its lifecycle:
+
     Name VARCHAR(256) NOT NULL DEFAULT '',
     YearsInBusiness SMALLINT NOT NULL DEFAULT 0,
     ParentCompany VARCHAR(256) NOT NULL DEFAULT '',

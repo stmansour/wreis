@@ -136,6 +136,8 @@ var Svcs = []ServiceHandler{
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 	{Cmd: "rentsteps", AuthNRequired: true, Handler: SvcHandlerRentSteps},
 	{Cmd: "renewoptions", AuthNRequired: true, Handler: SvcHandlerRenewOptions},
+	{Cmd: "traffic", AuthNRequired: true, Handler: SvcHandlerTraffic},
+	{Cmd: "trafficitems", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},
 }
 
@@ -181,9 +183,9 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if sid < 0 {
-		util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)
+		// util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)
 		e := fmt.Errorf("Service not recognized: %s", d.Service)
-		util.Console("***ERROR IN URL***  %s", e.Error())
+		// util.Console("***ERROR IN URL***  %s", e.Error())
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -225,7 +227,6 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			SvcErrorReturn(w, err)
 			return
 		}
-		// util.Console("\n\n**** %s: d.CookieUpdated = %t ****\n\n", funcname, d.CookieUpdated)
 		//----------------------------------------------------------------------
 		// If we make it here, we have a good session.  Add it to the request
 		// context

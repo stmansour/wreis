@@ -43,6 +43,7 @@ login() {
         encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASS}\"}"
         OUTFILE="loginrequest"
         dojsonPOST "http://localhost:8276/v1/authn/" "request" "${OUTFILE}"  "login"
+
         #-----------------------------------------------------------------------------
         # Now we need to add the token to the curl command for future calls to
         # the server.  curl -b "air=${TOKEN}"  ...
@@ -50,6 +51,15 @@ login() {
         #-----------------------------------------------------------------------------
         TOKEN=$(grep Token "${OUTFILE}" | awk '{print $2;}' | sed 's/[",]//g')
         COOKIES="-b air=${TOKEN}"
+
+        #-----------------------------------------------------------------------
+        # This is needed so that the tests can be entered at any point.
+        # login() uses dojsonPOST which updates STEP.  We only want the
+        # test steps in the main routine below to update the test counts.
+        # login should be written so that it can be called anywhere, anytime
+        # and it will not alter the sequencing of the output files.
+        #-----------------------------------------------------------------------
+        ((STEP--))
     fi
 }
 
@@ -235,6 +245,47 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     # read it back to make sure the changes stuck
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/property/4" "request" "${TFILES}${STEP}"  "Read_property"
+
+fi
+
+#------------------------------------------------------------------------------
+#  TEST g
+#
+#  Save Traffic
+#
+#  Scenario:
+#  login
+#  Read the traffic info from the db
+#
+#  Expected Results:
+#   1. Expecting 3 rent step items
+#   2. Write 4 rent steps back.  Only 1 change (added a new one)
+#------------------------------------------------------------------------------
+TFILES="g"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xb.sql
+    login
+
+    # read it back to make sure the changes stuck
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Read_traffic"
+
+    # write it - change the count on two
+    encodeRequest '{"cmd":"save","records": [{"Count": 9999,"Description": "Vehicles per day on Main street","FLAGS": 0,"PRID": 1,"TID": 1,"recid": 1},{"Count": 7777,"Description": "Elm Street","FLAGS": 0,"PRID": 1,"TID": 2,"recid": 2}]}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Property-save"
+
+    # read it back, make sure the change stuck
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Read_traffic"
+
+    # remove one, add a new one
+    encodeRequest '{"cmd":"save","records": [{"Count": 9999,"Description": "Vehicles per day on Main street","FLAGS": 0,"PRID": 1,"TID": 1},{"Count": 13458,"Description": "Parade Ave","FLAGS": 0,"PRID": 1,"TID": -1}]}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Property-save"
+
+    # read it back, verify the changes
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Read_traffic"
 
 fi
 

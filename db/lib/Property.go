@@ -11,7 +11,10 @@ import (
 // is part of a group or list. The group is defined by the RSLID
 //-----------------------------------------------------------------------------
 type Property struct {
-	PRID              int64  // unique id
+	PRID              int64 // unique id
+	ROLID             int64
+	RSLID             int64
+	FlowState         int64
 	Name              string // property name
 	YearsInBusiness   int64
 	ParentCompany     string
@@ -41,8 +44,6 @@ type Property struct {
 	LeaseExpirationDt         time.Time
 	TermRemainingOnLease      int64
 	TermRemainingOnLeaseUnits int64
-	ROLID                     int64
-	RSLID                     int64
 	Address                   string
 	Address2                  string
 	City                      string
@@ -118,6 +119,9 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		return a.PRID, ErrSessionRequired
 	}
 	fields := []interface{}{
+		a.ROLID,
+		a.RSLID,
+		a.FlowState,
 		a.Name,
 		a.YearsInBusiness,
 		a.ParentCompany,
@@ -143,8 +147,6 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
 		a.TermRemainingOnLeaseUnits,
-		a.ROLID,
-		a.RSLID,
 		a.Address,
 		a.Address2,
 		a.City,
@@ -210,6 +212,9 @@ func InsertPropertyWithLists(ctx context.Context, a *Property) (int64, error) {
 func ReadProperty(row *sql.Row, a *Property) error {
 	err := row.Scan(
 		&a.PRID,
+		&a.ROLID,
+		&a.RSLID,
+		&a.FlowState,
 		&a.Name,
 		&a.YearsInBusiness,
 		&a.ParentCompany,
@@ -235,8 +240,6 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.LeaseExpirationDt,
 		&a.TermRemainingOnLease,
 		&a.TermRemainingOnLeaseUnits,
-		&a.ROLID,
-		&a.RSLID,
 		&a.Address,
 		&a.Address2,
 		&a.City,
@@ -275,6 +278,9 @@ func ReadProperty(row *sql.Row, a *Property) error {
 func ReadProperties(rows *sql.Rows, a *Property) error {
 	err := rows.Scan(
 		&a.PRID,
+		&a.ROLID,
+		&a.RSLID,
+		&a.FlowState,
 		&a.Name,
 		&a.YearsInBusiness,
 		&a.ParentCompany,
@@ -300,8 +306,6 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.LeaseExpirationDt,
 		&a.TermRemainingOnLease,
 		&a.TermRemainingOnLeaseUnits,
-		&a.ROLID,
-		&a.RSLID,
 		&a.Address,
 		&a.Address2,
 		&a.City,
@@ -341,6 +345,9 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		return ErrSessionRequired
 	}
 	fields := []interface{}{
+		a.ROLID,
+		a.RSLID,
+		a.FlowState,
 		a.Name,
 		a.YearsInBusiness,
 		a.ParentCompany,
@@ -366,8 +373,6 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
 		a.TermRemainingOnLeaseUnits,
-		a.ROLID,
-		a.RSLID,
 		a.Address,
 		a.Address2,
 		a.City,
