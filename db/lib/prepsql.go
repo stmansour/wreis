@@ -174,4 +174,23 @@ func BuildPreparedStatements() {
 	Wdb.Prepstmt.DeleteRenewOptionsMembers, err = Wdb.DB.Prepare("DELETE from RenewOption WHERE ROLID=?")
 	Errcheck(err)
 
+	//==========================================
+	// Traffic
+	//==========================================
+	flds = "TID,PRID,FLAGS,Count,Description,CreateTS,CreateBy,LastModTime,LastModBy"
+	Wdb.DBFields["Traffic"] = flds
+	Wdb.Prepstmt.GetTraffic, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Traffic where TID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.GetTrafficItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["Traffic"] + " FROM Traffic where PRID=?")
+	Errcheck(err)
+	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
+	Wdb.Prepstmt.InsertTraffic, err = Wdb.DB.Prepare("INSERT INTO Traffic (" + s1 + ") VALUES(" + s2 + ")")
+	Errcheck(err)
+	Wdb.Prepstmt.UpdateTraffic, err = Wdb.DB.Prepare("UPDATE Traffic SET " + s3 + " WHERE TID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.DeleteTraffic, err = Wdb.DB.Prepare("DELETE from Traffic WHERE TID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.DeleteTrafficItems, err = Wdb.DB.Prepare("DELETE from Traffic WHERE PRID=?")
+	Errcheck(err)
+
 }

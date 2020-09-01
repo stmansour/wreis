@@ -33,7 +33,7 @@ type RentStep struct {
 // Any errors encountered, or nil if no errors
 //-----------------------------------------------------------------------------
 func DeleteRentStep(ctx context.Context, id int64) error {
-	return genericDelete(ctx, "Property", Wdb.Prepstmt.DeleteRentStep, id)
+	return genericDelete(ctx, "RentStep", Wdb.Prepstmt.DeleteRentStep, id)
 }
 
 // GetRentStep reads and returns a RentStep structure

@@ -236,9 +236,12 @@ function SetRentStepFLAGs(FLAGS) {
 }
 
 function EnableRentStepFormFields() {
+    var f = w2ui.propertyRentStepForm;
     if (GetRentStepOptionTextMode()) {
         $('#Opt').prop('disabled', true);
         $('#Dt').prop('disabled', false);
+        // $(f.box).find("#Opt").hide();
+        // $(f.box).find("input[name=Dt]").reClass("hidden");
     } else {
         $('#Opt').prop('disabled', false);
         $('#Dt').prop('disabled', true);

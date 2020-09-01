@@ -32,4 +32,11 @@ type PrepSQL struct {
 	UpdateRenewOptions        *sql.Stmt
 	DeleteRenewOptions        *sql.Stmt
 	DeleteRenewOptionsMembers *sql.Stmt
+
+	GetTraffic         *sql.Stmt
+	GetTrafficItems    *sql.Stmt
+	InsertTraffic      *sql.Stmt
+	UpdateTraffic      *sql.Stmt
+	DeleteTraffic      *sql.Stmt
+	DeleteTrafficItems *sql.Stmt
 }

@@ -266,7 +266,7 @@ function buildPropertyUIElements() {
             {field: 'LeaseGuarantor',       type: 'text', required: false},
             {field: 'LeaseType',            type: 'hidden', required: false},
             {field: 'DeliveryDt',           type: 'date', required: false},
-            {field: 'OriginalLeaseTerm',    type: 'text', required: false},
+            {field: 'OriginalLeaseTerm',    type: 'int', required: false},
             {field: 'RentCommencementDt',   type: 'date', required: false},
             {field: 'LeaseExpirationDt',    type: 'date', required: false},
             {field: 'TermRemainingOnLease', type: 'hidden', required: false},

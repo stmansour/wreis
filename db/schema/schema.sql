@@ -12,6 +12,9 @@ set GLOBAL sql_mode='ALLOW_INVALID_DATES';
 
 CREATE TABLE Property (
     PRID BIGINT NOT NULL AUTO_INCREMENT,
+    ROLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Renew Options
+    RSLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Rent Steps
+
     Name VARCHAR(256) NOT NULL DEFAULT '',
     YearsInBusiness SMALLINT NOT NULL DEFAULT 0,
     ParentCompany VARCHAR(256) NOT NULL DEFAULT '',
@@ -40,9 +43,6 @@ CREATE TABLE Property (
     LeaseExpirationDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',      -- GMT datetime
     TermRemainingOnLease BIGINT NOT NULL DEFAULT 0,         -- Duration
     TermRemainingOnLeaseUnits SMALLINT NOT NULL DEFAULT 0,  -- 0 = months, 1 = Years
-    ROLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Renew Options
-    RSLID BIGINT NOT NULL DEFAULT 0,                        -- ID of associated Rent Steps
-
     Address VARCHAR(100) NOT NULL DEFAULT '',               -- property address
     Address2 VARCHAR(100) NOT NULL DEFAULT '',
     City VARCHAR(100) NOT NULL DEFAULT '',
@@ -129,4 +129,17 @@ CREATE TABLE RentStep (
     CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (RSID)
+);
+
+CREATE TABLE Traffic (
+    TID BIGINT NOT NULL AUTO_INCREMENT,                     -- A Traffic ID
+    PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        --
+    Count BIGINT NOT NULL DEFAULT 0,                        -- number of vehicles per day, or whatever - see Description
+    Description VARCHAR(128) NOT NULL DEFAULT '',           -- Describes Count
+    LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
+    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    PRIMARY KEY (TID)
 );

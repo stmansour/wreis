@@ -213,9 +213,50 @@ func TestRentSteps(ctx context.Context) {
 	fmt.Printf("E. UpdateRentSteps\n")
 	fmt.Printf("rsl1 = %#v\n", rsl1)
 	if err = db.UpdateRentSteps(ctx, &rsl1); err != nil {
-		fmt.Printf("Error updating RentSteps: %s\n", err)
+		fmt.Printf("Error updating RentSteps: %s\n", err.Error())
 		os.Exit(1)
 	}
 
 	fmt.Printf("Success! Delete, Get, Insert, and Update RentSteps\n")
+}
+
+// TestTraffic checks the basic db functions for the Traffic struct
+//-----------------------------------------------------------------------------
+func TestTraffic(ctx context.Context) {
+	var err error
+	var t = db.Traffic{
+		PRID:        1,
+		Description: "Vehicles per day on Main street",
+		Count:       725,
+		FLAGS:       0,
+	}
+
+	if _, err = db.InsertTraffic(ctx, &t); err != nil {
+		fmt.Printf("Error inserting Traffic: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	var t1 = db.Traffic{
+		PRID:        1,
+		Description: "Elm Street",
+		Count:       1400,
+		FLAGS:       0,
+	}
+	if _, err = db.InsertTraffic(ctx, &t1); err != nil {
+		fmt.Printf("Error inserting Traffic: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	var a []db.Traffic
+	if a, err = db.GetTrafficItems(ctx, 1); err != nil {
+		fmt.Printf("Error getting Traffic items: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	if len(a) != 2 {
+		fmt.Printf("Error: wrong number of Traffic items. Expecting 2, got: %d\n", len(a))
+		os.Exit(1)
+	}
+
+	fmt.Printf("Traffic tested: Success!\n")
 }

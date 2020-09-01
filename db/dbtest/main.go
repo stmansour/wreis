@@ -83,4 +83,5 @@ func main() {
 	TestRentStep(ctx)
 	TestRentSteps(ctx)
 	TestProperty(ctx)
+	TestTraffic(ctx)
 }
