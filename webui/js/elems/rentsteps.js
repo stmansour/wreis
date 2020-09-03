@@ -98,7 +98,7 @@ function buildRentStepsUIElements() {
                 r.FLAGS = fr.FLAGS;
                 r.recid = fr.RSID;
                 showRentStepForm();
-            }
+            };
         }
     });
 
@@ -134,7 +134,7 @@ function buildRentStepsUIElements() {
         },
         onRefresh: function(event) {
             event.onComplete = function(event) {
-                console.log('propertyRentStepForm: Refresh completed');
+                // console.log('propertyRentStepForm: Refresh completed');
                 EnableRentStepFormFields();
             };
         },

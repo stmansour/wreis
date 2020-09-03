@@ -11,7 +11,8 @@ var propData = {
     ROLID: 0,
     bPropLoaded: false,         // false -> either it's new or user clicked property in the propertyGrid, true -> just switching tabls
     bRentStepsLoaded: false,    // "  same as above for RentSteps
-    bRenewOptionsLoaded: false,    // "  same as above for RenewOptions
+    bRenewOptionsLoaded: false, // "  same as above for RenewOptions
+    bTrafficLoaded: false,      // " for Traffic
 };
 
 function initializePropertyRecord() {
@@ -131,6 +132,7 @@ function buildPropertyUIElements() {
                 propData.bPropLoaded = false;
                 propData.bRentStepsLoaded = false;
                 propData.bRenewOptionsLoaded = false;
+                propData.bTrafficLoaded = false;
                 w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
                 setPropertyLayout('proptabGeneral');
             };
@@ -206,6 +208,7 @@ function buildPropertyUIElements() {
                         { id: 'proptabGeneral', caption: 'General' },
                         { id: 'proptabRentSteps', caption: 'Rent Steps' },
                         { id: 'proptabRenewOptions', caption: 'Renew Options' },
+                        { id: 'proptabTraffic', caption: 'Traffic' },
                     ],
                     //---------------------------------
                     //  HANDLE THE TAB CLICKS...
@@ -222,6 +225,10 @@ function buildPropertyUIElements() {
                             break;
 
                             case 'proptabRenewOptions':
+                            setPropertyLayout(event.target);
+                            break;
+
+                            case 'proptabTraffic':
                             setPropertyLayout(event.target);
                             break;
                         }
@@ -337,7 +344,8 @@ function buildPropertyUIElements() {
                     $.when(
                         savePropertyForm(),
                         saveRentSteps(),
-                        saveRenewOptions()
+                        saveRenewOptions(),
+                        saveTraffic()
                     )
                     .done( function() {
                         propertySaveDoneCB();
@@ -434,15 +442,18 @@ function propertySaveDoneCB() {
 function setPropertyLayout(tab) {
     w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
 
-    if ( tab == "proptabGeneral") {
+    switch (tab) {
+
+    case "proptabGeneral":
         if (propData.bPropLoaded) {
             w2ui.propertyForm.url = '';
         } else {
             w2ui.propertyForm.url = '/v1/property/' + propData.PRID;
         }
         w2ui.propertyFormLayout.content('main', w2ui.propertyForm);
+        break;
 
-    } else if (tab == "proptabRentSteps") {
+    case "proptabRentSteps":
         if (propData.bRentStepsLoaded) {
             w2ui.propertyRentStepsGrid.url = '';
         } else {
@@ -451,7 +462,9 @@ function setPropertyLayout(tab) {
         }
         w2ui.rentStepsLayout.content('main',w2ui.propertyRentStepsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.rentStepsLayout);
-    } else if (tab == "proptabRenewOptions") {
+        break;
+
+    case "proptabRenewOptions":
         if (propData.bRenewOptionsLoaded) {
             w2ui.propertyRenewOptionsGrid.url = '';
         } else {
@@ -460,6 +473,18 @@ function setPropertyLayout(tab) {
         }
         w2ui.renewOptionsLayout.content('main',w2ui.propertyRenewOptionsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.renewOptionsLayout);
+        break;
+
+    case "proptabTraffic":
+        if (propData.bTrafficLoaded) {
+            w2ui.propertyTrafficGrid.url = '';
+        } else {
+            w2ui.propertyTrafficGrid.clear();
+            w2ui.propertyTrafficGrid.url = '/v1/trafficitems/' + propData.PRID;
+        }
+        w2ui.propertyTrafficLayout.content('main',w2ui.propertyTrafficGrid);
+        w2ui.propertyFormLayout.content('main',w2ui.propertyTrafficLayout);
+        break;
     }
     showForm();
 }

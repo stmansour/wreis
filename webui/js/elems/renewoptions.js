@@ -96,7 +96,7 @@ function buildRenewOptionsUIElements() {
                 r.FLAGS = fr.FLAGS;
                 r.recid = fr.ROID;
                 showRenewOptionForm();
-            }
+            };
         }
     });
 
@@ -132,7 +132,6 @@ function buildRenewOptionsUIElements() {
         },
         onRefresh: function(event) {
             event.onComplete = function(event) {
-                console.log('propertyRenewOptionForm: Refresh completed');
                 EnableRenewOptionFormFields();
             };
         },

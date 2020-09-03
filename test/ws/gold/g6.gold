@@ -1,0 +1,29 @@
+{
+    "records": [
+        {
+            "Count": 9999,
+            "Description": "Vehicles per day on Main street",
+            "FLAGS": 0,
+            "PRID": 1,
+            "TID": 1,
+            "recid": 1
+        },
+        {
+            "Count": 13458,
+            "Description": "Parade Ave",
+            "FLAGS": 0,
+            "PRID": 1,
+            "TID": 3,
+            "recid": 3
+        },
+        {
+            "Count": 899,
+            "Description": "Odd Street",
+            "FLAGS": 0,
+            "PRID": 1,
+            "TID": 4,
+            "recid": 4
+        }
+    ],
+    "status": "success"
+}

@@ -273,7 +273,7 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
 
     # write it - change the count on two
     encodeRequest '{"cmd":"save","records": [{"Count": 9999,"Description": "Vehicles per day on Main street","FLAGS": 0,"PRID": 1,"TID": 1,"recid": 1},{"Count": 7777,"Description": "Elm Street","FLAGS": 0,"PRID": 1,"TID": 2,"recid": 2}]}'
-    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Property-save"
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "traffic-save"
 
     # read it back, make sure the change stuck
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
@@ -281,7 +281,15 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
 
     # remove one, add a new one
     encodeRequest '{"cmd":"save","records": [{"Count": 9999,"Description": "Vehicles per day on Main street","FLAGS": 0,"PRID": 1,"TID": 1},{"Count": 13458,"Description": "Parade Ave","FLAGS": 0,"PRID": 1,"TID": -1}]}'
-    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Property-save"
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "traffic-save"
+
+    # read it back, verify the changes
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Read_traffic"
+
+    # add a new one
+    encodeRequest '{"cmd":"save","records":[{"recid":1,"TID":1,"PRID":1,"Description":"Vehicles per day on Main street","Count":9999,"FLAGS":0},{"recid":3,"TID":3,"PRID":1,"Description":"Parade Ave","Count":13458,"FLAGS":0},{"recid":-2,"PRID":1,"TID":-2,"Description":"Odd Street","Count":899,"FLAGS":0}]}'
+    dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "traffic-save"
 
     # read it back, verify the changes
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
