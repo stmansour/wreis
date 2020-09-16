@@ -1,4 +1,4 @@
-DIRS = ws
+DIRS = ws pic
 
 clean:
 	rm -f testreport.txt dbqqqmods.sql

@@ -70,6 +70,13 @@ CREATE TABLE Property (
     HQPostalCode VARCHAR(100) NOT NULL DEFAULT '',
     HQCountry VARCHAR(100) NOT NULL DEFAULT '',
 
+    Img1 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img2 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img3 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img4 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img5 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img6 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created

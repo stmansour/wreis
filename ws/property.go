@@ -277,12 +277,19 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcErrorReturn(w, e)
 		return
 	}
-	// util.Console("After Migrate:  p.Name = %s\n", p.Name)
-
-	if err = db.UpdateProperty(r.Context(), &p); err != nil {
-		e := fmt.Errorf("%s: Error with db.UpdateProperty:  %s", funcname, err.Error())
-		SvcErrorReturn(w, e)
-		return
+	util.Console("After Migrate:  p.LeaseGuarantor = %d\n", p.LeaseGuarantor)
+	if p.PRID < 1 {
+		if _, err = db.InsertProperty(r.Context(), &p); err != nil {
+			e := fmt.Errorf("%s: Error with db.CreateProperty:  %s", funcname, err.Error())
+			SvcErrorReturn(w, e)
+			return
+		}
+	} else {
+		if err = db.UpdateProperty(r.Context(), &p); err != nil {
+			e := fmt.Errorf("%s: Error with db.UpdateProperty:  %s", funcname, err.Error())
+			SvcErrorReturn(w, e)
+			return
+		}
 	}
 	// util.Console("UpdateProperty completed successfully\n")
 	SvcWriteSuccessResponse(w)

@@ -16,30 +16,56 @@ var propData = {
 };
 
 function initializePropertyRecord() {
+    var time0 = new Date("Jan 1, 1970");
+    var now = new Date();
     var rec = {
             recid: 0,
             PRID: 0,
-            FirstName: '',
-            MiddleName: '',
-            LastName: '',
-            PreferredName: '',
-            JobTitle: '',
-            OfficePhone: '',
-            OfficeFax: '',
-            Email1: '',
-            Email2: '',
-            MailAddress: '',
-            MailAddress2: '',
-            MailCity: '',
-            MailState: '',
-            MailPostalCode: '',
-            MailCountry: '',
-            RoomNumber: '',
-            MailStop: '',
-            Status: 0,
-            OptOutDate: '12/31/3000',
-            LastModTime: new Date(),
-            LastModBy: 0
+            Name: "",
+            YearsInBusiness: 0,
+            ParentCompany: "",
+            URL: "",
+            Symbol: "",
+            Price: 0,
+            DownPayment: 0,
+            RentableArea: 0,
+            RentableAreaUnits: 0,
+            LotSize: 0,
+            LotSizeUnits: 0,
+            CapRate: 0,
+            AvgCap: 0,
+            FLAGS: 0,
+            Ownership: 0,
+            TenantTradeName: "",
+            LeaseGuarantor: 0,
+            LeaseType: 0,
+            OriginalLeaseTerm: 0,
+            TermRemainingOnLease: 0,
+            ROLID: 0,
+            RSLID: 0,
+            Address: "",
+            Address2: "",
+            City: "",
+            State: "",
+            PostalCode: "",
+            Country: "",
+            LLResponsibilities: "",
+            NOI: 0,
+            HQAddress: "",
+            HQAddress2: "",
+            HQCity: "",
+            HQState: "",
+            HQPostalCode: "",
+            HQCountry: "",
+            CreatedBy: 0,
+            LastModBy: 0,
+
+            BuildDate: time0,
+            DeliveryDt: time0,
+            RentCommencementDt: time0,
+            LeaseExpirationDt: time0,
+            CreateTime: now,
+            LastModTime: now,
     };
     return rec;
 }
@@ -74,7 +100,6 @@ function buildPropertyUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
          columns: [
-            {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
             {field: 'Recid',                size: '60px', caption: 'Recid', sortable: true, hidden: true},
             {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
             {field: 'Name',                 size: '200px', caption: 'Name', sortable: true, hidden: false},
@@ -98,7 +123,7 @@ function buildPropertyUIElements() {
             {field: 'LeaseType',            size: '60px', caption: 'LeaseType', sortable: true, hidden: true},
             {field: 'DeliveryDt',           size: '60px', caption: 'DeliveryDt', sortable: true, hidden: true},
             {field: 'OriginalLeaseTerm',    size: '60px', caption: 'OriginalLeaseTerm', sortable: true, hidden: true},
-            {field: 'RentCommencementDt',  size: '60px', caption: 'RentCommencementDt', sortable: true, hidden: true},
+            {field: 'RentCommencementDt',   size: '60px', caption: 'RentCommencementDt', sortable: true, hidden: true},
             {field: 'LeaseExpirationDt',    size: '60px', caption: 'LeaseExpirationDt', sortable: true, hidden: true},
             {field: 'TermRemainingOnLease', size: '60px', caption: 'TermRemainingOnLease', sortable: true, hidden: true},
             {field: 'ROLID',                size: '60px', caption: 'ROLID', sortable: true, hidden: true},
@@ -145,9 +170,20 @@ function buildPropertyUIElements() {
             var f = w2ui.propertyForm;
             f.record = initializePropertyRecord();
             f.recid = 0;
+            f.url = "";
             f.refresh();
             propData.PRID = 0;  // new entry
-            setToForm('propertyForm', '/v1/property/0',500);
+            w2ui.propertyFormLayout.content('main', w2ui.propertyForm);
+            if (typeof f.tabs != "undefined"){
+                if (typeof f.tabs.name == "string") {
+                    f.tabs.click('tab1');
+                }
+            }
+            w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
+            w2ui.toplayout.content('right', w2ui.propertyFormLayout);
+            w2ui.toplayout.sizeTo('right', 500);
+            w2ui.toplayout.render();
+            w2ui.toplayout.show('right', true);
         },
         onRefresh: function(/*event*/) {
             // console.log('propertyGrid.onRefresh')
@@ -276,7 +312,7 @@ function buildPropertyUIElements() {
             {field: 'OriginalLeaseTerm',    type: 'int', required: false},
             {field: 'RentCommencementDt',   type: 'date', required: false},
             {field: 'LeaseExpirationDt',    type: 'date', required: false},
-            {field: 'TermRemainingOnLease', type: 'hidden', required: false},
+            {field: 'TermRemainingOnLease', type: 'int', required: false},
             {field: 'ROLID',                type: 'hidden', required: false},
             {field: 'RSLID',                type: 'hidden', required: false},
             {field: 'Address',              type: 'text', required: false},
@@ -328,6 +364,7 @@ function buildPropertyUIElements() {
                 setDropDownSelectedIndex("OwnershipDD",r.Ownership);
                 setDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD",r.TermRemainingOnLeaseUnits);
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
+                setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
 
                 propData.bPropLoaded = true;
             };
@@ -397,12 +434,14 @@ function savePropertyForm() {
     rec.DeliveryDt = varToUTCString(rec.DeliveryDt);
     rec.RentCommencementDt = varToUTCString(rec.RentCommencementDt);
     rec.LeaseExpirationDt = varToUTCString(rec.LeaseExpirationDt);
-
+    rec.CreateTime = varToUTCString(rec.CreateTime);
+    rec.LastModTime = varToUTCString(rec.LastModTime);
 
     rec.LotSizeUnits = getDropDownSelectedIndex("LotSizeUnitsDD");
     rec.Ownership = getDropDownSelectedIndex("OwnershipDD");
     rec.TermRemainingOnLeaseUnits = getDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD");
     rec.LeaseType = getDropDownSelectedIndex("LeaseTypeDD");
+    rec.LeaseGuarantor = getDropDownSelectedIndex("LeaseGuarantorDD");
 
     //-----------------------------------------
     // Now send it to the server

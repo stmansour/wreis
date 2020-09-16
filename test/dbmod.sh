@@ -40,7 +40,12 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-
+ALTER TABLE Property ADD Img1 VARCHAR(2048) NOT NULL DEFAULT '' AFTER HQCountry;
+ALTER TABLE Property ADD Img2 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img1;
+ALTER TABLE Property ADD Img3 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img2;
+ALTER TABLE Property ADD Img4 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img3;
+ALTER TABLE Property ADD Img5 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img4;
+ALTER TABLE Property ADD Img6 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img5;
 LEOF
 
 #=====================================================

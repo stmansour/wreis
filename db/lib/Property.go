@@ -58,6 +58,12 @@ type Property struct {
 	HQState                   string
 	HQPostalCode              string
 	HQCountry                 string
+	Img1                      string // url to image
+	Img2                      string
+	Img3                      string
+	Img4                      string
+	Img5                      string
+	Img6                      string
 	LastModTime               time.Time    // when was the record last written
 	LastModBy                 int64        // id of user that did the modify
 	CreateTS                  time.Time    // when was this record created
@@ -161,6 +167,12 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.HQState,
 		a.HQPostalCode,
 		a.HQCountry,
+		a.Img1,
+		a.Img2,
+		a.Img3,
+		a.Img4,
+		a.Img5,
+		a.Img6,
 		a.CreateBy,
 		sess.UID,
 	}
@@ -254,6 +266,12 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.HQState,
 		&a.HQPostalCode,
 		&a.HQCountry,
+		&a.Img1,
+		&a.Img2,
+		&a.Img3,
+		&a.Img4,
+		&a.Img5,
+		&a.Img6,
 		&a.LastModTime,
 		&a.LastModBy,
 		&a.CreateTS,
@@ -320,6 +338,12 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.HQState,
 		&a.HQPostalCode,
 		&a.HQCountry,
+		&a.Img1,
+		&a.Img2,
+		&a.Img3,
+		&a.Img4,
+		&a.Img5,
+		&a.Img6,
 		&a.LastModTime,
 		&a.LastModBy,
 		&a.CreateTS,
@@ -387,6 +411,12 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.HQState,
 		a.HQPostalCode,
 		a.HQCountry,
+		a.Img1,
+		a.Img2,
+		a.Img3,
+		a.Img4,
+		a.Img5,
+		a.Img6,
 		sess.UID,
 		a.PRID,
 	}

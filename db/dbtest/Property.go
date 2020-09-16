@@ -56,6 +56,12 @@ func TestProperty(ctx context.Context) {
 		HQState:                   "AK",
 		HQPostalCode:              "98765",
 		HQCountry:                 "USA",
+		Img1:                      "http://example.com/pic1.jpg",
+		Img2:                      "http://example.com/pic2.jpg",
+		Img3:                      "http://example.com/pic3.jpg",
+		Img4:                      "http://example.com/pic4.jpg",
+		Img5:                      "http://example.com/pic5.jpg",
+		Img6:                      "http://example.com/pic6.jpg",
 	}
 	var delid, id int64
 	if id, err = db.InsertProperty(ctx, &rs); err != nil {
