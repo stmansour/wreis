@@ -57,6 +57,13 @@ function initializePropertyRecord() {
             HQState: "",
             HQPostalCode: "",
             HQCountry: "",
+            Img1: "",
+            Img2: "",
+            Img3: "",
+            Img4: "",
+            Img5: "",
+            Img6: "",
+
             CreatedBy: 0,
             LastModBy: 0,
 
@@ -142,6 +149,12 @@ function buildPropertyUIElements() {
             {field: 'HQState',              size: '60px', caption: 'HQState', sortable: true, hidden: true},
             {field: 'HQPostalCode',         size: '60px', caption: 'HQPostalCode', sortable: true, hidden: true},
             {field: 'HQCountry',            size: '60px', caption: 'HQCountry', sortable: true, hidden: true},
+            {field: 'Img1',                 size: '100px', caption: 'Img1', sortable: true, hidden: true},
+            {field: 'Img2',                 size: '100px', caption: 'Img2', sortable: true, hidden: true},
+            {field: 'Img3',                 size: '100px', caption: 'Img3', sortable: true, hidden: true},
+            {field: 'Img4',                 size: '100px', caption: 'Img4', sortable: true, hidden: true},
+            {field: 'Img5',                 size: '100px', caption: 'Img5', sortable: true, hidden: true},
+            {field: 'Img6',                 size: '100px', caption: 'Img6', sortable: true, hidden: true},
             {field: 'CreateTime',           size: '60px', caption: 'CreateTime', sortable: true, hidden: true},
             {field: 'CreatedBy',            size: '60px', caption: 'CreatedBy', sortable: true, hidden: true},
             {field: 'LastModTime',          size: '60px', caption: 'LastModTime', sortable: true, hidden: true},
@@ -245,6 +258,7 @@ function buildPropertyUIElements() {
                         { id: 'proptabRentSteps', caption: 'Rent Steps' },
                         { id: 'proptabRenewOptions', caption: 'Renew Options' },
                         { id: 'proptabTraffic', caption: 'Traffic' },
+                        { id: 'proptabPhotos', caption: 'Photos' },
                     ],
                     //---------------------------------
                     //  HANDLE THE TAB CLICKS...
@@ -265,6 +279,10 @@ function buildPropertyUIElements() {
                             break;
 
                             case 'proptabTraffic':
+                            setPropertyLayout(event.target);
+                            break;
+
+                            case 'proptabPhotos':
                             setPropertyLayout(event.target);
                             break;
                         }
@@ -329,6 +347,12 @@ function buildPropertyUIElements() {
             {field: 'HQState',              type: 'text', required: false},
             {field: 'HQPostalCode',         type: 'text', required: false},
             {field: 'HQCountry',            type: 'text', required: false},
+            {field: 'Img1',                 type: 'hidden', required: false},
+            {field: 'Img2',                 type: 'hidden', required: false},
+            {field: 'Img3',                 type: 'hidden', required: false},
+            {field: 'Img4',                 type: 'hidden', required: false},
+            {field: 'Img5',                 type: 'hidden', required: false},
+            {field: 'Img6',                 type: 'hidden', required: false},
             {field: 'CreateTime',           type: 'text', required: false},
             {field: 'CreatedBy',            type: 'text', required: false},
             {field: 'LastModTime',          type: 'text', required: false},
@@ -524,7 +548,12 @@ function setPropertyLayout(tab) {
         w2ui.propertyTrafficLayout.content('main',w2ui.propertyTrafficGrid);
         w2ui.propertyFormLayout.content('main',w2ui.propertyTrafficLayout);
         break;
+    case "proptabPhotos":
+        w2ui.propertyPhotosLayout.load('main','/static/html/formPhotos.html');
+        w2ui.propertyFormLayout.content('main',w2ui.propertyPhotosLayout);
+        break;
     }
+
     showForm();
 }
 
