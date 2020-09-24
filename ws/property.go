@@ -67,6 +67,12 @@ type PropertyGrid struct {
 	HQState                   string
 	HQPostalCode              string
 	HQCountry                 string
+	Img1                      string
+	Img2                      string
+	Img3                      string
+	Img4                      string
+	Img5                      string
+	Img6                      string
 	CreateTime                util.JSONDateTime
 	CreatedBy                 int64
 	LastModifyTime            util.JSONDateTime

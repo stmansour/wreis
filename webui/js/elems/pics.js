@@ -1,5 +1,6 @@
 /*global
-    w2ui, app, $, console, dateFmtStr, propData, Promise, document,
+    w2ui, app, $, console, dateFmtStr, propData, Promise, document, FormData,
+    fetch,
 */
 
 "use strict";
@@ -53,6 +54,20 @@ function AwaitImagePanelRenderComplete() {
     //-------------------------------------------------------------
     AppPics.WaitDepth = 0; // now is the time to reset this
     SetUpImageCatchers();
+
+    //--------------------------------------
+    //  Now load all the proper images...
+    //--------------------------------------
+    var r = w2ui.propertyForm.record;
+    for (i = 1; i < 7; i++) {
+        var id = "phototable" + i;
+        var image = document.getElementById(id);
+        if (image != null) {
+            id = "Img" + i;
+            image.src = r[id];
+            document.getElementById('spnFilePath' + i).innerHTML = '';
+        }
+    }
 }
 
 function SetUpImageCatchers() {
@@ -64,8 +79,9 @@ function SetUpImageCatchers() {
     };
     fileupload1.onchange = function() {
         var fileName = fileupload1.value.split('\\')[fileupload1.value.split('\\').length - 1];
-        filePath1.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img1 = "fileName";
+        filePath1.innerHTML = "uploading " + fileName + '<i class="fas fa-spinner fa-spin"></i>';
+        w2ui.propertyForm.record.Img1 = fileName;
+        SavePhotoToServer(fileName,1,fileupload1.files[0]);
     };
 
     var fileupload2 = document.getElementById("FileUpload2");
@@ -77,7 +93,7 @@ function SetUpImageCatchers() {
     fileupload2.onchange = function() {
         var fileName = fileupload2.value.split('\\')[fileupload2.value.split('\\').length - 1];
         filePath2.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img2 = "fileName";
+        w2ui.propertyForm.record.Img2 = fileName;
     };
 
     var fileupload3 = document.getElementById("FileUpload3");
@@ -89,7 +105,7 @@ function SetUpImageCatchers() {
     fileupload3.onchange = function() {
         var fileName = fileupload3.value.split('\\')[fileupload3.value.split('\\').length - 1];
         filePath3.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img3 = "fileName";
+        w2ui.propertyForm.record.Img3 = fileName;
     };
 
     var fileupload4 = document.getElementById("FileUpload4");
@@ -101,7 +117,7 @@ function SetUpImageCatchers() {
     fileupload4.onchange = function() {
         var fileName = fileupload4.value.split('\\')[fileupload4.value.split('\\').length - 1];
         filePath4.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img4 = "fileName";
+        w2ui.propertyForm.record.Img4 = fileName;
     };
 
     var fileupload5 = document.getElementById("FileUpload5");
@@ -113,7 +129,7 @@ function SetUpImageCatchers() {
     fileupload5.onchange = function() {
         var fileName = fileupload5.value.split('\\')[fileupload5.value.split('\\').length - 1];
         filePath5.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img5 = "fileName";
+        w2ui.propertyForm.record.Img5 = fileName;
     };
 
     var fileupload6 = document.getElementById("FileUpload6");
@@ -125,6 +141,55 @@ function SetUpImageCatchers() {
     fileupload6.onchange = function() {
         var fileName = fileupload6.value.split('\\')[fileupload6.value.split('\\').length - 1];
         filePath6.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img6 = "fileName";
+        w2ui.propertyForm.record.Img6 = fileName;
     };
+}
+
+// SavePhotoToServer.  Save the specified image to the property currently in
+// w2ui.propertyForm and save it under the supplied index.
+//
+// INPUTS
+//    f = filename of image
+//    x = index
+//    file = the actual file from the <input ...> object
+//-----------------------------------------------------------------------------
+ function SavePhotoToServer(f,x,file)
+{
+    let data = { cmd:'save', PRID: propData.PRID, idx: x, filename: f };
+    let formData = new FormData();
+    let url = '/v1/propertyphoto/' + propData.PRID + '/' + x;
+    var rr;
+
+    formData.append("request", JSON.stringify(data));
+    formData.append("photo", file);
+
+    doSaveImage(url,formData)
+    .then(resp => {
+        //---------------------------------------------------------------------------
+        // now we need to set the URL of the image to what has just been returned...
+        //---------------------------------------------------------------------------
+        var id = "phototable" + x;
+        var image = document.getElementById(id);
+        if (image == null) {
+            console.log('ERROR: could not find image: ' + id);
+            return;
+        }
+        image.src = resp.url;
+        document.getElementById('spnFilePath' + x).innerHTML = '';
+    });
+
+}
+
+
+async function doSaveImage(url,formData) {
+    var rr;
+    try {
+       rr = await fetch(url, {method: "POST", body: formData});
+    } catch(e) {
+       console.log('Error: ', e);
+       return null;
+    }
+
+    let resp = await rr.json();
+    return resp;
 }

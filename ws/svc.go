@@ -133,12 +133,23 @@ var Svcs = []ServiceHandler{
 	{Cmd: "encon", AuthNRequired: true, Handler: SvcEnableConsole},
 	{Cmd: "logoff", AuthNRequired: true, Handler: SvcLogoff}, // it handles properly if session has already timed out
 	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
+	{Cmd: "propertyphoto", AuthNRequired: true, Handler: SvcHandlerPropertyPhoto},
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 	{Cmd: "rentsteps", AuthNRequired: true, Handler: SvcHandlerRentSteps},
 	{Cmd: "renewoptions", AuthNRequired: true, Handler: SvcHandlerRenewOptions},
 	{Cmd: "traffic", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "trafficitems", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},
+}
+
+// SvcInfoType defines general info about the service handler module
+type SvcInfoType struct {
+	SaveRequest bool
+}
+
+// SvcInfo contains all the config info about running the services
+var SvcInfo = SvcInfoType{
+	SaveRequest: false,
 }
 
 // SvcHandlerPing is the most basic test that you can run against the server
@@ -170,11 +181,13 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	svcDebugTxn(funcname, r)
 	var d ServiceData
 	d.ID = -1 // indicates it has not been set
-
+	util.Console("debug> SVC: 00\n")
 	if e := svcGetPayload(w, r, &d); e != nil {
+		util.Console("debug> SVC: 01\n")
 		SvcErrorReturn(w, e)
 		return
 	}
+	util.Console("debug> SVC: 02\n")
 	sid := -1 // index to the service requested. Initialize to "not found"
 	for i := 0; i < len(Svcs); i++ {
 		if Svcs[i].Cmd == d.Service {
@@ -182,10 +195,12 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	util.Console("debug> SVC: 03: sid = %d\n", sid)
 	if sid < 0 {
-		// util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)
+		util.Console("debug> SVC: 04: sid = %d\n", sid)
+		util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)
 		e := fmt.Errorf("Service not recognized: %s", d.Service)
-		// util.Console("***ERROR IN URL***  %s", e.Error())
+		util.Console("***ERROR IN URL***  %s", e.Error())
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -194,15 +209,15 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	// Is authentication required for this command?  If so validate that we
 	// have a cookie.
 	//-----------------------------------------------------------------------
-	// util.Console("SVC: A\n")
+	util.Console("debug> SVC: A\n")
 	if Svcs[sid].AuthNRequired {
-		// util.Console("SVC: B\n")
+		util.Console("debug> SVC: B\n")
 		c, err := session.ValidateSessionCookie(w, r, 0 /* get all user info */) // this updates the expire time
 		if err != nil {
 			SvcErrorReturn(w, err)
 			return
 		}
-		// util.Console("SVC: C\n")
+		util.Console("debug> SVC: C\n")
 		if c.Status != "success" {
 			//----------------------------------------------------------------------
 			// user needs to log in.  If the command was logoff, just return success.
@@ -215,7 +230,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			SvcErrorReturn(w, db.ErrSessionRequired)
 			return
 		}
-		// util.Console("SVC: D\n")
+		util.Console("debug> SVC: D\n")
 		//----------------------------------------------------------------------
 		// The air cookie is valid.  Create (or get) the internal session. This
 		// is needed to identify the person associated with the request. All
@@ -234,12 +249,15 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		ctx := session.SetSessionContextKey(r.Context(), d.sess)
 		r = r.WithContext(ctx)
 
-		// util.Console("SVC: E\n")
+		util.Console("debug> SVC: E\n")
 	}
-	// util.Console("SVC: F\n")
+	util.Console("debug> SVC: F\n")
 
 	svcDebugURL(r, &d)
 	showRequestHeaders(r)
+
+	util.Console("debug> SVC: G, sid = %d\n", sid)
+
 	Svcs[sid].Handler(w, r, &d)
 	svcDebugTxnEnd()
 }
@@ -335,12 +353,20 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	}
 
 	// THIS IS A DEBUG FEATURE, USUALLY TURNED OFF
-	if false {
-		fname := "./aws-" + time.Now().String()
+	// util.Console("SvcInfo.SaveRequest = %v\n", SvcInfo.SaveRequest)
+	if SvcInfo.SaveRequest {
+		fname := "./reqBody-" + time.Now().String()
+		util.Console(">>> WRITING REQUEST BODY TO: %s\n", fname)
 		err = ioutil.WriteFile(fname, d.b, 0644)
 		if err != nil {
 			util.Console("Error with ioutil.WriteFile: %s\n", err.Error())
 		}
+	}
+
+	if d.Service == "propertyphoto" {
+		util.Console("data may contain binary info.\n\n")
+		hexdump(d.b)
+		return nil
 	}
 
 	util.Console("\t- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n")
@@ -356,11 +382,11 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 		return e
 	}
 	d.data = strings.TrimPrefix(u, "request=") // strip off "request=" if it is present
-	d.b = []byte(d.data)                       // keep the byte array around too
+	// d.b = []byte(d.data)                       // keep the byte array around too
 	util.Console("\tUnescaped d.b = %s\n", d.data)
 
 	var wjs WebGridSearchRequestJSON
-	err = json.Unmarshal(d.b, &wjs)
+	err = json.Unmarshal([]byte(d.data), &wjs)
 	if err != nil {
 		e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
 		SvcErrorReturn(w, e)
@@ -368,6 +394,40 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	}
 	util.MigrateStructVals(&wjs, &d.wsSearchReq)
 	return err
+}
+
+// hexdump will dump a maximum of 1000 characters of the request to the console
+// under the assumption that the data contains binary info. It provides a hex /
+// character dump of the data.
+//------------------------------------------------------------------------------
+func hexdump(data []byte) {
+	l := len(data)
+	util.Console("len(data) = %d\n", l)
+	if l > 1000 {
+		l = 1000
+		util.Console("note> will only dump the first %d bytes\n", l)
+	}
+	k := 0
+	bb := 0
+	for b := 0; b < l; b++ {
+		util.Console("%02x ", data[b])
+		k++
+		if k%16 == 0 {
+			k = 0
+			util.Console("   ")
+			for j := 0; j < 16; j++ {
+				var i = int(data[bb])
+				if 32 <= i && i < 127 {
+					util.Console("%c", data[bb])
+				} else {
+					util.Console(" ")
+				}
+				bb++
+			}
+			util.Console("\n")
+		}
+	}
+	util.Console("\n\n")
 }
 
 func getGETdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {

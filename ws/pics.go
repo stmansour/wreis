@@ -2,10 +2,16 @@ package ws
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"mime"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 	db "wreis/db/lib"
 	util "wreis/util/lib"
@@ -25,6 +31,177 @@ const (
 	S3Region        = "us-east-1" // This parameter define the region of bucket
 	ImageUploadPath = ""          // This parameter define in which folder have to upload image
 )
+
+var reImagePart = regexp.MustCompile(` filename="([^"]+)"`)
+
+type imageFileReq struct {
+	Cmd      string
+	PRID     int64
+	Idx      int64
+	Filename string
+}
+
+type imgSuccess struct {
+	Status string `json:"status"`
+	URL    string `json:"url"`
+}
+
+// SvcHandlerPropertyPhoto uploads a single file belonging to a property. The
+// URL is of the form:
+//
+//  @URL:   /v1/propertyphoto/PRID/idx
+//  @Method  POST
+//  @Synopsis Get information about the logged in user
+//  @Descr Based on the session cookie, this service will return the
+//  @Descr information known about the user. As of this writing, that
+//  @Descr information includes:  the username, the user's first (or
+//  @Descr preferred name), the user's id number, and a url to the
+//  @Descr user's image.
+//  @Input session.AIRAuthenticateResponse
+//  @Response SvcStatus
+// wsdoc }
+//-----------------------------------------------------------------------------
+func SvcHandlerPropertyPhoto(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	var req imageFileReq
+	var fname string
+	var imgFileBytes []byte
+	foundReq := false
+	foundImg := false
+	funcname := "SvcHandlerPropertyPhoto"
+	util.Console("Entered %s\n", funcname)
+	contentType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil || !strings.HasPrefix(contentType, "multipart/") {
+		e := fmt.Errorf("expecting a multipart message.  %d", http.StatusBadRequest)
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	rbody := bytes.NewReader(d.b)
+	reader := multipart.NewReader(rbody, params["boundary"])
+	defer r.Body.Close()
+
+	//---------------------------------------------------------
+	// Scan the parts, make sure we get the info we need...
+	//---------------------------------------------------------
+	for {
+		part, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			e := fmt.Errorf("%s: %s, %d", "unexpected error when retrieving a part of the message", err.Error(), http.StatusInternalServerError)
+			SvcErrorReturn(w, e)
+			return
+		}
+		defer part.Close()
+
+		fileBytes, err := ioutil.ReadAll(part)
+		if err != nil {
+			e := fmt.Errorf("%s:  %d", "failed to read content of the part", http.StatusInternalServerError)
+			SvcErrorReturn(w, e)
+			return
+		}
+
+		av := part.Header["Content-Disposition"]
+		val := av[0]
+		util.Console("Content-Disposition:  value = %s\n", val)
+
+		//---------------------------------------------------------------------
+		// look for Content-Disposition: name="request"  this will give us the
+		// structure to unmarshal
+		//---------------------------------------------------------------------
+		if strings.Contains(val, ` name="request"`) {
+			if err := json.Unmarshal(fileBytes, &req); err != nil {
+				e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
+				SvcFuncErrorReturn(w, e, funcname)
+				return
+			}
+			foundReq = true
+		}
+
+		//---------------------------------------------------------------------
+		// look for Content-Disposition: filename="<<whatever>>" this will
+		// give us the image file we need to save to S3
+		//---------------------------------------------------------------------
+		if reImagePart.MatchString(val) {
+			af := reImagePart.FindSubmatch([]byte(val))
+			if len(af) > 1 {
+				util.Console("af[0] = %s, af[1] = %s\n", string(af[0]), string(af[1]))
+				fname = string(af[1])
+			}
+			foundImg = true
+			imgFileBytes = fileBytes
+		}
+	}
+
+	//---------------------------------------------------------
+	// Reject if we didn't get everything we need...
+	//---------------------------------------------------------
+	if !foundReq || !foundImg || req.PRID != d.ID || fname != req.Filename || req.Idx < 1 || req.Idx > 6 {
+		var reasons string
+		if !foundReq {
+			reasons += fmt.Sprintf("No request was found. ")
+		}
+		if !foundImg {
+			reasons += fmt.Sprintf("No image was found. ")
+		}
+		if req.PRID != d.ID {
+			reasons += fmt.Sprintf("PRID in url is %d, but in request it is %d. ", d.ID, req.PRID)
+		}
+		if fname != req.Filename {
+			reasons += fmt.Sprintf("filename in MIME part is %s, but in request it is %s. ", fname, req.Filename)
+		}
+		if req.Idx < 1 || req.Idx > 6 {
+			reasons += fmt.Sprintf("idx = %d is out of range. ", req.Idx)
+		}
+
+		e := fmt.Errorf("Command request format is not correct: %s", reasons)
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	util.Console("len(imgFileBytes)=%d\n", len(imgFileBytes))
+
+	_, imageURL, err := UploadImageToS3(fname, imgFileBytes, req.PRID, req.Idx)
+	if err != nil {
+		e := fmt.Errorf("%s: Error from UploadImageToS3:  %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	pr, err := db.GetProperty(r.Context(), req.PRID)
+	if err != nil {
+		e := fmt.Errorf("%s: Error from db.GetProperty:  %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+	switch req.Idx {
+	case 1:
+		pr.Img1 = imageURL
+	case 2:
+		pr.Img2 = imageURL
+	case 3:
+		pr.Img3 = imageURL
+	case 4:
+		pr.Img4 = imageURL
+	case 5:
+		pr.Img5 = imageURL
+	case 6:
+		pr.Img6 = imageURL
+	}
+	if err = db.UpdateProperty(r.Context(), &pr); err != nil {
+		e := fmt.Errorf("%s: Error from db.UpdateProperty:  %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	util.Console("URL to image: %s\n", imageURL)
+	var resp imgSuccess
+	resp.Status = "success"
+	resp.URL = imageURL
+
+	SvcWriteResponse(&resp, w)
+}
 
 // GeneratePRImageFileName generate file name with PRID
 //------------------------------------------------------------------------------
@@ -80,7 +257,7 @@ func GetFileContentType(out *os.File) (string, error) {
 	return contentType, nil
 }
 
-// UploadImageFileToS3 upload image to AWS S3 bucket
+// UploadImageFileToS3 is a convenience function for UploadImageToS3.
 //
 // INPUTS
 //     fileHeader - It contains header information of file. e.g., filename, file type
@@ -97,6 +274,35 @@ func GetFileContentType(out *os.File) (string, error) {
 //     err        - any error encountered
 //------------------------------------------------------------------------------
 func UploadImageFileToS3(filename string, usrfile *os.File, PRID, idx int64) (string, string, error) {
+	//-----------------------------------------
+	// get the file size and read
+	// the file content into a buffer
+	//-----------------------------------------
+	fileInfo, _ := usrfile.Stat()
+	var size = fileInfo.Size()
+	buffer := make([]byte, size)
+	usrfile.Read(buffer)
+
+	return UploadImageToS3(filename, buffer, PRID, idx)
+}
+
+// UploadImageToS3 upload image to AWS S3 bucket
+//
+// INPUTS
+//     fileHeader - It contains header information of file. e.g., filename, file type
+//     buffer     - Contents of the file as bytes
+//
+//     PRID       - PRID of the property
+//     idx        - index number associated with this pic (1 - 6)
+//
+// RETURNS
+//     filename   - to associate with the contents of buffer, we don't
+//                  actually use this filename to open a file system file.
+//     imagePath  - of the form pic{{PRID}{{PRIDX}}
+//     imageURL   - URL to access the picture
+//     err        - any error encountered
+//------------------------------------------------------------------------------
+func UploadImageToS3(filename string, buffer []byte, PRID, idx int64) (string, string, error) {
 
 	//-----------------------------------------
 	// setup credential
@@ -133,15 +339,6 @@ func UploadImageFileToS3(filename string, usrfile *os.File, PRID, idx int64) (st
 	//-----------------------------------------
 	fname := GeneratePRImageFileName(filename, PRID, idx)
 	imagePath := path.Join(ImageUploadPath, fname)
-
-	//-----------------------------------------
-	// get the file size and read
-	// the file content into a buffer
-	//-----------------------------------------
-	fileInfo, _ := usrfile.Stat()
-	var size = fileInfo.Size()
-	buffer := make([]byte, size)
-	usrfile.Read(buffer)
 	contentType := http.DetectContentType(buffer)
 
 	//-----------------------------------------
