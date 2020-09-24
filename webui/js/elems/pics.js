@@ -59,13 +59,15 @@ function AwaitImagePanelRenderComplete() {
     //  Now load all the proper images...
     //--------------------------------------
     var r = w2ui.propertyForm.record;
-    for (i = 1; i < 7; i++) {
-        var id = "phototable" + i;
-        var image = document.getElementById(id);
-        if (image != null) {
-            id = "Img" + i;
-            image.src = r[id];
-            document.getElementById('spnFilePath' + i).innerHTML = '';
+    for (i = 1; i <= 6; i++) {
+        var ImgID = 'Img'+i;
+        if (r[ImgID].length > 0) {
+            var id = "phototable" + i;
+            var image = document.getElementById(id);
+            if (image != null) {
+                image.src = r[ImgID];
+                document.getElementById('spnFilePath' + i).innerHTML = '';
+            }
         }
     }
 }
@@ -79,69 +81,74 @@ function SetUpImageCatchers() {
     };
     fileupload1.onchange = function() {
         var fileName = fileupload1.value.split('\\')[fileupload1.value.split('\\').length - 1];
-        filePath1.innerHTML = "uploading " + fileName + '<i class="fas fa-spinner fa-spin"></i>';
+        filePath1.innerHTML = "uploading " + fileName;
         w2ui.propertyForm.record.Img1 = fileName;
         SavePhotoToServer(fileName,1,fileupload1.files[0]);
     };
 
     var fileupload2 = document.getElementById("FileUpload2");
     var filePath2 = document.getElementById("spnFilePath2");
-    image = document.getElementById("phototable2");
-    image.onclick = function() {
+    var image2 = document.getElementById("phototable2");
+    image2.onclick = function() {
         fileupload2.click();
     };
     fileupload2.onchange = function() {
-        var fileName = fileupload2.value.split('\\')[fileupload2.value.split('\\').length - 1];
-        filePath2.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img2 = fileName;
+        var fileName2 = fileupload2.value.split('\\')[fileupload2.value.split('\\').length - 1];
+        filePath2.innerHTML = "uploading " + fileName2;
+        w2ui.propertyForm.record.Img2 = fileName2;
+        SavePhotoToServer(fileName2,2,fileupload2.files[0]);
     };
 
     var fileupload3 = document.getElementById("FileUpload3");
     var filePath3 = document.getElementById("spnFilePath3");
-    image = document.getElementById("phototable3");
-    image.onclick = function() {
+    var image3 = document.getElementById("phototable3");
+    image3.onclick = function() {
         fileupload3.click();
     };
     fileupload3.onchange = function() {
-        var fileName = fileupload3.value.split('\\')[fileupload3.value.split('\\').length - 1];
-        filePath3.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img3 = fileName;
+        var fileName3 = fileupload3.value.split('\\')[fileupload3.value.split('\\').length - 1];
+        filePath3.innerHTML = "uploading " + fileName3;
+        w2ui.propertyForm.record.Img3 = fileName3;
+        SavePhotoToServer(fileName3,3,fileupload3.files[0]);
     };
 
     var fileupload4 = document.getElementById("FileUpload4");
     var filePath4 = document.getElementById("spnFilePath4");
-    image = document.getElementById("phototable4");
-    image.onclick = function() {
+    var image4 = document.getElementById("phototable4");
+    image4.onclick = function() {
         fileupload4.click();
     };
     fileupload4.onchange = function() {
-        var fileName = fileupload4.value.split('\\')[fileupload4.value.split('\\').length - 1];
-        filePath4.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img4 = fileName;
+        var fileName4 = fileupload4.value.split('\\')[fileupload4.value.split('\\').length - 1];
+        filePath4.innerHTML = "uploading " + fileName4;
+        w2ui.propertyForm.record.Img4 = fileName4;
+        SavePhotoToServer(fileName4,4,fileupload4.files[0]);
     };
 
     var fileupload5 = document.getElementById("FileUpload5");
     var filePath5 = document.getElementById("spnFilePath5");
-    image = document.getElementById("phototable5");
-    image.onclick = function() {
+    var image5 = document.getElementById("phototable5");
+    image5.onclick = function() {
         fileupload5.click();
     };
     fileupload5.onchange = function() {
-        var fileName = fileupload5.value.split('\\')[fileupload5.value.split('\\').length - 1];
-        filePath5.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img5 = fileName;
+        var fileName5 = fileupload5.value.split('\\')[fileupload5.value.split('\\').length - 1];
+        filePath5.innerHTML = "uploading " + fileName5;
+        w2ui.propertyForm.record.Img5 = fileName5;
+        SavePhotoToServer(fileName5,5,fileupload5.files[0]);
     };
 
     var fileupload6 = document.getElementById("FileUpload6");
     var filePath6 = document.getElementById("spnFilePath6");
-    image = document.getElementById("phototable6");
-    image.onclick = function() {
+    var image6 = document.getElementById("phototable6");
+    image6.onclick = function() {
         fileupload6.click();
     };
     fileupload6.onchange = function() {
-        var fileName = fileupload6.value.split('\\')[fileupload6.value.split('\\').length - 1];
-        filePath6.innerHTML = "<b>Selected File: </b>" + fileName;
-        w2ui.propertyForm.record.Img6 = fileName;
+        var fileName6 = fileupload6.value.split('\\')[fileupload6.value.split('\\').length - 1];
+        filePath6.innerHTML = "uploading " + fileName6;
+        w2ui.propertyForm.record.Img6 = fileName6;
+        SavePhotoToServer(fileName6,6,fileupload6.files[0]);
     };
 }
 
@@ -149,13 +156,13 @@ function SetUpImageCatchers() {
 // w2ui.propertyForm and save it under the supplied index.
 //
 // INPUTS
-//    f = filename of image
+//    f = fileName of image
 //    x = index
 //    file = the actual file from the <input ...> object
 //-----------------------------------------------------------------------------
  function SavePhotoToServer(f,x,file)
 {
-    let data = { cmd:'save', PRID: propData.PRID, idx: x, filename: f };
+    let data = { cmd:'save', PRID: propData.PRID, idx: x, fileName: f };
     let formData = new FormData();
     let url = '/v1/propertyphoto/' + propData.PRID + '/' + x;
     var rr;
