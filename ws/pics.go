@@ -10,7 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	db "wreis/db/lib"
@@ -33,6 +33,7 @@ const (
 )
 
 var reImagePart = regexp.MustCompile(` filename="([^"]+)"`)
+var rePhotoURL = regexp.MustCompile(`img-(\d+)-(\d+)-(.*)`)
 
 type imageFileReq struct {
 	Cmd      string
@@ -48,20 +49,130 @@ type imgSuccess struct {
 
 // SvcHandlerPropertyPhoto uploads a single file belonging to a property. The
 // URL is of the form:
-//
-//  @URL:   /v1/propertyphoto/PRID/idx
-//  @Method  POST
-//  @Synopsis Get information about the logged in user
-//  @Descr Based on the session cookie, this service will return the
-//  @Descr information known about the user. As of this writing, that
-//  @Descr information includes:  the username, the user's first (or
-//  @Descr preferred name), the user's id number, and a url to the
-//  @Descr user's image.
-//  @Input session.AIRAuthenticateResponse
-//  @Response SvcStatus
-// wsdoc }
 //-----------------------------------------------------------------------------
 func SvcHandlerPropertyPhoto(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	if d.MimeMultipartOnly {
+		handlePhotoSave(w, r, d)
+		return
+	}
+	switch d.wsSearchReq.Cmd {
+	case "delete":
+		handlePhotoDelete(w, r, d)
+	default:
+		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		SvcErrorReturn(w, err)
+		return
+	}
+}
+
+// parsePhotoURL
+//
+//   https://s3.amazonaws.com/directory-pics/img-1-1-roller-32.png
+//------------------------------------------------------------------------------
+func parsePhotoURL(url string) (int64, int64, string) {
+	var fname string
+	var PRID, Idx int64
+	s := filepath.Base(url)                  // gets us to: img-1-1-roller-32.png
+	ba := rePhotoURL.FindSubmatch([]byte(s)) // [1] = "1", [2] = "1", [3] = "roller-32.png"
+	if len(ba) >= 4 {
+		PRID, _ = util.IntFromString(string(ba[1]), "bla")
+		Idx, _ = util.IntFromString(string(ba[2]), "bla")
+		fname = string(ba[3])
+	}
+	return PRID, Idx, fname
+}
+
+// handlePhotoDelete the photo with index idx from PRID
+// URL is of the form:
+//                      d.ID  d.SUBID
+//    /v1/propertyphoto/PRID/idx
+//
+//-----------------------------------------------------------------------------
+func handlePhotoDelete(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "handlePhotoDelete"
+	util.Console("Entered %s\n", funcname)
+
+	//---------------------------
+	// Quick sanity check...
+	//---------------------------
+	if d.ID < 1 || d.SUBID < 1 || d.SUBID > 6 {
+		e := fmt.Errorf("%s: Error in property value PRID (%d) or Image Index (%d)", funcname, d.ID, d.SUBID)
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	var PRID, Idx int64
+	var Fname, tmpURL string
+
+	//---------------------------
+	// get property
+	//---------------------------
+	pr, err := db.GetProperty(r.Context(), d.ID)
+	if err != nil {
+		e := fmt.Errorf("%s: Error from db.GetProperty:  %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	switch d.SUBID {
+	case 1:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img1)
+		tmpURL = pr.Img1
+		pr.Img1 = ""
+	case 2:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img2)
+		tmpURL = pr.Img2
+		pr.Img2 = ""
+	case 3:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img3)
+		tmpURL = pr.Img3
+		pr.Img3 = ""
+	case 4:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img4)
+		tmpURL = pr.Img4
+		pr.Img4 = ""
+	case 5:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img5)
+		tmpURL = pr.Img5
+		pr.Img5 = ""
+	case 6:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img6)
+		tmpURL = pr.Img6
+		pr.Img6 = ""
+	}
+
+	if d.ID != PRID || d.SUBID != Idx {
+		e := fmt.Errorf("%s: Image %s is not associated with PRID %d, Idx %d", funcname, tmpURL, PRID, Idx)
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	if err = DeleteS3ImageFile(Fname, PRID, Idx); err != nil {
+		e := fmt.Errorf("%s: Error deleting image from S3: %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	if err = db.UpdateProperty(r.Context(), &pr); err != nil {
+		e := fmt.Errorf("%s: Error from db.UpdateProperty:  %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
+
+	var resp imgSuccess
+	resp.Status = "success"
+	resp.URL = ""
+
+	SvcWriteResponse(&resp, w)
+}
+
+// handlePhotoSave uploads a single file belonging to a property. The
+// URL is of the form:
+//
+//    /v1/propertyphoto/PRID/idx
+//
+//-----------------------------------------------------------------------------
+func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var req imageFileReq
 	var fname string
 	var imgFileBytes []byte
@@ -221,7 +332,7 @@ func GeneratePRImageFileName(filename string, PRID, idx int64) string {
 // return the entire filename portion of the url.
 //------------------------------------------------------------------------------
 func GetImageFilenameFromURL(s string) string {
-	_, fname := path.Split(s)
+	_, fname := filepath.Split(s)
 	sa := strings.Split(fname, "-")
 	if len(sa) < 4 {
 		return s
@@ -338,7 +449,7 @@ func UploadImageToS3(filename string, buffer []byte, PRID, idx int64) (string, s
 	// Path after the bucket name
 	//-----------------------------------------
 	fname := GeneratePRImageFileName(filename, PRID, idx)
-	imagePath := path.Join(ImageUploadPath, fname)
+	imagePath := filepath.Join(ImageUploadPath, fname)
 	contentType := http.DetectContentType(buffer)
 
 	//-----------------------------------------

@@ -935,6 +935,75 @@ stopWsrv() {
 	fi
 }
 
+
+########################################################################
+# doCheckOnly()
+#   just check server output against gold file
+#
+#	Parameters:
+#       $1 = base file name
+########################################################################
+doCheckOnly() {
+	if [ ! -f ${GOLD}/${1}.gold ]; then
+		echo "UNSET CONTENT" > ${GOLD}/${1}.gold
+		mkdir -p gold
+		echo "Created a default ${GOLD}/$1.gold for you. Update this file with known-good output."
+	fi
+
+	#--------------------------------------------------------------------
+	# The actual data has timestamp and token information that changes every run.
+	# The timestamp can be filtered out for purposes of testing whether
+	# or not the web service could be called and can return the expected
+	# data.
+	#--------------------------------------------------------------------
+	declare -a out_filters=(
+		's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
+		's/(^[ \t]+"CreateTS":).*/$1 TIMESTAMP/'
+		's/(^[ \t]+"Token":).*/$1 TOKEN/'
+		's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
+	)
+	cp gold/${1}.gold qqx
+	cp ${1} qqy
+	for f in "${out_filters[@]}"
+	do
+		perl -pe "$f" qqx > qqx1; mv qqx1 qqx
+		perl -pe "$f" qqy > qqy1; mv qqy1 qqy
+	done
+
+	if [ "x${5}" != "x" ]; then
+		# echo "  [ CHECKING FOR ${5} ]"
+		f="s/([ \t]+\"${5}\":).*/\$1 CONFCODE/"
+		perl -pe "$f" qqx > qqx1; mv qqx1 qqx
+		perl -pe "$f" qqy > qqy1; mv qqy1 qqy
+	fi
+
+	UDIFFS=$(diff qqx qqy | wc -l)
+	if [ ${UDIFFS} -eq 0 ]; then
+		if [ ${SHOWCOMMAND} -eq 1 ]; then
+			echo "PASSED	cmd: ${CMD}"
+		else
+			echo "PASSED"
+		fi
+	else
+		echo "FAILED..." >> ${ERRFILE}
+		echo "Differences in ${1} are as follows:" >> ${ERRFILE}
+		diff qqx qqy >> ${ERRFILE}
+		echo "If correct:  mv ${1} ${GOLD}/${1}.gold" >> ${ERRFILE}
+		echo "Command to reproduce:  ${CMD}" >> ${ERRFILE}
+		cat ${ERRFILE}
+		failmsg
+		if [ "${ASKBEFOREEXIT}" = "1" ]; then
+			pause ${1}
+		else
+			if [ ${MANAGESERVER} -eq 1 ]; then
+				echo "STOPPING RENTROLL SERVER"
+				pkill rentroll
+			fi
+			exit 1
+		fi
+	fi
+}
+
 ########################################################################
 # dojsonPOST()
 #   Simulate a POST command to the server and use

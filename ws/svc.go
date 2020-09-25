@@ -106,16 +106,17 @@ type WebGridDelete struct {
 // need to parse further to get its unique data.  It includes fields for
 // common data elements in web svc requests
 type ServiceData struct { // position 0 is 'v1'
-	Service       string               // the service requested (position 1)
-	GID           int64                // which group (position 2)
-	ID            int64                // the numeric id parsed from position 3
-	DetVal        string               // the string for the 4th param if provided
-	wsSearchReq   WebGridSearchRequest // what did the search requester ask for
-	wsTypeDownReq WebTypeDownRequest   // fast for typedown
-	data          string               // the raw unparsed data as string
-	b             []byte               // the raw unparsed bytes
-	GetParams     map[string]string    // parameters when HTTP GET is used
-	sess          *session.Session     // user session
+	MimeMultipartOnly bool                 // true if we stopped parsing after determining that we have a mime-multipart message
+	Service           string               // the service requested (position 1)
+	ID                int64                // the numeric id parsed from position 2
+	SUBID             int64                // the numeric id parsed from position 3
+	DetVal            string               // the string for the 4th param if provided
+	wsSearchReq       WebGridSearchRequest // what did the search requester ask for
+	wsTypeDownReq     WebTypeDownRequest   // fast for typedown
+	data              string               // the raw unparsed data as string
+	b                 []byte               // the raw unparsed bytes
+	GetParams         map[string]string    // parameters when HTTP GET is used
+	sess              *session.Session     // user session
 }
 
 // ServiceHandler describes the handler for all services
@@ -134,6 +135,7 @@ var Svcs = []ServiceHandler{
 	{Cmd: "logoff", AuthNRequired: true, Handler: SvcLogoff}, // it handles properly if session has already timed out
 	{Cmd: "property", AuthNRequired: true, Handler: SvcHandlerProperty},
 	{Cmd: "propertyphoto", AuthNRequired: true, Handler: SvcHandlerPropertyPhoto},
+	{Cmd: "propertyphotodelete", AuthNRequired: true, Handler: SvcHandlerPropertyPhoto},
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 	{Cmd: "rentsteps", AuthNRequired: true, Handler: SvcHandlerRentSteps},
 	{Cmd: "renewoptions", AuthNRequired: true, Handler: SvcHandlerRenewOptions},
@@ -268,8 +270,8 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	var err error
 	//-----------------------------------------------------------------------
-	// pathElements:  0   1            2
-	//               /v1/{subservice}/{ID}
+	// pathElements:  0   1            2   3
+	//               /v1/{subservice}/{ID}/{SUBID}
 	//-----------------------------------------------------------------------
 	ss := strings.Split(r.RequestURI[1:], "?") // it could be GET command
 	pathElements := strings.Split(ss[0], "/")
@@ -277,10 +279,16 @@ func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error
 	if lpe > 1 { // look for the requested service
 		d.Service = pathElements[1]
 	}
-	if lpe > 2 { // subservice, if any
+	if lpe > 2 { // ID, if any
 		d.ID, err = util.IntFromString(pathElements[2], "bad ID")
 		if err != nil {
 			return fmt.Errorf("ID in URL is invalid: %s", err.Error())
+		}
+	}
+	if lpe > 3 { // SUBID if any
+		d.SUBID, err = util.IntFromString(pathElements[3], "bad SUBID")
+		if err != nil {
+			return fmt.Errorf("SUBID in URL is invalid: %s", err.Error())
 		}
 	}
 	switch r.Method {
@@ -345,6 +353,7 @@ func SvcGetInt64(s, errmsg string, w http.ResponseWriter) (int64, error) {
 func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	funcname := "getPOSTdata"
 	var err error
+	d.MimeMultipartOnly = false
 	d.b, err = ioutil.ReadAll(r.Body)
 	if err != nil {
 		e := fmt.Errorf("%s: Error reading message Body: %s", funcname, err.Error())
@@ -366,6 +375,7 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	if d.Service == "propertyphoto" {
 		util.Console("data may contain binary info.\n\n")
 		hexdump(d.b)
+		d.MimeMultipartOnly = true
 		return nil
 	}
 
@@ -432,6 +442,7 @@ func hexdump(data []byte) {
 
 func getGETdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	funcname := "getGETdata"
+	d.MimeMultipartOnly = false
 	s, err := url.QueryUnescape(strings.TrimSpace(r.URL.String()))
 	if err != nil {
 		e := fmt.Errorf("%s: Error with url.QueryUnescape:  %s", funcname, err.Error())

@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document, FormData,
-    fetch,
+    fetch,w2confirm, doDeletePhoto,
 */
 
 "use strict";
@@ -162,6 +162,10 @@ function SetUpImageCatchers() {
 //-----------------------------------------------------------------------------
  function SavePhotoToServer(f,x,file)
 {
+    if (typeof file === "undefined") {
+        document.getElementById('spnFilePath' + x).innerHTML = '';
+        return;
+    }
     let data = { cmd:'save', PRID: propData.PRID, idx: x, fileName: f };
     let formData = new FormData();
     let url = '/v1/propertyphoto/' + propData.PRID + '/' + x;
@@ -187,7 +191,6 @@ function SetUpImageCatchers() {
 
 }
 
-
 async function doSaveImage(url,formData) {
     var rr;
     try {
@@ -199,4 +202,41 @@ async function doSaveImage(url,formData) {
 
     let resp = await rr.json();
     return resp;
+}
+
+function deleteImg(x) {
+    w2confirm('Are you sure you want to delete image '+x)
+    .yes(function () {
+        doDeletePhoto(x)
+    })
+    .no(function () {
+        console.log('NO');
+     }
+ );
+}
+
+function doDeletePhoto(x) {
+    let data = { cmd:'delete', PRID: propData.PRID, idx: x };
+    var dat = JSON.stringify(data);
+    var url = '/v1/propertyphotodelete/' + propData.PRID + '/' + x;
+
+    return $.post(url, dat, null, "json")
+        .done(function(data) {
+            // if (data.status === "success") {
+            // }
+            if (data.status === "error") {
+                w2ui.propertyGrid.error('ERROR: '+ data.message);
+                return;
+            }
+            var id = "phototable" + x;
+            var image = document.getElementById(id);
+            if (image == null) {
+                console.log('ERROR: could not find image: ' + id);
+                return;
+            }
+            image.src = '/static/html/images/building-100.png';
+        })
+        .fail(function(data){
+                w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
+        });
 }

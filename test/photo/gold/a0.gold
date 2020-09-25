@@ -1,1 +1,4 @@
-UNSET CONTENT
+{
+    "status": "success",
+    "url": "https://s3.amazonaws.com/directory-pics/img-1-1-roller-32.png"
+}

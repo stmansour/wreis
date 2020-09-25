@@ -294,7 +294,6 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     # read it back, verify the changes
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Read_traffic"
-
 fi
 
 stopWsrv
