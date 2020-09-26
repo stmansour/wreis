@@ -68,6 +68,7 @@ function AwaitImagePanelRenderComplete() {
                 image.src = r[ImgID];
                 document.getElementById('spnFilePath' + i).innerHTML = '';
             }
+            image.width = 190;
         }
     }
 }
@@ -166,6 +167,13 @@ function SetUpImageCatchers() {
         document.getElementById('spnFilePath' + x).innerHTML = '';
         return;
     }
+    var id = "phototable" + x;
+    var image = document.getElementById(id);
+    if (image == null) {
+        console.log('ERROR: could not find image: ' + id);
+        return;
+    }
+    image.src = "/static/html/images/spinner.gif";
     let data = { cmd:'save', PRID: propData.PRID, idx: x, fileName: f };
     let formData = new FormData();
     let url = '/v1/propertyphoto/' + propData.PRID + '/' + x;
@@ -186,6 +194,7 @@ function SetUpImageCatchers() {
             return;
         }
         image.src = resp.url;
+        image.width = 190;
         document.getElementById('spnFilePath' + x).innerHTML = '';
     });
 
@@ -235,6 +244,7 @@ function doDeletePhoto(x) {
                 return;
             }
             image.src = '/static/html/images/building-100.png';
+            image.width = 100;
         })
         .fail(function(data){
                 w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
