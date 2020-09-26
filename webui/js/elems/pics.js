@@ -174,6 +174,7 @@ function SetUpImageCatchers() {
         return;
     }
     image.src = "/static/html/images/spinner.gif";
+    image.width = 190;
     let data = { cmd:'save', PRID: propData.PRID, idx: x, fileName: f };
     let formData = new FormData();
     let url = '/v1/propertyphoto/' + propData.PRID + '/' + x;
@@ -213,10 +214,24 @@ async function doSaveImage(url,formData) {
     return resp;
 }
 
+// deleteImg is called when the user presses one of the trashcan buttons in the
+// photos form.  If no photo is assigned to the slot they chose then it just
+// returns.  Otherwise it will ask if the user is sure they want to delete the
+// photo. If they do, it will call doDeletePhoto()
+//
+// INPUTS
+//     x = index number of the image.
+//------------------------------------------------------------------------------
 function deleteImg(x) {
+    var id='Img' + x;
+    var url=w2ui.propertyForm.record[id];
+    if (url.length < 1) {
+        return;
+    }
+
     w2confirm('Are you sure you want to delete image '+x)
     .yes(function () {
-        doDeletePhoto(x)
+        doDeletePhoto(x);
     })
     .no(function () {
         console.log('NO');
@@ -224,6 +239,10 @@ function deleteImg(x) {
  );
 }
 
+// doDeletePhoto is called when the user acknowledges that they want to delete
+// one of the photos in the photos form. If the slot (1 - 8) has an associated
+// image, it will be deleted.
+//------------------------------------------------------------------------------
 function doDeletePhoto(x) {
     let data = { cmd:'delete', PRID: propData.PRID, idx: x };
     var dat = JSON.stringify(data);
@@ -245,6 +264,7 @@ function doDeletePhoto(x) {
             }
             image.src = '/static/html/images/building-100.png';
             image.width = 100;
+            w2ui.propertyForm.record["Img"+x] = "";
         })
         .fail(function(data){
                 w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
