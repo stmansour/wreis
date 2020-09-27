@@ -81,7 +81,7 @@ CREATE TABLE Property (
 
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
-    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (PRID)
 );
@@ -107,7 +107,7 @@ CREATE TABLE RenewOptions (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
-    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (ROLID)
 );
@@ -121,7 +121,7 @@ CREATE TABLE RenewOption (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = options (Opt), 1 = dates (Dt) (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
-    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (ROID)
 );
@@ -131,7 +131,7 @@ CREATE TABLE RentSteps (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = count, 1 = dates -- See comment for RenewOptions FLAGS
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
-    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (RSLID)
 );
@@ -145,7 +145,7 @@ CREATE TABLE RentStep (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = options, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
-    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (RSID)
 );
@@ -158,7 +158,7 @@ CREATE TABLE Traffic (
     Description VARCHAR(128) NOT NULL DEFAULT '',           -- Describes Count
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
-    CreateTS TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (TID)
 );

@@ -1,9 +1,12 @@
 package ws
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	db "wreis/db/lib"
 	util "wreis/util/lib"
 )
@@ -17,8 +20,7 @@ import (
 
 // PropertyGrid is the structure of data for a property we send to the UI
 type PropertyGrid struct {
-	Recid             int64 `json:"recid"`
-	PID               int64
+	Recid             int64  `json:"recid"`
 	PRID              int64  // unique id
 	Name              string // property name
 	YearsInBusiness   int64
@@ -76,12 +78,136 @@ type PropertyGrid struct {
 	Img7                      string
 	Img8                      string
 	CreateTime                util.JSONDateTime
-	CreatedBy                 int64
-	LastModifyTime            util.JSONDateTime
-	LastModifyBy              int64
+	CreateBy                  int64
+	LastModTime               util.JSONDateTime
+	LastModBy                 int64
 	//
 	// RO db.RenewOptions // contains the list of RenewOptions and context
 	// RS db.RentSteps    // contains the list of RentSteps and context
+}
+
+// which fields needs to be fetched for SQL query for property grid
+var propFieldsMap = map[string][]string{
+	"PRID":                      {"Property.PRID"},
+	"Name":                      {"Property.Name"},
+	"YearsInBusiness":           {"Property.YearsInBusiness"},
+	"ParentCompany":             {"Property.ParentCompany"},
+	"URL":                       {"Property.URL"},
+	"Symbol":                    {"Property.Symbol"},
+	"Price":                     {"Property.Price"},
+	"DownPayment":               {"Property.DownPayment"},
+	"RentableArea":              {"Property.RentableArea"},
+	"RentableAreaUnits":         {"Property.RentableAreaUnits"},
+	"LotSize":                   {"Property.LotSize"},
+	"LotSizeUnits":              {"Property.LotSizeUnits"},
+	"CapRate":                   {"Property.CapRate"},
+	"AvgCap":                    {"Property.AvgCap"},
+	"BuildDate":                 {"Property.BuildDate"},
+	"FLAGS":                     {"Property.FLAGS"},
+	"Ownership":                 {"Property.Ownership"},
+	"TenantTradeName":           {"Property.TenantTradeName"},
+	"LeaseGuarantor":            {"Property.LeaseGuarantor"},
+	"LeaseType":                 {"Property.LeaseType"},
+	"DeliveryDt":                {"Property.DeliveryDt"},
+	"OriginalLeaseTerm":         {"Property.OriginalLeaseTerm"},
+	"RentCommencementDt":        {"Property.RentCommencementDt"},
+	"LeaseExpirationDt":         {"Property.LeaseExpirationDt"},
+	"TermRemainingOnLease":      {"Property.TermRemainingOnLease"},
+	"TermRemainingOnLeaseUnits": {"Property.TermRemainingOnLeaseUnits"},
+	"ROLID":                     {"Property.ROLID"},
+	"RSLID":                     {"Property.RSLID"},
+	"Address":                   {"Property.Address"},
+	"Address2":                  {"Property.Address2"},
+	"City":                      {"Property.City"},
+	"State":                     {"Property.State"},
+	"PostalCode":                {"Property.PostalCode"},
+	"Country":                   {"Property.Country"},
+	"LLResponsibilities":        {"Property.LLResponsibilities"},
+	"NOI":                       {"Property.NOI"},
+	"HQAddress":                 {"Property.HQAddress"},
+	"HQAddress2":                {"Property.HQAddress2"},
+	"HQCity":                    {"Property.HQCity"},
+	"HQState":                   {"Property.HQState"},
+	"HQPostalCode":              {"Property.HQPostalCode"},
+	"HQCountry":                 {"Property.HQCountry"},
+	"Img1":                      {"Property.Img1"},
+	"Img2":                      {"Property.Img2"},
+	"Img3":                      {"Property.Img3"},
+	"Img4":                      {"Property.Img4"},
+	"Img5":                      {"Property.Img5"},
+	"Img6":                      {"Property.Img6"},
+	"Img7":                      {"Property.Img7"},
+	"Img8":                      {"Property.Img8"},
+	"CreateTime":                {"Property.CreateTime"},
+	"CreateBy":                  {"Property.CreateBy"},
+	"LastModTime":               {"Property.LastModTime"},
+	"LastModBy":                 {"Property.LastModBy"},
+}
+
+// which fields needs to be fetched for SQL query for property grid
+var propQuerySelectFields = []string{
+	"Property.PRID",
+	"Property.Name",
+	"Property.YearsInBusiness",
+	"Property.ParentCompany",
+	"Property.URL",
+	"Property.Symbol",
+	"Property.Price",
+	"Property.DownPayment",
+	"Property.RentableArea",
+	"Property.RentableAreaUnits",
+	"Property.LotSize",
+	"Property.LotSizeUnits",
+	"Property.CapRate",
+	"Property.AvgCap",
+	"Property.BuildDate",
+	"Property.FLAGS",
+	"Property.Ownership",
+	"Property.TenantTradeName",
+	"Property.LeaseGuarantor",
+	"Property.LeaseType",
+	"Property.DeliveryDt",
+	"Property.OriginalLeaseTerm",
+	"Property.RentCommencementDt",
+	"Property.LeaseExpirationDt",
+	"Property.TermRemainingOnLease",
+	"Property.TermRemainingOnLeaseUnits",
+	"Property.ROLID",
+	"Property.RSLID",
+	"Property.Address",
+	"Property.Address2",
+	"Property.City",
+	"Property.State",
+	"Property.PostalCode",
+	"Property.Country",
+	"Property.LLResponsibilities",
+	"Property.NOI",
+	"Property.HQAddress",
+	"Property.HQAddress2",
+	"Property.HQCity",
+	"Property.HQState",
+	"Property.HQPostalCode",
+	"Property.HQCountry",
+	"Property.Img1",
+	"Property.Img2",
+	"Property.Img3",
+	"Property.Img4",
+	"Property.Img5",
+	"Property.Img6",
+	"Property.Img7",
+	"Property.Img8",
+	"Property.CreateTime",
+	"Property.CreateBy",
+	"Property.LastModTime",
+	"Property.LastModBy",
+}
+
+// this is the list of fields to search for a string if the field name is blank
+var propDefaultFields = []string{
+	"Name",
+	"City",
+	"State",
+	"PostalCode",
 }
 
 // SearchPropertyResponse is the response data for a Rental Agreement Search
@@ -115,9 +241,8 @@ type GetProperty struct {
 //##########################################################################################################################################################
 //-----------------------------------------------------------------------------
 
-// SvcHandlerProperty formats a complete data record for an assessment for use
+// SvcHandlerProperty formats a complete data record for an property for use
 // with the w2ui Form
-// For this call, we expect the URI to contain the BID and the PID as follows:
 //
 // The server command can be:
 //      get
@@ -130,7 +255,7 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	switch d.wsSearchReq.Cmd {
 	case "get":
 		if d.ID <= 0 && d.wsSearchReq.Limit > 0 {
-			SvcSearchProperty(w, r, d) // it is a query for the grid.
+			SvcSearchProperty1(w, r, d) // it is a query for the grid.
 		} else {
 			if d.ID < 0 {
 				SvcErrorReturn(w, fmt.Errorf("PropertyID is required but was not specified"))
@@ -151,57 +276,73 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	}
 }
 
-// SvcSearchProperty generates a report of all Property defined business d.BID
-// wsdoc {
-//  @Title  Search Property
-//	@URL /v1/Property/[:GID]
-//  @Method  POST
-//	@Synopsis Search Property
-//  @Descr  Search all Property and return those that match the Search Logic.
-//  @Descr  The search criteria includes start and stop dates of interest.
-//	@Input WebGridSearchRequest
-//  @Response PropertySearchResponse
-// wsdoc }
+// SvcSearchProperty1 generates a report of all Property records matching the
+// search criteria.
+//
+//	@URL /v1/Property/
+//
 //-----------------------------------------------------------------------------
-func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
-	funcname := "SvcSearchProperty"
+func SvcSearchProperty1(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "SvcSearchProperty1"
 	util.Console("Entered %s\n", funcname)
-
 	var g SearchPropertyResponse
 	var err error
 
-	//---------------------------------------------
-	// We'll grab all fields for the properties
-	//---------------------------------------------
-	q := fmt.Sprintf("SELECT %s FROM Property ", db.Wdb.DBFields["Property"]) // the fields we want
+	whr := ""
+	order := `Property.Name ASC` // default ORDER
 
-	// any WHERE clause work store in qw
-	qw := "" // for now, no WHERE clause
-	q += " ORDER BY "
-	order := "PRID ASC" // default ORDER
-	if len(d.wsSearchReq.Sort) > 0 {
-		for i := 0; i < len(d.wsSearchReq.Sort); i++ {
-			if i > 0 {
-				q += ","
-			}
-			q += d.wsSearchReq.Sort[i].Field + " " + d.wsSearchReq.Sort[i].Direction
-		}
-	} else {
-		q += order
+	// get where clause and order clause for sql query
+	util.Console("len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
+	HandleBlankSearchField(d, propDefaultFields)
+	util.Console("AFTER HandleBlankSearchField:  len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
+	whereClause, orderClause := GetSearchAndSortSQL(d, propFieldsMap)
+	if len(whereClause) > 0 {
+		whr += "WHERE " + whereClause
 	}
-	// now set up the offset and limit
-	q += fmt.Sprintf(" LIMIT %d OFFSET %d", d.wsSearchReq.Limit, d.wsSearchReq.Offset)
-	g.Total, err = db.GetRowCountRaw("Property", "", qw)
+	if len(orderClause) > 0 {
+		order = orderClause
+	}
+
+	query := `
+	SELECT {{.SelectClause}}
+	FROM Property {{.WhereClause}}
+	ORDER BY {{.OrderClause}}`
+
+	qc := db.QueryClause{
+		"SelectClause": strings.Join(propQuerySelectFields, ","),
+		"WhereClause":  whr,
+		"OrderClause":  order,
+	}
+
+	countQuery := db.RenderSQLQuery(query, qc)
+	g.Total, err = db.GetQueryCount(countQuery)
 	if err != nil {
-		util.Console("Error from db.GetRowCountRaw: %s\n", err.Error())
 		SvcErrorReturn(w, err)
 		return
 	}
+	util.Console("g.Total = %d\n", g.Total)
 
-	util.Console("\nQuery = %s\n\n", q)
-	rows, err := db.Wdb.DB.Query(q)
+	// FETCH the records WITH LIMIT AND OFFSET
+	// limit the records to fetch from server, page by page
+	limitAndOffsetClause := `
+	LIMIT {{.LimitClause}}
+	OFFSET {{.OffsetClause}};`
+
+	// build query with limit and offset clause
+	// if query ends with ';' then remove it
+	queryWithLimit := query + limitAndOffsetClause
+
+	// Add limit and offset value
+	qc["LimitClause"] = strconv.Itoa(d.wsSearchReq.Limit)
+	qc["OffsetClause"] = strconv.Itoa(d.wsSearchReq.Offset)
+
+	// get formatted query with substitution of select, where, order clause
+	qry := db.RenderSQLQuery(queryWithLimit, qc)
+	util.Console("db query = %s\n", qry)
+
+	// execute the query
+	rows, err := db.Wdb.DB.Query(qry)
 	if err != nil {
-		util.Console("Error from DB Query: %s\n", err.Error())
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -210,13 +351,13 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	i := int64(d.wsSearchReq.Offset)
 	count := 0
 	for rows.Next() {
-		var q PropertyGrid
-		var p db.Property
-		if err = db.ReadProperties(rows, &p); err != nil {
-			util.Console("%s.  Error reading Person: %s\n", funcname, err.Error())
+		q, err := PropertyRowScan(rows)
+		if err != nil {
+			SvcErrorReturn(w, err)
+			return
 		}
-		util.MigrateStructVals(&p, &q)
-		q.Recid = p.PRID
+		q.Recid = i
+
 		g.Records = append(g.Records, q)
 		count++ // update the count only after adding the record
 		if count >= d.wsSearchReq.Limit {
@@ -225,17 +366,176 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		i++
 	}
 
-	util.Console("g.Total = %d\n", g.Total)
-	w.Header().Set("Content-Type", "application/json")
+	err = rows.Err()
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
 	g.Status = "success"
 	SvcWriteResponse(&g, w)
-
 }
+
+// PropertyRowScan scans a result from sql row and dump it in a
+// PropertyGrid struct
+//
+// RETURNS
+//  Property
+//-----------------------------------------------------------------------------
+func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
+	var q PropertyGrid
+	err := rows.Scan(
+		&q.PRID,
+		&q.Name,
+		&q.YearsInBusiness,
+		&q.ParentCompany,
+		&q.URL,
+		&q.Symbol,
+		&q.Price,
+		&q.DownPayment,
+		&q.RentableArea,
+		&q.RentableAreaUnits,
+		&q.LotSize,
+		&q.LotSizeUnits,
+		&q.CapRate,
+		&q.AvgCap,
+		&q.BuildDate,
+		&q.FLAGS,
+		&q.Ownership,
+		&q.TenantTradeName,
+		&q.LeaseGuarantor,
+		&q.LeaseType,
+		&q.DeliveryDt,
+		&q.OriginalLeaseTerm,
+		&q.RentCommencementDt,
+		&q.LeaseExpirationDt,
+		&q.TermRemainingOnLease,
+		&q.TermRemainingOnLeaseUnits,
+		&q.ROLID,
+		&q.RSLID,
+		&q.Address,
+		&q.Address2,
+		&q.City,
+		&q.State,
+		&q.PostalCode,
+		&q.Country,
+		&q.LLResponsibilities,
+		&q.NOI,
+		&q.HQAddress,
+		&q.HQAddress2,
+		&q.HQCity,
+		&q.HQState,
+		&q.HQPostalCode,
+		&q.HQCountry,
+		&q.Img1,
+		&q.Img2,
+		&q.Img3,
+		&q.Img4,
+		&q.Img5,
+		&q.Img6,
+		&q.Img7,
+		&q.Img8,
+		&q.CreateTime,
+		&q.CreateBy,
+		&q.LastModTime,
+		&q.LastModBy,
+	)
+	return q, err
+}
+
+// // SvcSearchProperty generates a report of all Property defined business d.BID
+// // wsdoc {
+// //  @Title  Search Property
+// //	@URL /v1/Property/[:GID]
+// //  @Method  POST
+// //	@Synopsis Search Property
+// //  @Descr  Search all Property and return those that match the Search Logic.
+// //  @Descr  The search criteria includes start and stop dates of interest.
+// //	@Input WebGridSearchRequest
+// //  @Response PropertySearchResponse
+// // wsdoc }
+// //-----------------------------------------------------------------------------
+// func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+// 	funcname := "SvcSearchProperty"
+// 	util.Console("Entered %s\n", funcname)
+//
+// 	var g SearchPropertyResponse
+// 	var err error
+//
+// 	//---------------------------------------------
+// 	// We'll grab all fields for the properties
+// 	//---------------------------------------------
+// 	q := fmt.Sprintf("SELECT %s FROM Property ", db.Wdb.DBFields["Property"]) // the fields we want
+//
+// 	// any WHERE clause work store in qw
+// 	qw := "" // for now, no WHERE clause
+// 	if len(d.wsSearchReq.Search) > 0 {
+// 		qw = "WHERE "
+// 		for i := 0; i < len(d.wsSearchReq.Search); i++ {
+// 			util.Console("%d. %#v\n", i, d.wsSearchReq.Search[i])
+// 			qw +=
+// 		}
+// 	}
+//
+// 	q += " ORDER BY "
+// 	order := "PRID ASC" // default ORDER
+// 	if len(d.wsSearchReq.Sort) > 0 {
+// 		for i := 0; i < len(d.wsSearchReq.Sort); i++ {
+// 			if i > 0 {
+// 				q += ","
+// 			}
+// 			q += d.wsSearchReq.Sort[i].Field + " " + d.wsSearchReq.Sort[i].Direction
+// 		}
+// 	} else {
+// 		q += order
+// 	}
+// 	// now set up the offset and limit
+// 	q += fmt.Sprintf(" LIMIT %d OFFSET %d", d.wsSearchReq.Limit, d.wsSearchReq.Offset)
+// 	g.Total, err = db.GetRowCountRaw("Property", "", qw)
+// 	if err != nil {
+// 		util.Console("Error from db.GetRowCountRaw: %s\n", err.Error())
+// 		SvcErrorReturn(w, err)
+// 		return
+// 	}
+//
+// 	util.Console("\nQuery = %s\n\n", q)
+// 	rows, err := db.Wdb.DB.Query(q)
+// 	if err != nil {
+// 		util.Console("Error from DB Query: %s\n", err.Error())
+// 		SvcErrorReturn(w, err)
+// 		return
+// 	}
+// 	defer rows.Close()
+//
+// 	i := int64(d.wsSearchReq.Offset)
+// 	count := 0
+// 	for rows.Next() {
+// 		var q PropertyGrid
+// 		var p db.Property
+// 		if err = db.ReadProperties(rows, &p); err != nil {
+// 			util.Console("%s.  Error reading Person: %s\n", funcname, err.Error())
+// 		}
+// 		util.MigrateStructVals(&p, &q)
+// 		q.Recid = p.PRID
+// 		g.Records = append(g.Records, q)
+// 		count++ // update the count only after adding the record
+// 		if count >= d.wsSearchReq.Limit {
+// 			break // if we've added the max number requested, then exit
+// 		}
+// 		i++
+// 	}
+//
+// 	util.Console("g.Total = %d\n", g.Total)
+// 	w.Header().Set("Content-Type", "application/json")
+// 	g.Status = "success"
+// 	SvcWriteResponse(&g, w)
+//
+// }
 
 // deleteProperty deletes a payment type from the database
 // wsdoc {
 //  @Title  Delete Property
-//	@URL /v1/Property/PID
+//	@URL /v1/Property/PRID
 //  @Method  POST
 //	@Synopsis Delete a Payment Type
 //  @Desc  This service deletes a Property.
@@ -250,13 +550,13 @@ func deleteProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	SvcWriteSuccessResponse(w)
 }
 
-// SaveProperty returns the requested assessment
+// SaveProperty returns the requested property
 // wsdoc {
 //  @Title  Save Property
 //	@URL /v1/Property/PRID
 //  @Method  GET
 //	@Synopsis Update the information on a Property with the supplied data, create if necessary.
-//  @Description  This service creates a Property if PID == 0 or updates a Property if PID > 0 with
+//  @Description  This service creates a Property if PRID == 0 or updates a Property if PRID > 0 with
 //  @Description  the information supplied. All fields must be supplied.
 //	@Input SaveProperty
 //  @Response SvcStatusResponse
@@ -311,13 +611,13 @@ func PropertyUpdate(p *PropertyGrid, d *ServiceData) error {
 	return nil
 }
 
-// GetProperty returns the requested assessment
+// GetProperty returns the requested property
 // wsdoc {
 //  @Title  Get Property
-//	@URL /v1/property/:PID
+//	@URL /v1/property/:PRID
 //  @Method  GET
 //	@Synopsis Get information on a Property
-//  @Description  Return all fields for assessment :PID
+//  @Description  Return all fields for property :PRID
 //	@Input WebGridSearchRequest
 //  @Response GetProperty
 // wsdoc }

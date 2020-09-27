@@ -66,7 +66,7 @@ function initializePropertyRecord() {
             Img7: "",
             Img8: "",
 
-            CreatedBy: 0,
+            CreateBy: 0,
             LastModBy: 0,
 
             BuildDate: time0,
@@ -160,7 +160,7 @@ function buildPropertyUIElements() {
             {field: 'Img7',                 size: '100px', caption: 'Img7', sortable: true, hidden: true},
             {field: 'Img8',                 size: '100px', caption: 'Img8', sortable: true, hidden: true},
             {field: 'CreateTime',           size: '60px', caption: 'CreateTime', sortable: true, hidden: true},
-            {field: 'CreatedBy',            size: '60px', caption: 'CreatedBy', sortable: true, hidden: true},
+            {field: 'CreateBy',            size: '60px', caption: 'CreateBy', sortable: true, hidden: true},
             {field: 'LastModTime',          size: '60px', caption: 'LastModTime', sortable: true, hidden: true},
             {field: 'LastModBy',            size: '60px', caption: 'LastModBy', sortable: true, hidden: true},
         ],
@@ -360,7 +360,7 @@ function buildPropertyUIElements() {
             {field: 'Img7',                 type: 'hidden', required: false},
             {field: 'Img8',                 type: 'hidden', required: false},
             {field: 'CreateTime',           type: 'text', required: false},
-            {field: 'CreatedBy',            type: 'text', required: false},
+            {field: 'CreateBy',            type: 'text', required: false},
             {field: 'LastModTime',          type: 'text', required: false},
             {field: 'LastModBy',            type: 'text', required: false},
         ],

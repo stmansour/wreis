@@ -958,7 +958,7 @@ doCheckOnly() {
 	#--------------------------------------------------------------------
 	declare -a out_filters=(
 		's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
-		's/(^[ \t]+"CreateTS":).*/$1 TIMESTAMP/'
+		's/(^[ \t]+"CreateTime":).*/$1 TIMESTAMP/'
 		's/(^[ \t]+"Token":).*/$1 TOKEN/'
 		's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
 	)
@@ -1048,7 +1048,7 @@ dojsonPOST () {
 		#--------------------------------------------------------------------
 		declare -a out_filters=(
 			's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"CreateTS":).*/$1 TIMESTAMP/'
+			's/(^[ \t]+"CreateTime":).*/$1 TIMESTAMP/'
 			's/(^[ \t]+"Token":).*/$1 TOKEN/'
 			's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
 		)
@@ -1153,7 +1153,7 @@ dobinPOST () {
 		#--------------------------------------------------------------------
 		declare -a out_filters=(
 			's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"CreateTS":).*/$1 TIMESTAMP/'
+			's/(^[ \t]+"CreateTime":).*/$1 TIMESTAMP/'
 			's/(^[ \t]+"Token":).*/$1 TOKEN/'
 			's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
 		)

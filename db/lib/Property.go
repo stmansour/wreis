@@ -68,7 +68,7 @@ type Property struct {
 	Img8                      string
 	LastModTime               time.Time    // when was the record last written
 	LastModBy                 int64        // id of user that did the modify
-	CreateTS                  time.Time    // when was this record created
+	CreateTime                  time.Time    // when was this record created
 	CreateBy                  int64        // id of user that created it
 	RO                        RenewOptions // contains the list of RenewOptions and context
 	RS                        RentSteps    // contains the list of RentSteps and context
@@ -280,7 +280,7 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.Img8,
 		&a.LastModTime,
 		&a.LastModBy,
-		&a.CreateTS,
+		&a.CreateTime,
 		&a.CreateBy,
 	)
 	SkipSQLNoRowsError(&err)
@@ -354,7 +354,7 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.Img8,
 		&a.LastModTime,
 		&a.LastModBy,
-		&a.CreateTS,
+		&a.CreateTime,
 		&a.CreateBy,
 	)
 	SkipSQLNoRowsError(&err)

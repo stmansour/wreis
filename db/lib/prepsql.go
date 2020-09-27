@@ -13,7 +13,7 @@ var mySQLRpl = string("?")
 var myRpl = mySQLRpl
 
 // TRNSfields defined fields for Transactant, used in at least one other function
-var TRNSfields = string("TCID,BID,NLID,FirstName,MiddleName,LastName,PreferredName,CompanyName,IsCompany,PrimaryEmail,SecondaryEmail,WorkPhone,CellPhone,Address,Address2,City,State,PostalCode,Country,Website,Comment,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy")
+var TRNSfields = string("TCID,BID,NLID,FirstName,MiddleName,LastName,PreferredName,CompanyName,IsCompany,PrimaryEmail,SecondaryEmail,WorkPhone,CellPhone,Address,Address2,City,State,PostalCode,Country,Website,Comment,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy")
 
 // GenSQLInsertAndUpdateStrings generates a string suitable for SQL INSERT and UPDATE statements given the fields as used in SELECT statements.
 //
@@ -45,11 +45,11 @@ func GenSQLInsertAndUpdateStrings(s string) (string, string, string, string, str
 			continue
 		}
 		// INSERT FIELDS Inclusion
-		if fld != "LastModTime" && fld != "CreateTS" { // remove these fields for INSERT
+		if fld != "LastModTime" && fld != "CreateTime" { // remove these fields for INSERT
 			insertFields = append(insertFields, fld)
 		}
 		// UPDATE FIELDS Inclusion
-		if fld != "LastModTime" && fld != "CreateTS" && fld != "CreateBy" { // remove these fields for UPDATE
+		if fld != "LastModTime" && fld != "CreateTime" && fld != "CreateBy" { // remove these fields for UPDATE
 			updateFields = append(updateFields, fld)
 		}
 	}
@@ -94,7 +94,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Property
 	//==========================================
-	flds = "PRID,ROLID,RSLID,FlowState,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,TermRemainingOnLease,TermRemainingOnLeaseUnits,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,Img1,Img2,Img3,Img4,Img5,Img6,Img7,Img8,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "PRID,ROLID,RSLID,FlowState,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,TermRemainingOnLease,TermRemainingOnLeaseUnits,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,Img1,Img2,Img3,Img4,Img5,Img6,Img7,Img8,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["Property"] = flds
 	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property where PRID=?")
 	Errcheck(err)
@@ -109,7 +109,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Rent Step
 	//==========================================
-	flds = "RSID,RSLID,Dt,Opt,Rent,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "RSID,RSLID,Dt,Opt,Rent,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentStep"] = flds
 	Wdb.Prepstmt.GetRentStep, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentStep where RSID=?")
 	Errcheck(err)
@@ -124,7 +124,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Rent Steps
 	//==========================================
-	flds = "RSLID,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "RSLID,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentSteps"] = flds
 	Wdb.Prepstmt.GetRentSteps, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentSteps where RSLID=?")
 	Errcheck(err)
@@ -143,7 +143,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Renew Option
 	//==========================================
-	flds = "ROID,ROLID,Dt,Opt,Rent,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "ROID,ROLID,Dt,Opt,Rent,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RenewOption"] = flds
 	Wdb.Prepstmt.GetRenewOption, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOption where ROID=?")
 	Errcheck(err)
@@ -158,7 +158,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Renew Options
 	//==========================================
-	flds = "ROLID,FLAGS,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "ROLID,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RenewOptions"] = flds
 	Wdb.Prepstmt.GetRenewOptions, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOptions where ROLID=?")
 	Errcheck(err)
@@ -177,7 +177,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Traffic
 	//==========================================
-	flds = "TID,PRID,FLAGS,Count,Description,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "TID,PRID,FLAGS,Count,Description,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["Traffic"] = flds
 	Wdb.Prepstmt.GetTraffic, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Traffic where TID=?")
 	Errcheck(err)

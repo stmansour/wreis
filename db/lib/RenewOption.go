@@ -18,7 +18,7 @@ type RenewOption struct {
 	FLAGS       uint64    // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
-	CreateTS    time.Time // when was this record created
+	CreateTime    time.Time // when was this record created
 	CreateBy    int64     // id of user that created it
 }
 
@@ -104,7 +104,7 @@ func ReadRenewOption(row *sql.Row, a *RenewOption) error {
 		&a.Opt,
 		&a.Rent,
 		&a.FLAGS,
-		&a.CreateTS,
+		&a.CreateTime,
 		&a.CreateBy,
 		&a.LastModTime,
 		&a.LastModBy)
@@ -132,7 +132,7 @@ func ReadRenewOptionItem(rows *sql.Rows, a *RenewOption) error {
 		&a.Opt,
 		&a.Rent,
 		&a.FLAGS,
-		&a.CreateTS,
+		&a.CreateTime,
 		&a.CreateBy,
 		&a.LastModTime,
 		&a.LastModBy)

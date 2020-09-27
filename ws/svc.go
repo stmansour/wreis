@@ -183,13 +183,13 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	svcDebugTxn(funcname, r)
 	var d ServiceData
 	d.ID = -1 // indicates it has not been set
-	util.Console("debug> SVC: 00\n")
+	// util.Console("debug> SVC: 00\n")
 	if e := svcGetPayload(w, r, &d); e != nil {
-		util.Console("debug> SVC: 01\n")
+		// util.Console("debug> SVC: 01\n")
 		SvcErrorReturn(w, e)
 		return
 	}
-	util.Console("debug> SVC: 02\n")
+	// util.Console("debug> SVC: 02\n")
 	sid := -1 // index to the service requested. Initialize to "not found"
 	for i := 0; i < len(Svcs); i++ {
 		if Svcs[i].Cmd == d.Service {
@@ -197,9 +197,9 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	util.Console("debug> SVC: 03: sid = %d\n", sid)
+	// util.Console("debug> SVC: 03: sid = %d\n", sid)
 	if sid < 0 {
-		util.Console("debug> SVC: 04: sid = %d\n", sid)
+		// util.Console("debug> SVC: 04: sid = %d\n", sid)
 		util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)
 		e := fmt.Errorf("Service not recognized: %s", d.Service)
 		util.Console("***ERROR IN URL***  %s", e.Error())
@@ -211,15 +211,15 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	// Is authentication required for this command?  If so validate that we
 	// have a cookie.
 	//-----------------------------------------------------------------------
-	util.Console("debug> SVC: A\n")
+	// util.Console("debug> SVC: A\n")
 	if Svcs[sid].AuthNRequired {
-		util.Console("debug> SVC: B\n")
+		// util.Console("debug> SVC: B\n")
 		c, err := session.ValidateSessionCookie(w, r, 0 /* get all user info */) // this updates the expire time
 		if err != nil {
 			SvcErrorReturn(w, err)
 			return
 		}
-		util.Console("debug> SVC: C\n")
+		// util.Console("debug> SVC: C\n")
 		if c.Status != "success" {
 			//----------------------------------------------------------------------
 			// user needs to log in.  If the command was logoff, just return success.
@@ -232,7 +232,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			SvcErrorReturn(w, db.ErrSessionRequired)
 			return
 		}
-		util.Console("debug> SVC: D\n")
+		// util.Console("debug> SVC: D\n")
 		//----------------------------------------------------------------------
 		// The air cookie is valid.  Create (or get) the internal session. This
 		// is needed to identify the person associated with the request. All
@@ -251,14 +251,14 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 		ctx := session.SetSessionContextKey(r.Context(), d.sess)
 		r = r.WithContext(ctx)
 
-		util.Console("debug> SVC: E\n")
+		// util.Console("debug> SVC: E\n")
 	}
-	util.Console("debug> SVC: F\n")
+	// util.Console("debug> SVC: F\n")
 
 	svcDebugURL(r, &d)
 	showRequestHeaders(r)
 
-	util.Console("debug> SVC: G, sid = %d\n", sid)
+	// util.Console("debug> SVC: G, sid = %d\n", sid)
 
 	Svcs[sid].Handler(w, r, &d)
 	svcDebugTxnEnd()

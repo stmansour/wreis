@@ -15,7 +15,7 @@ type RentSteps struct {
 	FLAGS       uint64     // 1<<0 = 0 means count based, 1 means date based
 	LastModTime time.Time  // when was the record last written
 	LastModBy   int64      // id of user that did the modify
-	CreateTS    time.Time  // when was this record created
+	CreateTime    time.Time  // when was this record created
 	CreateBy    int64      // id of user that created it
 	RS          []RentStep // associated slice of RentStep records
 }
@@ -195,7 +195,7 @@ func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 	err := row.Scan(
 		&a.RSLID,
 		&a.FLAGS,
-		&a.CreateTS,
+		&a.CreateTime,
 		&a.CreateBy,
 		&a.LastModTime,
 		&a.LastModBy)
