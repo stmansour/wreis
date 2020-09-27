@@ -60,7 +60,7 @@ function AwaitImagePanelRenderComplete() {
     //  Now load all the proper images...
     //--------------------------------------
     var r = w2ui.propertyForm.record;
-    for (i = 1; i <= 6; i++) {
+    for (i = 1; i <= AppPics.NumImgs; i++) {
         var ImgID = 'Img'+i;
         if (r[ImgID].length > 0) {
             var id = "phototable" + i;
@@ -224,6 +224,7 @@ function SetUpImageCatchers() {
         image.src = resp.url;
         image.width = 190;
         document.getElementById('spnFilePath' + x).innerHTML = '';
+        w2ui.propertyForm.record["Img"+x] = resp.url;
     });
 
 }

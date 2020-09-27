@@ -30,6 +30,7 @@ import (
 const (
 	S3Region        = "us-east-1" // This parameter define the region of bucket
 	ImageUploadPath = ""          // This parameter define in which folder have to upload image
+	MaxPhotoIndex   = 8
 )
 
 var reImagePart = regexp.MustCompile(` filename="([^"]+)"`)
@@ -95,7 +96,7 @@ func handlePhotoDelete(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//---------------------------
 	// Quick sanity check...
 	//---------------------------
-	if d.ID < 1 || d.SUBID < 1 || d.SUBID > 6 {
+	if d.ID < 1 || d.SUBID < 1 || d.SUBID > MaxPhotoIndex {
 		e := fmt.Errorf("%s: Error in property value PRID (%d) or Image Index (%d)", funcname, d.ID, d.SUBID)
 		SvcFuncErrorReturn(w, e, funcname)
 		return
@@ -139,6 +140,14 @@ func handlePhotoDelete(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		PRID, Idx, Fname = parsePhotoURL(pr.Img6)
 		tmpURL = pr.Img6
 		pr.Img6 = ""
+	case 7:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img7)
+		tmpURL = pr.Img7
+		pr.Img7 = ""
+	case 8:
+		PRID, Idx, Fname = parsePhotoURL(pr.Img8)
+		tmpURL = pr.Img8
+		pr.Img8 = ""
 	}
 
 	if d.ID != PRID || d.SUBID != Idx {
@@ -248,7 +257,7 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//---------------------------------------------------------
 	// Reject if we didn't get everything we need...
 	//---------------------------------------------------------
-	if !foundReq || !foundImg || req.PRID != d.ID || fname != req.Filename || req.Idx < 1 || req.Idx > 6 {
+	if !foundReq || !foundImg || req.PRID != d.ID || fname != req.Filename || req.Idx < 1 || req.Idx > MaxPhotoIndex {
 		var reasons string
 		if !foundReq {
 			reasons += fmt.Sprintf("No request was found. ")
@@ -299,6 +308,10 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		pr.Img5 = imageURL
 	case 6:
 		pr.Img6 = imageURL
+	case 7:
+		pr.Img7 = imageURL
+	case 8:
+		pr.Img8 = imageURL
 	}
 	if err = db.UpdateProperty(r.Context(), &pr); err != nil {
 		e := fmt.Errorf("%s: Error from db.UpdateProperty:  %s", funcname, err.Error())
