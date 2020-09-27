@@ -73,6 +73,8 @@ type PropertyGrid struct {
 	Img4                      string
 	Img5                      string
 	Img6                      string
+	Img7                      string
+	Img8                      string
 	CreateTime                util.JSONDateTime
 	CreatedBy                 int64
 	LastModifyTime            util.JSONDateTime

@@ -76,6 +76,8 @@ CREATE TABLE Property (
     Img4 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
     Img5 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
     Img6 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img7 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img8 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
 
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it

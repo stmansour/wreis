@@ -62,6 +62,8 @@ func TestProperty(ctx context.Context) {
 		Img4:                      "http://example.com/pic4.jpg",
 		Img5:                      "http://example.com/pic5.jpg",
 		Img6:                      "http://example.com/pic6.jpg",
+		Img7:                      "http://example.com/pic7.jpg",
+		Img8:                      "http://example.com/pic8.jpg",
 	}
 	var delid, id int64
 	if id, err = db.InsertProperty(ctx, &rs); err != nil {

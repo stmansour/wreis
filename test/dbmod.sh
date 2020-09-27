@@ -34,18 +34,20 @@ DBNAME="wreis"
 #     PRIMARY KEY (TID)
 # );
 # ALTER TABLE Property ADD FlowState BIGINT NOT NULL DEFAULT 0 AFTER RSLID;
+# ALTER TABLE Property ADD Img1 VARCHAR(2048) NOT NULL DEFAULT '' AFTER HQCountry;
+# ALTER TABLE Property ADD Img2 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img1;
+# ALTER TABLE Property ADD Img3 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img2;
+# ALTER TABLE Property ADD Img4 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img3;
+# ALTER TABLE Property ADD Img5 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img4;
+# ALTER TABLE Property ADD Img6 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img5;
 
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-ALTER TABLE Property ADD Img1 VARCHAR(2048) NOT NULL DEFAULT '' AFTER HQCountry;
-ALTER TABLE Property ADD Img2 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img1;
-ALTER TABLE Property ADD Img3 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img2;
-ALTER TABLE Property ADD Img4 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img3;
-ALTER TABLE Property ADD Img5 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img4;
-ALTER TABLE Property ADD Img6 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img5;
+ALTER TABLE Property ADD Img7 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img6;
+ALTER TABLE Property ADD Img8 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img7;
 LEOF
 
 #=====================================================
@@ -53,6 +55,7 @@ LEOF
 #=====================================================
 declare -a dbs=(
 	'ws/xb.sql'
+	'photo/xa.sql'
 )
 
 for f in "${dbs[@]}"

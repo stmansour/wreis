@@ -7,6 +7,7 @@
 
 var AppPics = {
     WaitDepth: 0,
+    NumImgs: 8,
 };
 
 function buildPropertyPhotosUIElements() {
@@ -31,7 +32,7 @@ function buildPropertyPhotosUIElements() {
 
 function AwaitImagePanelRenderComplete() {
     var done = true;
-    for (var i = 1; i <= 6; i++) {
+    for (var i = 1; i <= AppPics.NumImgs; i++) {
         var s = 'FileUpload' + i;
         var x = document.getElementById(s);
         if (x == null) {
@@ -150,6 +151,32 @@ function SetUpImageCatchers() {
         filePath6.innerHTML = "uploading " + fileName6;
         w2ui.propertyForm.record.Img6 = fileName6;
         SavePhotoToServer(fileName6,6,fileupload6.files[0]);
+    };
+
+    var fileupload7 = document.getElementById("FileUpload7");
+    var filePath7 = document.getElementById("spnFilePath7");
+    var image7 = document.getElementById("phototable7");
+    image7.onclick = function() {
+        fileupload7.click();
+    };
+    fileupload7.onchange = function() {
+        var fileName7 = fileupload7.value.split('\\')[fileupload7.value.split('\\').length - 1];
+        filePath7.innerHTML = "uploading " + fileName7;
+        w2ui.propertyForm.record.Img7 = fileName7;
+        SavePhotoToServer(fileName7,7,fileupload7.files[0]);
+    };
+
+    var fileupload8 = document.getElementById("FileUpload8");
+    var filePath8 = document.getElementById("spnFilePath8");
+    var image8 = document.getElementById("phototable8");
+    image8.onclick = function() {
+        fileupload8.click();
+    };
+    fileupload8.onchange = function() {
+        var fileName8 = fileupload8.value.split('\\')[fileupload8.value.split('\\').length - 1];
+        filePath8.innerHTML = "uploading " + fileName8;
+        w2ui.propertyForm.record.Img8 = fileName8;
+        SavePhotoToServer(fileName8,8,fileupload8.files[0]);
     };
 }
 

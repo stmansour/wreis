@@ -94,7 +94,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Property
 	//==========================================
-	flds = "PRID,ROLID,RSLID,FlowState,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,TermRemainingOnLease,TermRemainingOnLeaseUnits,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,Img1,Img2,Img3,Img4,Img5,Img6,CreateTS,CreateBy,LastModTime,LastModBy"
+	flds = "PRID,ROLID,RSLID,FlowState,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,TermRemainingOnLease,TermRemainingOnLeaseUnits,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,Img1,Img2,Img3,Img4,Img5,Img6,Img7,Img8,CreateTS,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["Property"] = flds
 	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property where PRID=?")
 	Errcheck(err)
