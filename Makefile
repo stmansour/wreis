@@ -16,4 +16,3 @@ package:
 
 all: clean wreis package test
 	echo "Completed"
-	cat test/testreport.txt
