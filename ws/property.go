@@ -237,6 +237,13 @@ type GetProperty struct {
 	Record PropertyGrid `json:"record"`
 }
 
+// StateFilter captures the filter data from the propertyGrid toolbar that
+// indicates how the properties should be filtered by State
+//--------------------------------------------------------------------------
+type StateFilter struct {
+	States []int64 `json:"statefilter"`
+}
+
 //-----------------------------------------------------------------------------
 //##########################################################################################################################################################
 //-----------------------------------------------------------------------------
@@ -287,6 +294,29 @@ func SvcSearchProperty1(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	util.Console("Entered %s\n", funcname)
 	var g SearchPropertyResponse
 	var err error
+	var sf StateFilter
+	var statefltr string
+
+	if strings.Index(d.data, "statefilter") >= 0 {
+		util.Console("Unmarshal statefilter:  d.data = %s\n", d.data)
+		err = json.Unmarshal([]byte(d.data), &sf)
+		if err != nil {
+			e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
+			SvcErrorReturn(w, e)
+			return
+		}
+		if len(sf.States) > 0 {
+			statefltr = " FLOWSTATE IN ("
+			for j := 0; j < len(sf.States); j++ {
+				statefltr += fmt.Sprintf("%d", sf.States[j])
+				if j+1 < len(sf.States) {
+					statefltr += ","
+				}
+			}
+			statefltr += ")"
+		}
+		util.Console("len(sf.States) = %d\n", len(sf.States))
+	}
 
 	whr := ""
 	order := `Property.Name ASC` // default ORDER
@@ -296,9 +326,16 @@ func SvcSearchProperty1(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	HandleBlankSearchField(d, propDefaultFields)
 	util.Console("AFTER HandleBlankSearchField:  len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
 	whereClause, orderClause := GetSearchAndSortSQL(d, propFieldsMap)
+	if len(statefltr) > 0 {
+		if len(whereClause) > 0 {
+			whereClause += " AND "
+		}
+		whereClause += statefltr
+	}
 	if len(whereClause) > 0 {
 		whr += "WHERE " + whereClause
 	}
+	util.Console("whereClause = %s\n", whereClause)
 	if len(orderClause) > 0 {
 		order = orderClause
 	}
@@ -442,95 +479,6 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 	)
 	return q, err
 }
-
-// // SvcSearchProperty generates a report of all Property defined business d.BID
-// // wsdoc {
-// //  @Title  Search Property
-// //	@URL /v1/Property/[:GID]
-// //  @Method  POST
-// //	@Synopsis Search Property
-// //  @Descr  Search all Property and return those that match the Search Logic.
-// //  @Descr  The search criteria includes start and stop dates of interest.
-// //	@Input WebGridSearchRequest
-// //  @Response PropertySearchResponse
-// // wsdoc }
-// //-----------------------------------------------------------------------------
-// func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
-// 	funcname := "SvcSearchProperty"
-// 	util.Console("Entered %s\n", funcname)
-//
-// 	var g SearchPropertyResponse
-// 	var err error
-//
-// 	//---------------------------------------------
-// 	// We'll grab all fields for the properties
-// 	//---------------------------------------------
-// 	q := fmt.Sprintf("SELECT %s FROM Property ", db.Wdb.DBFields["Property"]) // the fields we want
-//
-// 	// any WHERE clause work store in qw
-// 	qw := "" // for now, no WHERE clause
-// 	if len(d.wsSearchReq.Search) > 0 {
-// 		qw = "WHERE "
-// 		for i := 0; i < len(d.wsSearchReq.Search); i++ {
-// 			util.Console("%d. %#v\n", i, d.wsSearchReq.Search[i])
-// 			qw +=
-// 		}
-// 	}
-//
-// 	q += " ORDER BY "
-// 	order := "PRID ASC" // default ORDER
-// 	if len(d.wsSearchReq.Sort) > 0 {
-// 		for i := 0; i < len(d.wsSearchReq.Sort); i++ {
-// 			if i > 0 {
-// 				q += ","
-// 			}
-// 			q += d.wsSearchReq.Sort[i].Field + " " + d.wsSearchReq.Sort[i].Direction
-// 		}
-// 	} else {
-// 		q += order
-// 	}
-// 	// now set up the offset and limit
-// 	q += fmt.Sprintf(" LIMIT %d OFFSET %d", d.wsSearchReq.Limit, d.wsSearchReq.Offset)
-// 	g.Total, err = db.GetRowCountRaw("Property", "", qw)
-// 	if err != nil {
-// 		util.Console("Error from db.GetRowCountRaw: %s\n", err.Error())
-// 		SvcErrorReturn(w, err)
-// 		return
-// 	}
-//
-// 	util.Console("\nQuery = %s\n\n", q)
-// 	rows, err := db.Wdb.DB.Query(q)
-// 	if err != nil {
-// 		util.Console("Error from DB Query: %s\n", err.Error())
-// 		SvcErrorReturn(w, err)
-// 		return
-// 	}
-// 	defer rows.Close()
-//
-// 	i := int64(d.wsSearchReq.Offset)
-// 	count := 0
-// 	for rows.Next() {
-// 		var q PropertyGrid
-// 		var p db.Property
-// 		if err = db.ReadProperties(rows, &p); err != nil {
-// 			util.Console("%s.  Error reading Person: %s\n", funcname, err.Error())
-// 		}
-// 		util.MigrateStructVals(&p, &q)
-// 		q.Recid = p.PRID
-// 		g.Records = append(g.Records, q)
-// 		count++ // update the count only after adding the record
-// 		if count >= d.wsSearchReq.Limit {
-// 			break // if we've added the max number requested, then exit
-// 		}
-// 		i++
-// 	}
-//
-// 	util.Console("g.Total = %d\n", g.Total)
-// 	w.Header().Set("Content-Type", "application/json")
-// 	g.Status = "success"
-// 	SvcWriteResponse(&g, w)
-//
-// }
 
 // deleteProperty deletes a payment type from the database
 // wsdoc {

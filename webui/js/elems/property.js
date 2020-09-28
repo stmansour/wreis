@@ -13,6 +13,7 @@ var propData = {
     bRentStepsLoaded: false,    // "  same as above for RentSteps
     bRenewOptionsLoaded: false, // "  same as above for RenewOptions
     bTrafficLoaded: false,      // " for Traffic
+    statefilter: [1,2,3,4,5,6], // how to filter properties  (1-6) = open, (7) = closed
 };
 
 function initializePropertyRecord() {
@@ -96,7 +97,7 @@ function buildPropertyUIElements() {
             selectColumn    : false,
             expandColumn    : false,
             toolbarEdit     : false,
-            toolbarSearch   : false,
+            toolbarSearch   : true,
             toolbarInput    : true,
             searchAll       : false,
             toolbarReload   : true,
@@ -206,13 +207,45 @@ function buildPropertyUIElements() {
             // console.log('propertyGrid.onRefresh')
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
-        onLoad: function(/*event*/) {
+        onLoad: function(event) {
+            event.onComplete = function(event) {
+                propData.statefilter = [1,2,3,4,5,6];
+                propertySetPostData();
+            };
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
         onSearch: function(event) {
             console.log('onSearch event fired. event = ' + event);
         }
     });
+
+    w2ui.propertyGrid.toolbar.add([
+        { type: 'break' },
+        { type: 'radio', id: 'openProperties', group: '1', text: 'Open', /* icon: 'fa fa-star',*/ checked: true },
+        { type: 'radio', id: 'closedProperties', group: '1', text: 'Closed', /*icon: 'fa fa-heart'*/ },
+        { type: 'radio', id: 'allProperties', group: '1', text: 'All', /*icon: 'fa fa-heart'*/ },
+    ]);
+
+    w2ui.propertyGrid.toolbar.onClick = function(event) {
+        event.onComplete = function (event) {
+            var found = false;
+            switch (event.item.id) {
+            case "openProperties": found=true; propData.statefilter = [1,2,3,4,5,6]; break;
+            case "closedProperties": found=true; propData.statefilter = [7]; break;
+            case "allProperties": found=true; propData.statefilter = [1,2,3,4,5,6,7]; break;
+            }
+            if (found) {
+                propertySetPostData();
+                w2ui.propertyGrid.reload();
+            }
+        };
+    };
+
+    function propertySetPostData() {
+        w2ui.propertyGrid.postData = {
+            statefilter: propData.statefilter,
+        };
+    }
 
     // create a layout.
     //  top    - toolbar
@@ -478,8 +511,10 @@ function savePropertyForm() {
     //-----------------------------------------
     var params = {
         cmd: "save",
-        record: rec
+        record: rec,
+        states: [0,0,0,0,0,0,0]
     };
+
     var dat = JSON.stringify(params);
     var url = '/v1/property/' + rec.PRID;
 
