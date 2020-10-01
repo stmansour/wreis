@@ -26,6 +26,12 @@ type PrepSQL struct {
 	UpdateRenewOption *sql.Stmt
 	DeleteRenewOption *sql.Stmt
 
+	GetStateInfo    *sql.Stmt
+	GetAllStateInfo *sql.Stmt
+	InsertStateInfo *sql.Stmt
+	UpdateStateInfo *sql.Stmt
+	DeleteStateInfo *sql.Stmt
+
 	GetRenewOptions           *sql.Stmt
 	GetRenewOptionsItems      *sql.Stmt
 	InsertRenewOptions        *sql.Stmt

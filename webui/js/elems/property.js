@@ -1,6 +1,7 @@
 /*global
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
+    propertyStateOnLoad,setTimeout,
 */
 
 "use strict";
@@ -14,6 +15,8 @@ var propData = {
     bRenewOptionsLoaded: false, // "  same as above for RenewOptions
     bTrafficLoaded: false,      // " for Traffic
     statefilter: [1,2,3,4,5,6], // how to filter properties  (1-6) = open, (7) = closed
+    formWidth: 575,             // how wide is the entry / edit form
+    numStates: 7,               // states go from 1 to 7
 };
 
 function initializePropertyRecord() {
@@ -35,6 +38,7 @@ function initializePropertyRecord() {
             LotSizeUnits: 0,
             CapRate: 0,
             AvgCap: 0,
+            FlowState: 1,  // initialize to State = 1
             FLAGS: 0,
             Ownership: 0,
             TenantTradeName: "",
@@ -126,6 +130,7 @@ function buildPropertyUIElements() {
             {field: 'CapRate',              size: '60px', caption: 'CapRate', sortable: true, hidden: true},
             {field: 'AvgCap',               size: '60px', caption: 'AvgCap', sortable: true, hidden: true},
             {field: 'BuildDate',            size: '60px', caption: 'BuildDate', sortable: true, hidden: true},
+            {field: 'FlowState',            size: '60px', caption: 'FlowState', sortable: true, hidden: true},
             {field: 'FLAGS',                size: '60px', caption: 'FLAGS', sortable: true, hidden: true},
             {field: 'Ownership',            size: '60px', caption: 'Ownership', sortable: true, hidden: true},
             {field: 'TenantTradeName',      size: '60px', caption: 'TenantTradeName', sortable: true, hidden: true},
@@ -167,9 +172,15 @@ function buildPropertyUIElements() {
         ],
         onClick: function(event) {
             event.onComplete = function (event) {
+                var f = w2ui.propertyForm;
                 var rec = w2ui.propertyGrid.get(event.recid);
                 w2ui.propertyForm.recid = rec.PRID;
                 propData.PRID = rec.PRID;
+
+                f.url = "/v1/property/"+rec.PRID;
+                f.refresh();
+                f.reload();  // get this going as quickly as possible
+
                 propData.RSLID = rec.RSLID;
                 propData.ROLID = rec.ROLID;
                 propData.bPropLoaded = false;
@@ -177,7 +188,12 @@ function buildPropertyUIElements() {
                 propData.bRenewOptionsLoaded = false;
                 propData.bTrafficLoaded = false;
                 w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
-                setPropertyLayout('proptabGeneral');
+                var l = w2ui.propertyFormLayout.get('main');
+                if (typeof l.tabs != "undefined"){
+                    if (typeof l.tabs.name == "string") {
+                        l.tabs.click('proptabState');
+                    }
+                }
             };
         },
         onRequest: function(event) {
@@ -192,16 +208,17 @@ function buildPropertyUIElements() {
             f.refresh();
             propData.PRID = 0;  // new entry
             w2ui.propertyFormLayout.content('main', w2ui.propertyForm);
-            if (typeof f.tabs != "undefined"){
-                if (typeof f.tabs.name == "string") {
-                    f.tabs.click('tab1');
-                }
-            }
             w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
             w2ui.toplayout.content('right', w2ui.propertyFormLayout);
-            w2ui.toplayout.sizeTo('right', 500);
+            w2ui.toplayout.sizeTo('right', propData.formWidth);
             w2ui.toplayout.render();
             w2ui.toplayout.show('right', true);
+            var l = w2ui.propertyFormLayout.get('main');
+            if (typeof l.tabs != "undefined"){
+                if (typeof l.tabs.name == "string") {
+                    l.tabs.click('proptabGeneral');
+                }
+            }
         },
         onRefresh: function(/*event*/) {
             // console.log('propertyGrid.onRefresh')
@@ -291,6 +308,7 @@ function buildPropertyUIElements() {
                     style: "padding-top: 10px;",
                     active: 'proptabGeneral',
                     tabs: [
+                        { id: 'proptabState', caption: 'State' },
                         { id: 'proptabGeneral', caption: 'General' },
                         { id: 'proptabRentSteps', caption: 'Rent Steps' },
                         { id: 'proptabRenewOptions', caption: 'Renew Options' },
@@ -303,6 +321,10 @@ function buildPropertyUIElements() {
                     onClick: function (event) {
                         // console.log('event.target = ' + event.target);
                         switch (event.target) {
+                            case "proptabState":
+                            setPropertyLayout(event.target);
+                            break;
+
                             case "proptabGeneral":
                             setPropertyLayout(event.target);
                             break;
@@ -358,6 +380,7 @@ function buildPropertyUIElements() {
             {field: 'CapRate',              type: 'percent',  required: false},
             {field: 'AvgCap',               type: 'percent',  required: false},
             {field: 'BuildDate',            type: 'date', required: false},
+            {field: 'FlowState',            type: 'hidden†', required: false},
             {field: 'FLAGS',                type: 'text', required: false},
             {field: 'Ownership',            type: 'hidden', required: false},
             {field: 'TenantTradeName',      type: 'text', required: false},
@@ -430,6 +453,7 @@ function buildPropertyUIElements() {
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
 
                 propData.bPropLoaded = true;
+                propertyStateOnLoad(); // need to call this now that we know the state
             };
         },
     });
@@ -548,6 +572,12 @@ function setPropertyLayout(tab) {
 
     switch (tab) {
 
+    case "proptabState":
+        w2ui.propertyFormLayout.load('main', '/static/html/formState.html', null,propertyStateOnLoad);
+        setTimeout(propertyStateOnLoad, 100 );
+        // setTimeout(propertyStateOnLoad, 1000 );
+        break;
+
     case "proptabGeneral":
         if (propData.bPropLoaded) {
             w2ui.propertyForm.url = '';
@@ -601,6 +631,6 @@ function setPropertyLayout(tab) {
 function showForm() {
     // SHOW the right panel now
     w2ui.toplayout.content('right', w2ui.propertyFormLayout);
-    w2ui.toplayout.sizeTo('right', 500);
+    w2ui.toplayout.sizeTo('right', propData.formWidth);
     w2ui.toplayout.show('right', true);
 }

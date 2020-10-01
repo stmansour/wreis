@@ -23,6 +23,7 @@ relink:
 
 test: dbtest
 	@touch fail
+	mysql --no-defaults wreis < ../schema/db.sql
 	./dbtest
 	@echo "*** TEST completed in ${THISDIR} ***"
 	@rm -f fail

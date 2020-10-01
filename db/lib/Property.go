@@ -177,7 +177,7 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.Img6,
 		a.Img7,
 		a.Img8,
-		a.CreateBy,
+		sess.UID,
 		sess.UID,
 	}
 

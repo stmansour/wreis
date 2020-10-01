@@ -18,7 +18,7 @@ type Traffic struct {
 	Description string    // Descriptionion comment:  "years 1 - 2" etc.
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
-	CreateTime    time.Time // when was this record created
+	CreateTime  time.Time // when was this record created
 	CreateBy    int64     // id of user that created it
 }
 
@@ -131,7 +131,7 @@ func InsertTraffic(ctx context.Context, a *Traffic) (int64, error) {
 		a.FLAGS,
 		a.Count,
 		a.Description,
-		a.CreateBy,
+		sess.UID,
 		sess.UID,
 	}
 	var err error

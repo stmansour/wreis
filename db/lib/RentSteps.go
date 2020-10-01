@@ -15,7 +15,7 @@ type RentSteps struct {
 	FLAGS       uint64     // 1<<0 = 0 means count based, 1 means date based
 	LastModTime time.Time  // when was the record last written
 	LastModBy   int64      // id of user that did the modify
-	CreateTime    time.Time  // when was this record created
+	CreateTime  time.Time  // when was this record created
 	CreateBy    int64      // id of user that created it
 	RS          []RentStep // associated slice of RentStep records
 }
@@ -133,7 +133,7 @@ func InsertRentSteps(ctx context.Context, a *RentSteps) (int64, error) {
 	}
 	fields := []interface{}{
 		a.FLAGS,
-		a.CreateBy,
+		sess.UID,
 		sess.UID,
 	}
 	a.CreateBy, a.LastModBy, a.RSLID, err = genericInsert(ctx, "RentSteps", Wdb.Prepstmt.InsertRentSteps, fields, a)

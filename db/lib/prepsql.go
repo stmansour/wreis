@@ -193,4 +193,21 @@ func BuildPreparedStatements() {
 	Wdb.Prepstmt.DeleteTrafficItems, err = Wdb.DB.Prepare("DELETE from Traffic WHERE PRID=?")
 	Errcheck(err)
 
+	//==========================================
+	// StateInfo
+	//==========================================
+	flds = "SIID,PRID,InitiatorUID,InitiatorDt,ApproverUID,ApproverDt,FlowState,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
+	Wdb.DBFields["StateInfo"] = flds
+	Wdb.Prepstmt.GetStateInfo, err = Wdb.DB.Prepare("SELECT " + flds + " FROM StateInfo where SIID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.GetAllStateInfo, err = Wdb.DB.Prepare("SELECT " + flds + " FROM StateInfo where PRID=?")
+	Errcheck(err)
+	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
+	Wdb.Prepstmt.InsertStateInfo, err = Wdb.DB.Prepare("INSERT INTO StateInfo (" + s1 + ") VALUES(" + s2 + ")")
+	Errcheck(err)
+	Wdb.Prepstmt.UpdateStateInfo, err = Wdb.DB.Prepare("UPDATE StateInfo SET " + s3 + " WHERE SIID=?")
+	Errcheck(err)
+	Wdb.Prepstmt.DeleteStateInfo, err = Wdb.DB.Prepare("DELETE from StateInfo WHERE SIID=?")
+	Errcheck(err)
+
 }

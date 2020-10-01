@@ -19,7 +19,7 @@ type RentStep struct {
 	FLAGS       uint64    // 1<<0 :  0 -> use Opt text, 1 -> use date
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
-	CreateTime    time.Time // when was this record created
+	CreateTime  time.Time // when was this record created
 	CreateBy    int64     // id of user that created it
 }
 

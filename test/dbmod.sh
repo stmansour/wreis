@@ -43,16 +43,34 @@ DBNAME="wreis"
 # ALTER TABLE Property ADD Img7 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img6;
 # ALTER TABLE Property ADD Img8 VARCHAR(2048) NOT NULL DEFAULT '' AFTER Img7;
 
+# ALTER TABLE Property CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+# ALTER TABLE RenewOption CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+# ALTER TABLE RenewOptions CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+# ALTER TABLE RentStep CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+# ALTER TABLE RentSteps CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+# CREATE TABLE StateInfo (
+#     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID
+#     PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
+#     FLAGS BIGINT NOT NULL DEFAULT 0,                        --
+#     FlowState BIGINT NOT NULL DEFAULT 0,                    --
+#     InitiatorUID BIGINT NOT NULL DEFAULT 0,                 --
+#     ApproverUID BIGINT NOT NULL DEFAULT 0,                 --
+#     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
+#     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+#     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,-- when was this record created
+#     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+#     PRIMARY KEY (SIID)
+# )
+
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-ALTER TABLE Property CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE RenewOption CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE RenewOptions CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE RentStep CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE RentSteps CHANGE CreateTS CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+    ALTER TABLE StateInfo ADD InitiatorDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00' AFTER InitiatorUID;
+    ALTER TABLE StateInfo ADD ApproverDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00' AFTER ApproverUID;
+
 LEOF
 
 #=====================================================

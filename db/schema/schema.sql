@@ -162,3 +162,19 @@ CREATE TABLE Traffic (
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (TID)
 );
+
+CREATE TABLE StateInfo (
+    SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID
+    PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        --
+    FlowState BIGINT NOT NULL DEFAULT 0,                    --
+    InitiatorUID BIGINT NOT NULL DEFAULT 0,                 --
+    InitiatorDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    ApproverUID BIGINT NOT NULL DEFAULT 0,                 --
+    ApproverDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
+    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,-- when was this record created
+    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    PRIMARY KEY (SIID)
+);

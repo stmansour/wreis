@@ -1,0 +1,159 @@
+<html>
+
+<head>
+    <style>
+        .alpha td {
+            border: 0px solid #888888;
+            color: #777777;
+            text-align: center;
+        }
+        td {
+            font: 11px Arial, sans-serif;
+        }
+        body {
+            background-color: #bbbbbb;
+        }
+        .stateLabelCell td {
+            color: #777777;
+        }
+    </style>
+
+</head>
+
+<body onload="propertyStateOnLoad()">
+    <div style="background-color: #e0e0e0;">
+        <table border="0" cellpadding="4" align="center" id="phototable" cellspacing="10">
+            <tr>
+                <td valign="top" align="left" style="background-color: #f8f8f8;" id="stateLabelCell1">
+                    <p style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo1">1<br></span>
+                        <span style="font-size:11pt;" id="stateStepName1">New Record Entry</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell1">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell1">Initiated By:</td><td><span id="state1CreateUser1"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell1">Last Update:</td><td><span id="state1LastMod1"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell1">Approved By:</td><td><span id="state1ApproveUser1"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell1">Approved On:</td><td><span id="state1ApprovedTime1"></span></td></tr>
+                        </table>
+                    </p>
+                    <!-- <p>
+                        <input type="text" id="approverEmail1" size="35"><button>Advance To First Task List</button>
+                    </p> -->
+                </td>
+            </tr>
+            <tr>
+                <td align="left" valign="top" style="background-color: #f8f8f8;" id="stateLabelCell2">
+                    <p  style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo2">2<br></span>
+                        <span style="font-size:11pt;" id="stateStepName2">First Task List</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell2">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell2">Initiated By:</td><td><span id="state2CreateUser2"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell2">Last Update:</td><td><span id="state2LastMod2"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell2">Approved By:</td><td><span id="state2ApproveUser2"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell2">Approved On:</td><td><span id="state2ApprovedTime2"></span></td></tr>
+                        </table>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" valign="top" style="background-color: #f8f8f8;" id="stateLabelCell3">
+                    <p  style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo3">3<br></span>
+                        <span style="font-size:11pt;" id="stateStepName3">Marketing Package</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell3">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell3">Initiated By:</td><td><span id="state2CreateUser3"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell3">Last Update:</td><td><span id="state2LastMod3"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell3">Approved By:</td><td><span id="state2ApproveUser3"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell3">Approved On:</td><td><span id="state2ApprovedTime3"></span></td></tr>
+                        </table>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" valign="top" style="background-color: #f8f8f8;" id="stateLabelCell4">
+                    <p  style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo4">4<br></span>
+                        <span style="font-size:11pt;" id="stateStepName4">Ready To List</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell4">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell4">Initiated By:</td><td><span id="state2CreateUser4"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell4">Last Update:</td><td><span id="state2LastMod4"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell4">Approved By:</td><td><span id="state2ApproveUser4"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell4">Approved On:</td><td><span id="state2ApprovedTime4"></span></td></tr>
+                        </table>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" valign="top" style="background-color: #f8f8f8;" id="stateLabelCell5">
+                    <p  style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo5">5<br></span>
+                        <span style="font-size:11pt;" id="stateStepName5">Listed</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell5">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell5">Initiated By:</td><td><span id="state2CreateUser5"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell5">Last Update:</td><td><span id="state2LastMod5"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell5">Approved By:</td><td><span id="state2ApproveUser5"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell5">Approved On:</td><td><span id="state2ApprovedTime5"></span></td></tr>
+                        </table>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" valign="top" style="background-color: #f8f8f8;" id="stateLabelCell6">
+                    <p  style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo6">6<br></span>
+                        <span style="font-size:11pt;" id="stateStepName6">Under Contract</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell6">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell6">Initiated By:</td><td><span id="state2CreateUser6"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell6">Last Update:</td><td><span id="state2LastMod6"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell6">Approved By:</td><td><span id="state2ApproveUser6"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell6">Approved On:</td><td><span id="state2ApprovedTime6"></span></td></tr>
+                        </table>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td align="left" valign="top" style="background-color: #f8f8f8;" id="stateLabelCell7">
+                    <p  style="color: #777;font-weight:bold">
+                        <span style="font-size:18pt;" id="stateStepNo7">7<br></span>
+                        <span style="font-size:11pt;" id="stateStepName7">Closed</span>
+                    </p>
+                </td>
+                <td valign="top" id="stateDataCell7">
+                    <p style="color: #444;">
+                        <table>
+                        <tr><td align="right" name="stateLabelCell7">Initiated By:</td><td><span id="state2CreateUser7"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell7">Last Update:</td><td><span id="state2LastMod7"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell7">Approved By:</td><td><span id="state2ApproveUser7"></span></td></tr>
+                        <tr><td align="right" name="stateLabelCell7">Approved On:</td><td><span id="state2ApprovedTime7"></span></td></tr>
+                        </table>
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

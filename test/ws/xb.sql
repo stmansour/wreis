@@ -365,6 +365,39 @@ INSERT INTO `RentSteps` VALUES (1,0,'2020-07-16 08:34:53',0,'2020-07-16 08:34:53
 UNLOCK TABLES;
 
 --
+-- Table structure for table `StateInfo`
+--
+
+DROP TABLE IF EXISTS `StateInfo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StateInfo` (
+  `SIID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `PRID` bigint(20) NOT NULL DEFAULT '0',
+  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
+  `FlowState` bigint(20) NOT NULL DEFAULT '0',
+  `InitiatorUID` bigint(20) NOT NULL DEFAULT '0',
+  `InitiatorDt` date NOT NULL DEFAULT '1970-01-01',
+  `ApproverUID` bigint(20) NOT NULL DEFAULT '0',
+  `ApproverDt` date NOT NULL DEFAULT '1970-01-01',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`SIID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `StateInfo`
+--
+
+LOCK TABLES `StateInfo` WRITE;
+/*!40000 ALTER TABLE `StateInfo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `StateInfo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Traffic`
 --
 
@@ -404,4 +437,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-28 13:08:42
+-- Dump completed on 2020-09-30 18:01:01

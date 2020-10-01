@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"wreis/session"
 )
 
 // RenewOption defines a date and a rent amount for a property. A RenewOption record
@@ -18,7 +19,7 @@ type RenewOption struct {
 	FLAGS       uint64    // 1<<0 :  0 -> count is valid, 1 -> Dt is valid
 	LastModTime time.Time // when was the record last written
 	LastModBy   int64     // id of user that did the modify
-	CreateTime    time.Time // when was this record created
+	CreateTime  time.Time // when was this record created
 	CreateBy    int64     // id of user that created it
 }
 
@@ -69,6 +70,10 @@ func GetRenewOption(ctx context.Context, id int64) (RenewOption, error) {
 // any error encountered or nil if no error
 //-----------------------------------------------------------------------------
 func InsertRenewOption(ctx context.Context, a *RenewOption) (int64, error) {
+	sess, ok := session.GetSessionFromContext(ctx)
+	if !ok {
+		return int64(0), ErrSessionRequired
+	}
 	// transaction... context
 	fields := []interface{}{
 		a.ROLID,
@@ -76,8 +81,8 @@ func InsertRenewOption(ctx context.Context, a *RenewOption) (int64, error) {
 		a.Opt,
 		a.Rent,
 		a.FLAGS,
-		a.CreateBy,
-		a.LastModBy,
+		sess.UID,
+		sess.UID,
 	}
 	var err error
 	a.CreateBy, a.LastModBy, a.ROID, err = genericInsert(ctx, "RenewOption", Wdb.Prepstmt.InsertRenewOption, fields, a)

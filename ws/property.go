@@ -36,6 +36,7 @@ type PropertyGrid struct {
 	CapRate           float64
 	AvgCap            float64
 	BuildDate         util.JSONDateTime
+	FlowState         int64
 	//======================================================================
 	// FLAGS
 	//     1<<0  Drive Through?  0 = no, 1 = yes
@@ -103,6 +104,7 @@ var propFieldsMap = map[string][]string{
 	"CapRate":                   {"Property.CapRate"},
 	"AvgCap":                    {"Property.AvgCap"},
 	"BuildDate":                 {"Property.BuildDate"},
+	"FlowState":                 {"Property.FlowState"},
 	"FLAGS":                     {"Property.FLAGS"},
 	"Ownership":                 {"Property.Ownership"},
 	"TenantTradeName":           {"Property.TenantTradeName"},
@@ -161,6 +163,7 @@ var propQuerySelectFields = []string{
 	"Property.CapRate",
 	"Property.AvgCap",
 	"Property.BuildDate",
+	"Property.FlowState",
 	"Property.FLAGS",
 	"Property.Ownership",
 	"Property.TenantTradeName",
@@ -437,6 +440,7 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.CapRate,
 		&q.AvgCap,
 		&q.BuildDate,
+		&q.FlowState,
 		&q.FLAGS,
 		&q.Ownership,
 		&q.TenantTradeName,
