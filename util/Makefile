@@ -1,6 +1,6 @@
-DIRS=lib
+DIRS=lib utiltest
 
-db:
+util:
 	for dir in $(DIRS); do make -C $$dir;done
 
 clean:

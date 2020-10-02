@@ -169,9 +169,9 @@ CREATE TABLE StateInfo (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        --
     FlowState BIGINT NOT NULL DEFAULT 0,                    --
     InitiatorUID BIGINT NOT NULL DEFAULT 0,                 --
-    InitiatorDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    InitiatorDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
     ApproverUID BIGINT NOT NULL DEFAULT 0,                 --
-    ApproverDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    ApproverDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,-- when was this record created

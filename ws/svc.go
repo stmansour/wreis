@@ -139,6 +139,7 @@ var Svcs = []ServiceHandler{
 	{Cmd: "ping", AuthNRequired: false, Handler: SvcHandlerPing},
 	{Cmd: "rentsteps", AuthNRequired: true, Handler: SvcHandlerRentSteps},
 	{Cmd: "renewoptions", AuthNRequired: true, Handler: SvcHandlerRenewOptions},
+	{Cmd: "stateinfo", AuthNRequired: true, Handler: SvcHandlerStateInfo},
 	{Cmd: "traffic", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "trafficitems", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},

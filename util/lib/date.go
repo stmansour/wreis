@@ -11,17 +11,39 @@ func DateToString(t time.Time) string {
 	return t.Format("01/02/2006")
 }
 
+// RRDATEFMT, et al, are possible date formats
+const (
+	RRDATEFMT         = "01/02/06"
+	RRDATEFMT2        = "1/2/06"
+	RRDATEFMT3        = "1/2/2006"
+	RRDATEFMT4        = "01/02/2006"
+	RRDATEINPFMT      = "2006-01-02"
+	RRDATEFMTSQL      = RRDATEINPFMT
+	RRDATETIMESQL     = "2006-01-02 15:04:05"
+	RRJSUTCDATETIME   = "Mon, 02 Jan 2006 15:04:05 MST"
+	RRDATETIMEINPFMT  = "2006-01-02 15:04:05 MST"
+	RRDATETIMEFMT     = "2006-01-02T15:04:05Z"
+	RRDATETIMEW2UIFMT = "1/2/2006 3:04 pm"
+	RRDATEREPORTFMT   = "Jan 2, 2006"
+	RRDATETIMERPTFMT  = "Jan 2, 2006 3:04pm MST"
+	RRDATERECEIPTFMT  = "January 2, 2006"
+)
+
 // AcceptedDateFmts is the array of string formats that StringToDate accepts
 var AcceptedDateFmts = []string{
-	RRDATEINPFMT,
-	RRDATEFMT2,
 	RRDATEFMT,
+	RRDATEFMT2,
 	RRDATEFMT3,
+	RRDATEFMT4,
+	RRDATEINPFMT,
+	RRDATEFMTSQL,
+	RRDATETIMESQL,
 	RRJSUTCDATETIME,
-	RRDATETIMEW2UIFMT,
 	RRDATETIMEINPFMT,
 	RRDATETIMEFMT,
+	RRDATETIMEW2UIFMT,
 	RRDATEREPORTFMT,
+	RRDATETIMERPTFMT,
 	RRDATERECEIPTFMT,
 }
 
@@ -41,5 +63,19 @@ func StringToDate(s string) (time.Time, error) {
 			return Dt, nil
 		}
 	}
-	return Dt, fmt.Errorf("Date could not be decoded")
+	return Dt, fmt.Errorf("Date could not be decoded: %s", s)
+}
+
+// EqualDtToJSONDate compares a time.time to a JSONDate
+//----------------------------------------------------------------------------
+func EqualDtToJSONDate(dt *time.Time, jdt *JSONDate) bool {
+	d := time.Time(*jdt) // check for Date change
+	return d.Equal(d)
+}
+
+// EqualDtToJSONDateTime compares a time.time to a JSONDate
+//----------------------------------------------------------------------------
+func EqualDtToJSONDateTime(dt *time.Time, jdt *JSONDateTime) bool {
+	d := time.Time(*jdt) // check for Date change
+	return d.Equal(d)
 }

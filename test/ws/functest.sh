@@ -295,6 +295,49 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/trafficitems/1" "request" "${TFILES}${STEP}"  "Read_traffic"
 fi
+#------------------------------------------------------------------------------
+#  TEST h
+#
+#  Save Traffic
+#
+#  Scenario:
+#  login
+#  Read the traffic info from the db
+#
+#  Expected Results:
+#   1. Expecting 3 rent step items
+#   2. Write 4 rent steps back.  Only 1 change (added a new one)
+#------------------------------------------------------------------------------
+TFILES="h"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xh.sql
+    login
+    # read what we have
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Read-StateInfo"
+
+    # save a new one, modify one.  New one added is SIID 2
+    encodeRequest '{"cmd":"save","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":1,"InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":1,"SIID":1,"recid":1},{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":2,"InitiatorDt":"2020-10-01 10:23:45 UTC","InitiatorUID":211,"PRID":1,"SIID":-1,"recid":2}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Save-StateInfo"
+
+    # add a third
+    encodeRequest '{"cmd":"save","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":1,"InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":1,"SIID":1,"recid":1},{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":2,"InitiatorDt":"2020-10-01 10:23:45 UTC","InitiatorUID":211,"PRID":1,"SIID":2,"recid":2},{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"InitiatorDt":"2020-10-02 10:23:45 UTC","InitiatorUID":211,"PRID":1,"SIID":-2,"recid":2}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Save-StateInfo"
+
+    # read to make sure we have 3
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Read-StateInfo"
+
+    # remove the third
+    encodeRequest '{"cmd":"save","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":1,"InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":1,"SIID":1,"recid":1},{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":2,"InitiatorDt":"2020-10-01 10:23:45 UTC","InitiatorUID":211,"PRID":1,"SIID":2,"recid":2}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Save-StateInfo"
+
+    # read to make sure we have 2
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Read-StateInfo"
+
+fi
 
 stopWsrv
 echo "WREIS SERVER STOPPED"

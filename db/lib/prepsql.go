@@ -200,7 +200,7 @@ func BuildPreparedStatements() {
 	Wdb.DBFields["StateInfo"] = flds
 	Wdb.Prepstmt.GetStateInfo, err = Wdb.DB.Prepare("SELECT " + flds + " FROM StateInfo where SIID=?")
 	Errcheck(err)
-	Wdb.Prepstmt.GetAllStateInfo, err = Wdb.DB.Prepare("SELECT " + flds + " FROM StateInfo where PRID=?")
+	Wdb.Prepstmt.GetAllStateInfoItems, err = Wdb.DB.Prepare("SELECT " + flds + " FROM StateInfo where PRID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertStateInfo, err = Wdb.DB.Prepare("INSERT INTO StateInfo (" + s1 + ") VALUES(" + s2 + ")")

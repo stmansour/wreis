@@ -60,6 +60,45 @@ func GetStateInfo(ctx context.Context, id int64) (StateInfo, error) {
 	return a, ReadStateInfo(row, &a)
 }
 
+// GetAllStateInfoItems reads and returns a all StateInfo structures associated with
+// the supplied PRID
+//
+// INPUTS
+// ctx - db context
+// id - PRID of the property
+//
+// RETURNS
+// ErrSessionRequired if the session is invalid
+// nil if the session is valid
+//-----------------------------------------------------------------------------
+func GetAllStateInfoItems(ctx context.Context, id int64) ([]StateInfo, error) {
+	var err error
+	var a []StateInfo
+	if !ValidateSession(ctx) {
+		return a, ErrSessionRequired
+	}
+
+	fields := []interface{}{id}
+	stmt2, rows, err := getRowsFromDB(ctx, Wdb.Prepstmt.GetAllStateInfoItems, fields)
+	if err != nil {
+		return a, err
+	}
+	if stmt2 != nil {
+		defer stmt2.Close()
+	}
+	for i := 0; rows.Next(); i++ {
+		var x StateInfo
+		if err = ReadStateInfoItem(rows, &x); err != nil {
+			return a, err
+		}
+		a = append(a, x)
+	}
+	if err = rows.Err(); err != nil {
+		return a, err
+	}
+	return a, nil
+}
+
 // InsertStateInfo writes a new StateInfo record to the database
 //
 // INPUTS
