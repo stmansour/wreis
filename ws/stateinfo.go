@@ -18,19 +18,21 @@ import (
 
 // StateInfo is an individual member of the rent step list.
 type StateInfo struct {
-	Recid        int64             `json:"recid"`
-	SIID         int64             // unique id for this record
-	PRID         int64             // id of property to which this record belongs
-	InitiatorUID int64             // date/time this state was initiated
-	InitiatorDt  util.JSONDateTime // date/time this state was initiated
-	ApproverUID  int64             // date/time this state was approved
-	ApproverDt   util.JSONDateTime // date/time this state was approved
-	FlowState    int64             // state being described
-	FLAGS        uint64            // 1<<0 :  0 -> Opt is valid, 1 -> Dt is valid
-	LastModTime  util.JSONDateTime // when was the record last written
-	LastModBy    int64             // id of user that did the modify
-	CreateTime   util.JSONDateTime // when was this record created
-	CreateBy     int64             // id of user that created it
+	Recid         int64             `json:"recid"`
+	SIID          int64             // unique id for this record
+	PRID          int64             // id of property to which this record belongs
+	InitiatorUID  int64             // date/time this state was initiated
+	InitiatorDt   util.JSONDateTime // date/time this state was initiated
+	InitiatorName string            //
+	ApproverUID   int64             // date/time this state was approved
+	ApproverDt    util.JSONDateTime // date/time this state was approved
+	ApproverName  string            //
+	FlowState     int64             // state being described
+	FLAGS         uint64            // 1<<0 :  0 -> Opt is valid, 1 -> Dt is valid
+	LastModTime   util.JSONDateTime // when was the record last written
+	LastModBy     int64             // id of user that did the modify
+	CreateTime    util.JSONDateTime // when was this record created
+	CreateBy      int64             // id of user that created it
 }
 
 // SearchStateInfoResponse is the response data for a Rental Agreement Search
@@ -291,25 +293,53 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "getStateInfo"
 	util.Console("entered %s\n", funcname)
 	var g GetStateInfo
+	var mm = map[int64]int{}
+	var mmm = map[int64]UserInfo{}
 
-	// util.Console("%s: A\n", funcname)
 	a, err := db.GetAllStateInfoItems(r.Context(), d.ID)
 	if err != nil {
-		// util.Console("%s: B\n", funcname)
 		SvcErrorReturn(w, err)
 		return
 	}
-	// util.Console("%s: C.  num items = %d\n", funcname, len(a))
 	for i := 0; i < len(a); i++ {
 		var gg StateInfo
-		// util.Console("%s: C.1  a[i] = %#v\n", funcname, a[i])
 		util.MigrateStructVals(&a[i], &gg)
-		// util.Console("%s: C.2  gg = %#v\n", funcname, gg)
 		gg.Recid = gg.SIID
 		g.Records = append(g.Records, gg)
-		// util.Console("%s: C.3  len(g.Records) = %d\n", funcname, len(g.Records))
+
+		// Keep track of the users we need, we'll pull them down after the
+		// loop completes...
+		//-------------------------------------------------------------------
+		mm[gg.InitiatorUID] = 1
 	}
-	util.Console("%s: D\n", funcname)
+
+	for k := range mm {
+		var p UserInfo
+		if p, err = GetUserInfo(k); err != nil {
+			SvcErrorReturn(w, err)
+			return
+		}
+		mmm[k] = p
+	}
+
+	for i := 0; i < len(g.Records); i++ {
+		j := g.Records[i].ApproverUID
+		var ui UserInfo
+		var ok bool
+		if ui, ok = mmm[j]; !ok {
+			ui.FirstName = "?? unknown"
+			ui.LastName = "user ??"
+			mmm[j] = ui
+		}
+		g.Records[i].ApproverName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
+		j = g.Records[i].InitiatorUID
+		if ui, ok = mmm[j]; !ok {
+			ui.FirstName = "?? unknown"
+			ui.LastName = "user ??"
+			mmm[j] = ui
+		}
+		g.Records[i].InitiatorName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
+	}
 
 	g.Status = "success"
 	SvcWriteResponse(&g, w)
