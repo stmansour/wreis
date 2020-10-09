@@ -14,9 +14,11 @@ var propData = {
     bRentStepsLoaded: false,    // "  same as above for RentSteps
     bRenewOptionsLoaded: false, // "  same as above for RenewOptions
     bTrafficLoaded: false,      // " for Traffic
+    bStateLoaded: false,        // " for state info
     statefilter: [1,2,3,4,5,6], // how to filter properties  (1-6) = open, (7) = closed
     formWidth: 575,             // how wide is the entry / edit form
-    numStates: 7,               // states go from 1 to 7
+    numStates: 7,               // states go from 1 to 7 -- this is a full complement of sates, the states array may have less
+    states: [],                 // the server will be queried for these on existing properties, or filled with an inital state on new
 };
 
 function initializePropertyRecord() {
@@ -187,6 +189,7 @@ function buildPropertyUIElements() {
                 propData.bRentStepsLoaded = false;
                 propData.bRenewOptionsLoaded = false;
                 propData.bTrafficLoaded = false;
+                propData.bStateLoaded = false;
                 w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
                 var l = w2ui.propertyFormLayout.get('main');
                 if (typeof l.tabs != "undefined"){

@@ -4,24 +4,35 @@
 
 "use strict";
 
-// function buildPropertyStateUIElements() {
-//     $().w2layout({
-//         name: 'propertyStateFormLayout',
-//         padding: 0,
-//         panels: [
-//             { type: 'left',    size: 0,     hidden: true },
-//             { type: 'top',     size: 0,     hidden: true, content: 'top',  resizable: true, style: app.pstyle },
-//             { type: 'main',    size: '60%', hidden: false, content: 'main', resizable: true, style: app.pstyle },
-//             { type: 'preview', size: 0,     hidden: true,  content: 'PREVIEW'  },
-//             { type: 'bottom',  size: 50,    hidden: false, content: 'bottom', resizable: false, style: app.pstyle },
-//             { type: 'right',   size: 0,     hidden: true }
-//         ]
-//     });
-// }
-
-
-
 function propertyStateOnLoad() {
+    if (propData.bStateLoaded) {
+        updatePropertState();
+        return
+    }
+
+    var params = {
+        cmd: "get",
+    };
+    var dat = JSON.stringify(params);
+    var url = '/v1/stateinfo/' + propData.PRID;
+
+    return $.post(url, dat, null, "json")
+    .done(function(data) {
+        if (data.status === "error") {
+            w2ui.propertyGrid.error('ERROR: '+ data.message);
+            return;
+        }
+        propData.states = data.records;
+        propData.bStateLoaded = true;
+        updatePropertyState();
+    })
+    .fail(function(data){
+            w2ui.propertyGrid.error("Get states failed. " + data);
+    });
+
+}
+
+function updatePropertyState() {
     var greenText = "#11AA11";
     var greenBG = "#e0ffe0";
     var grayText = "#888888";
@@ -40,6 +51,26 @@ function propertyStateOnLoad() {
         color = (r.FlowState >= i ) ? "black" : grayText;
         setStateLabelColor(color,i);
     }
+    for (i = 0; i < propData.states.length; i++) {
+        var s = "";
+        var id;
+        if (propData.states[i].InitiatorUID > 0) {
+            s = propData.states[i].InitiatorName + '  (' + propData.states[i].InitiatorUID + ')';
+            id = "stateCreateUser" + propData.states[i].FlowState;
+            x = document.getElementById(id);
+            if (x != null) {
+                x.innerHTML = s;
+            }
+        }
+        if (propData.states[i].ApproverUID > 0) {
+            s = propData.states[i].ApproverName + '(' + propData.states[i].ApproverUID + ')';
+            id = "stateApproveUser" + propData.states[i].FlowState;
+            x = document.getElementById(id);
+            if (x != null) {
+                x.innerHTML = s;
+            }
+        }
+    }
 }
 
 function setStateColor(id,color) {
@@ -56,8 +87,8 @@ function setStateBGColor(id,color) {
     }
 }
 
-function setStateLabelColor(color,i) {
-    var x = document.getElementsByName("stateLabelCell"+i);
+function setStateLabelColor(color,j) {
+    var x = document.getElementsByName("stateLabelCell"+j);
     if (x == null) {return;}
     for (var i=0; i<x.length; i++) {
         x[i].style.color = color;

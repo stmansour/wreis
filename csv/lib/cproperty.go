@@ -58,7 +58,7 @@ const (
 	PRRentSteps                 = iota
 )
 
-// CanonicalPropertyList defines the cannonical array of ColumnDefs for the CSV
+// CanonicalPropertyList defines the canonical array of ColumnDefs for the CSV
 // import of Properties.
 //------------------------------------------------------------------------------
 var CanonicalPropertyList = []ColumnDef{

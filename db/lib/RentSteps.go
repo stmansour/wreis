@@ -137,6 +137,9 @@ func InsertRentSteps(ctx context.Context, a *RentSteps) (int64, error) {
 		sess.UID,
 	}
 	a.CreateBy, a.LastModBy, a.RSLID, err = genericInsert(ctx, "RentSteps", Wdb.Prepstmt.InsertRentSteps, fields, a)
+	if err != nil {
+		return a.RSLID, err
+	}
 	if err = insertRentStepsList(ctx, a); err != nil {
 		return a.RSLID, err
 	}

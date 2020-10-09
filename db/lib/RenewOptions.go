@@ -14,7 +14,7 @@ type RenewOptions struct {
 	FLAGS       uint64        // 1<<0
 	LastModTime time.Time     // when was the record last written
 	LastModBy   int64         // id of user that did the modify
-	CreateTime    time.Time     // when was this record created
+	CreateTime  time.Time     // when was this record created
 	CreateBy    int64         // id of user that created it
 	RO          []RenewOption // associated slice of RenewOption records
 }
@@ -99,7 +99,6 @@ func GetRenewOptionsItems(ctx context.Context, id int64) ([]RenewOption, error) 
 	}
 	return a, nil
 }
-
 
 // InsertRenewOptions writes a new RenewOptions record to the database
 //
