@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	db "wreis/db/lib"
+	"wreis/session"
 	util "wreis/util/lib"
 )
 
@@ -542,6 +544,27 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		if _, err = db.InsertProperty(r.Context(), &p); err != nil {
 			e := fmt.Errorf("%s: Error with db.CreateProperty:  %s", funcname, err.Error())
 			SvcErrorReturn(w, e)
+			return
+		}
+		//----------------------------------
+		// Now, save the initial state...
+		//----------------------------------
+		sess, ok := session.GetSessionFromContext(r.Context())
+		if !ok {
+			SvcErrorReturn(w, db.ErrSessionRequired)
+			return
+		}
+
+		now := time.Now()
+		var s = db.StateInfo{
+			PRID:         p.PRID,
+			InitiatorUID: sess.UID,
+			InitiatorDt:  now,
+			FlowState:    1,
+			FLAGS:        uint64(0),
+		}
+		if _, err := db.InsertStateInfo(r.Context(), &s); err != nil {
+			SvcErrorReturn(w, err)
 			return
 		}
 	} else {

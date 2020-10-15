@@ -298,15 +298,11 @@ fi
 #------------------------------------------------------------------------------
 #  TEST h
 #
-#  Save Traffic
+#  State Info
 #
 #  Scenario:
-#  login
-#  Read the traffic info from the db
 #
 #  Expected Results:
-#   1. Expecting 3 rent step items
-#   2. Write 4 rent steps back.  Only 1 change (added a new one)
 #------------------------------------------------------------------------------
 TFILES="h"
 STEP=0
@@ -337,6 +333,9 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "Read-StateInfo"
 
+    # read property 7 to make sure all info is being correctly fetched
+    encodeRequest '{"cmd":"get"}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/7" "request" "${TFILES}${STEP}"  "Read-StateInfo"
 fi
 
 stopWsrv

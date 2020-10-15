@@ -196,7 +196,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// StateInfo
 	//==========================================
-	flds = "SIID,PRID,InitiatorUID,InitiatorDt,ApproverUID,ApproverDt,FlowState,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
+	flds = "SIID,PRID,InitiatorUID,InitiatorDt,ApproverUID,ApproverDt,FlowState,Reason,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["StateInfo"] = flds
 	Wdb.Prepstmt.GetStateInfo, err = Wdb.DB.Prepare("SELECT " + flds + " FROM StateInfo where SIID=?")
 	Errcheck(err)

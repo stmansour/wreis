@@ -17,7 +17,8 @@ type StateInfo struct {
 	ApproverUID  int64     // date/time this state was approved
 	ApproverDt   time.Time // date/time this state was approved
 	FlowState    int64     // state being described
-	FLAGS        uint64    // 1<<0 :  0 -> use Opt text, 1 -> use date
+	Reason       string    // if FLAGS bit 0 is 1, this is the reason it was not approved.
+	FLAGS        uint64    // 1<<0 :  valid if ApproverUID > 0,  0 = approved, 1 = not approved
 	LastModTime  time.Time // when was the record last written
 	LastModBy    int64     // id of user that did the modify
 	CreateTime   time.Time // when was this record created
@@ -122,6 +123,7 @@ func InsertStateInfo(ctx context.Context, a *StateInfo) (int64, error) {
 		a.ApproverUID,
 		a.ApproverDt,
 		a.FlowState,
+		a.Reason,
 		a.FLAGS,
 		sess.UID,
 		sess.UID,
@@ -152,6 +154,7 @@ func ReadStateInfo(row *sql.Row, a *StateInfo) error {
 		&a.ApproverUID,
 		&a.ApproverDt,
 		&a.FlowState,
+		&a.Reason,
 		&a.FLAGS,
 		&a.CreateTime,
 		&a.CreateBy,
@@ -182,6 +185,7 @@ func ReadStateInfoItem(rows *sql.Rows, a *StateInfo) error {
 		&a.ApproverUID,
 		&a.ApproverDt,
 		&a.FlowState,
+		&a.Reason,
 		&a.FLAGS,
 		&a.CreateTime,
 		&a.CreateBy,
@@ -213,6 +217,7 @@ func UpdateStateInfo(ctx context.Context, a *StateInfo) error {
 		a.ApproverUID,
 		a.ApproverDt,
 		a.FlowState,
+		a.Reason,
 		a.FLAGS,
 		sess.UID,
 		a.SIID,

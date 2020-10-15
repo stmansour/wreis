@@ -26,11 +26,20 @@ type UserInfoResponse struct {
 	Message string
 }
 
+// UserListInfoResponse is the directory server's response to a user info request
+type UserListInfoResponse struct {
+	Status  string     `json:"status"`
+	Total   int64      `json:"total"`
+	Records []UserInfo `json:"records"`
+	Message string
+}
+
 // UserInfoRequest has all the command info needed to make a request for
 // user information to the Directory Service.
 //-----------------------------------------------------------------------------
 type UserInfoRequest struct {
-	Cmd string `json:"cmd"` // get, save, delete
+	Cmd  string `json:"cmd"` // get, save, delete
+	UIDs []int64
 }
 
 // GetUserInfo contacts the directory service and gets information about
@@ -42,6 +51,7 @@ type UserInfoRequest struct {
 // RETURNS
 //   Name information about the person
 //   any errors encountered
+//-----------------------------------------------------------------------------
 func GetUserInfo(uid int64) (UserInfo, error) {
 	funcname := "ws.getUserInfo"
 	var p UserInfo
@@ -87,5 +97,63 @@ func GetUserInfo(uid int64) (UserInfo, error) {
 		return p, fmt.Errorf("%s", foo.Message)
 	default:
 		return p, fmt.Errorf("%s: Unexpected response from authentication service:  %s", funcname, foo.Status)
+	}
+}
+
+// GetUserListInfo contacts the directory service and gets information about
+// the user with the supplied UID.
+//
+// INPUTS
+//   uids = slice User IDs of persons of interest
+//
+// RETURNS
+//   Name information about the users in the uid list
+//   any errors encountered
+//-----------------------------------------------------------------------------
+func GetUserListInfo(uids []int64) ([]UserInfo, error) {
+	funcname := "ws.getUserInfo"
+	var g []UserInfo
+	var r = UserInfoRequest{Cmd: "getlist"}
+	r.UIDs = append(r.UIDs, uids...)
+	b, err := json.Marshal(&r)
+	if err != nil {
+		e := fmt.Errorf("Error marshaling json data: %s", err.Error())
+		util.Ulog("%s: %s\n", funcname, err.Error())
+		return g, e
+	}
+
+	//----------------------------------------------------------------------
+	// the business portion of the URL is ignored.  We snap it to 0
+	//----------------------------------------------------------------------
+	url := fmt.Sprintf("%sv1/people/0", db.Wdb.Config.AuthNHost)
+	// util.Console("userInfo request: %s\n", url)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return g, fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
+	}
+	defer resp.Body.Close()
+
+	// util.Console("response Status: %s\n", resp.Status)
+	// util.Console("response Headers: %s\n", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	// util.Console("response Body: %s\n", string(body))
+
+	var foo UserListInfoResponse
+	if err := json.Unmarshal([]byte(body), &foo); err != nil {
+		return g, fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
+	}
+
+	g = foo.Records
+
+	switch foo.Status {
+	case "success":
+		return g, nil
+	case "error":
+		return g, fmt.Errorf("%s", foo.Message)
+	default:
+		return g, fmt.Errorf("%s: Unexpected response from authentication service:  %s", funcname, foo.Status)
 	}
 }

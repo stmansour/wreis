@@ -9,6 +9,11 @@ import (
 	util "wreis/util/lib"
 )
 
+const (
+	fn = "?? unknown"
+	ln = "user ??"
+)
+
 // StateInfoGrid contains the data from StateInfo that is targeted to the UI Grid that displays
 // a list of StateInfo structs
 
@@ -28,11 +33,14 @@ type StateInfo struct {
 	ApproverDt    util.JSONDateTime // date/time this state was approved
 	ApproverName  string            //
 	FlowState     int64             // state being described
+	Reason        string            // if rejected, why
 	FLAGS         uint64            // 1<<0 :  0 -> Opt is valid, 1 -> Dt is valid
 	LastModTime   util.JSONDateTime // when was the record last written
 	LastModBy     int64             // id of user that did the modify
 	CreateTime    util.JSONDateTime // when was this record created
 	CreateBy      int64             // id of user that created it
+	CreateByName  string            // creator name
+	LastModByName string            // modifier name
 }
 
 // SearchStateInfoResponse is the response data for a Rental Agreement Search
@@ -296,30 +304,65 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var mm = map[int64]int{}
 	var mmm = map[int64]UserInfo{}
 
+	// util.Console("Getting all state info items for property: %d\n", d.ID)
 	a, err := db.GetAllStateInfoItems(r.Context(), d.ID)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
 	}
+	// util.Console("Number of state info items found: %d\n", len(a))
+	// util.Console("a = %#v\n", a)
+
 	for i := 0; i < len(a); i++ {
 		var gg StateInfo
 		util.MigrateStructVals(&a[i], &gg)
 		gg.Recid = gg.SIID
 		g.Records = append(g.Records, gg)
+		// util.Console("after migrate: gg.InitiatorUID = %d, gg.ApproverUID = %d, gg.CreateBy = %d, gg.LastModBy = %d\n", gg.InitiatorUID, gg.ApproverUID, gg.CreateBy, gg.LastModBy)
 
 		// Keep track of the users we need, we'll pull them down after the
 		// loop completes...
 		//-------------------------------------------------------------------
-		mm[gg.InitiatorUID] = 1
+		if gg.InitiatorUID > 0 {
+			mm[gg.InitiatorUID] = 1
+			// util.Console("+ mm[%d]\n", mm[gg.InitiatorUID])
+		}
+		if gg.ApproverUID > 0 {
+			mm[gg.ApproverUID] = 1
+			// util.Console("+ mm[%d]\n", mm[gg.ApproverUID])
+		}
+		if gg.CreateBy > 0 {
+			mm[gg.CreateBy] = 1
+			// util.Console("+ mm[%d]\n", mm[gg.CreateBy])
+		}
+		if gg.LastModBy > 0 {
+			mm[gg.LastModBy] = 1
+			// util.Console("+ mm[%d]\n", mm[gg.LastModBy])
+		}
 	}
 
+	// util.Console("LOOPING THROUGH mm\n")
+	// for k := range mm {
+	// 	var p UserInfo
+	// 	// util.Console("getting user info for: k = %d, v = %d\n", k, v)
+	// 	if p, err = GetUserInfo(k); err != nil {
+	// 		SvcErrorReturn(w, err)
+	// 		return
+	// 	}
+	// 	mmm[k] = p
+	// }
+
+	var uids []int64
+	var p []UserInfo
 	for k := range mm {
-		var p UserInfo
-		if p, err = GetUserInfo(k); err != nil {
-			SvcErrorReturn(w, err)
-			return
-		}
-		mmm[k] = p
+		uids = append(uids, k)
+	}
+	if p, err = GetUserListInfo(uids); err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+	for i := 0; i < len(p); i++ {
+		mmm[p[i].UID] = p[i]
 	}
 
 	for i := 0; i < len(g.Records); i++ {
@@ -327,18 +370,34 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		var ui UserInfo
 		var ok bool
 		if ui, ok = mmm[j]; !ok {
-			ui.FirstName = "?? unknown"
-			ui.LastName = "user ??"
+			ui.FirstName = fn
+			ui.LastName = ln
 			mmm[j] = ui
+			// util.Console("NO USER INFO FOR UID = %d\n", j)
 		}
 		g.Records[i].ApproverName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
 		j = g.Records[i].InitiatorUID
 		if ui, ok = mmm[j]; !ok {
-			ui.FirstName = "?? unknown"
-			ui.LastName = "user ??"
+			ui.FirstName = fn
+			ui.LastName = ln
 			mmm[j] = ui
+			// util.Console("NO USER INFO FOR UID = %d\n", j)
 		}
 		g.Records[i].InitiatorName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
+		if ui, ok = mmm[g.Records[i].CreateBy]; !ok {
+			ui.FirstName = fn
+			ui.LastName = ln
+			mmm[j] = ui
+			// util.Console("NO USER INFO FOR UID = %d\n", j)
+		}
+		g.Records[i].CreateByName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
+		if ui, ok = mmm[g.Records[i].LastModBy]; !ok {
+			ui.FirstName = fn
+			ui.LastName = ln
+			mmm[j] = ui
+			// util.Console("NO USER INFO FOR UID = %d\n", j)
+		}
+		g.Records[i].LastModByName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
 	}
 
 	g.Status = "success"

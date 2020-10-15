@@ -1,13 +1,20 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document,
+    updatePropertyState, stateStatus,
 */
 
 "use strict";
 
 function propertyStateOnLoad() {
     if (propData.bStateLoaded) {
-        updatePropertState();
-        return
+        updatePropertyState();
+        return;
+    }
+
+    if (propData.PRID == 0) {
+        propData.bStateLoaded = true;
+        updatePropertyState();
+        return;
     }
 
     var params = {
@@ -33,43 +40,126 @@ function propertyStateOnLoad() {
 }
 
 function updatePropertyState() {
-    var greenText = "#11AA11";
-    var greenBG = "#e0ffe0";
-    var grayText = "#888888";
-    var grayBG = "#e0e0e0";
     var x;
     var color;
     var r = w2ui.propertyForm.record;
-    console.log('propertyStateOnLoad has been called. FlowState = ' + r.FlowState);
-    for (var i = 1; i <= propData.numStates; i++) {
-        color = (r.FlowState >= i ) ? greenText : grayText;
-        setStateColor('stateStepNo'+i,color);
-        setStateColor('stateStepName'+i,color);
-        color = (r.FlowState >= i ) ? greenBG : grayBG;
-        setStateBGColor('stateLabelCell'+i,color);
-        setStateBGColor('stateDataCell'+i,color);
-        color = (r.FlowState >= i ) ? "black" : grayText;
-        setStateLabelColor(color,i);
+    var fs;
+    if (r == null) {
+        console.log('r is null.  w2ui.propertyForm.record =  ' + w2ui.propertyForm.record);
+        return;
     }
-    for (i = 0; i < propData.states.length; i++) {
-        var s = "";
-        var id;
-        if (propData.states[i].InitiatorUID > 0) {
-            s = propData.states[i].InitiatorName + '  (' + propData.states[i].InitiatorUID + ')';
-            id = "stateCreateUser" + propData.states[i].FlowState;
-            x = document.getElementById(id);
-            if (x != null) {
-                x.innerHTML = s;
+    fs = r.FlowState;
+    // for (var i = 1; i <= propData.numStates; i++) {
+    //     color = (r.FlowState >= i ) ? doneText : notStartedText;
+    //     setStateColor('stateStepNo'+i,color);
+    //     setStateColor('stateStepName'+i,color);
+    //     color = (r.FlowState >= i ) ? doneBG : notStartedBG;
+    //     setStateBGColor('stateLabelCell'+i,color);
+    //     setStateBGColor('stateDataCell'+i,color);
+    //     color = (r.FlowState >= i ) ? "black" : notStartedText;
+    //     setStateLabelColor(color,i);
+    // }
+    if (propData.states != null) {
+        for (var i = 0; i < propData.states.length; i++) {
+            var s = "";
+            var id;
+            var dt;
+            var j = propData.states[i].FlowState;
+
+            color = getStateTextColor(j,fs,0);
+            setStateColor('stateStepNo'+j,color);
+            setStateColor('stateStepName'+j,color);
+
+            color = getStateTextColor(j,fs,1);
+            setStateBGColor('stateLabelCell'+j,color);
+            setStateBGColor('stateDataCell'+j,color);
+
+            color = (r.FlowState >= j ) ? "black" : propData.notStartedText;
+            setStateLabelColor(color,j);
+
+            if (propData.states[i].InitiatorUID > 0) {
+                dt = new Date(propData.states[i].InitiatorDt);
+                s = propData.states[i].InitiatorName + ', ' + dt.toDateString();
+                id = "stateCreateUser" + j;
+                setHTMLByID(id,s);
             }
-        }
-        if (propData.states[i].ApproverUID > 0) {
-            s = propData.states[i].ApproverName + '(' + propData.states[i].ApproverUID + ')';
-            id = "stateApproveUser" + propData.states[i].FlowState;
-            x = document.getElementById(id);
-            if (x != null) {
-                x.innerHTML = s;
+            if (propData.states[i].ApproverUID > 0) {
+                s = propData.states[i].ApproverName;
+                id = "stateApproveUser" + j;
+                setHTMLByID(id,s);
             }
+            stateStatus(propData.states[i],r.FlowState);
+            id = "stateLastMod" + j;
+            dt = new Date(propData.states[i].LastModTime);
+            s = propData.states[i].LastModByName + ", " + dt.toDateString();
+            setHTMLByID(id,s);
         }
+    }
+}
+
+// getStateTextColor describes the status of the state.
+//
+// INPUTS
+//   ts  = FlowState of stateinfo structure
+//   fs = FlowState of the current property
+//   g  = 0 -> foreground color, 1 -> background color
+//
+// RETURNS
+//   the requested color string
+//------------------------------------------------------------------------------
+function getStateTextColor(ts,fs,g) {
+    if ( ts < fs ) {
+        // state is completed
+        return g != 0 ? propData.doneBG : propData.doneText;
+    } else if ( ts == fs ) {
+        // state is in progress
+        return g != 0 ? propData.inProgressBG : propData.inProgressText;
+    } else {
+        return g != 0 ? propData.notStartedBG : propData.notStartedText;
+    }
+    return "black";
+}
+
+// stateStatus describes the status of the state.
+//
+//   FLAGS & 0x1 is the approval status.
+//                0 =>  approved
+//                1 =>  rejected  and t.Reason explains why
+//
+// INPUTS
+//   t  = stateinfo structure
+//   fs = FlowState of the current property
+//
+// RETURNS
+//
+//------------------------------------------------------------------------------
+function stateStatus(t,fs) {
+    // If ApproverDt field has year >1970 then the approver has made a determination
+    var dt = new Date(t.ApproverDt);
+    var label;
+    var id = "stateStatus" + t.FlowState;  // the label for this particular state
+
+    if (dt.getFullYear() > 1970) {
+        if (dt.FLAGS & 0x1 > 0) {
+            // 1 means not approved
+            label = "Rejected: " + dt.toDateString() + ", " + t.Reason;
+        } else {
+            label = "Approved: " + dt.toDateString();
+        }
+    } else {
+        label = "";
+        if (fs == t.FlowState) {
+            label = "In Progress";
+        }
+    }
+
+    setHTMLByID(id,label);
+}
+
+function setHTMLByID(id,s) {
+    var x = document.getElementById(id);
+    if (x != null) {
+        x.innerHTML = s;
     }
 }
 

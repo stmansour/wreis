@@ -2,18 +2,21 @@
     "records": [
         {
             "ApproverDt": "1970-01-01 00:00:00 UTC",
-            "ApproverName": "?? unknown user ??",
+            "ApproverName": "Thomas Santaniello",
             "ApproverUID": 203,
-            "CreateBy": 0,
+            "CreateBy": 211,
+            "CreateByName": "Steven Mansour",
             "CreateTime": "2020-10-01 14:36:47 UTC",
             "FLAGS": 0,
             "FlowState": 1,
-            "InitiatorDt": "2020-09-28 00:00:00 UTC",
+            "InitiatorDt": "2020-10-01 00:00:00 UTC",
             "InitiatorName": "Steven Mansour",
             "InitiatorUID": 211,
-            "LastModBy": 0,
-            "LastModTime": "2020-10-01 14:37:24 UTC",
+            "LastModBy": 269,
+            "LastModByName": "William Tester",
+            "LastModTime": "2020-10-13 22:29:52 UTC",
             "PRID": 1,
+            "Reason": "",
             "SIID": 1,
             "recid": 1
         }

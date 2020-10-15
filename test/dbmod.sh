@@ -62,15 +62,14 @@ DBNAME="wreis"
 #     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
 #     PRIMARY KEY (SIID)
 # )
+# ALTER TABLE StateInfo ADD InitiatorDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00' AFTER InitiatorUID;
+# ALTER TABLE StateInfo ADD Reason VARCHAR(256) NOT NULL DEFAULT '' AFTER ApproverDt;
 
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-    ALTER TABLE StateInfo ADD InitiatorDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00' AFTER InitiatorUID;
-    ALTER TABLE StateInfo ADD ApproverDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00' AFTER ApproverUID;
-
 LEOF
 
 #=====================================================
@@ -78,6 +77,7 @@ LEOF
 #=====================================================
 declare -a dbs=(
 	'ws/xb.sql'
+	'ws/xh.sql'
 	'photo/xa.sql'
 )
 

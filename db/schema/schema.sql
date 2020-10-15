@@ -166,12 +166,13 @@ CREATE TABLE Traffic (
 CREATE TABLE StateInfo (
     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID
     PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        --
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
     FlowState BIGINT NOT NULL DEFAULT 0,                    --
     InitiatorUID BIGINT NOT NULL DEFAULT 0,                 --
-    InitiatorDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
-    ApproverUID BIGINT NOT NULL DEFAULT 0,                 --
-    ApproverDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    InitiatorDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00', -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    ApproverUID BIGINT NOT NULL DEFAULT 0,                  --
+    ApproverDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',  -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    Reason VARCHAR(256) NOT NULL DEFAULT '',                -- if FLAGS bit 0 is 1, this is the reason it was not approved
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,-- when was this record created

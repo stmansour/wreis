@@ -19,7 +19,38 @@ var propData = {
     formWidth: 575,             // how wide is the entry / edit form
     numStates: 7,               // states go from 1 to 7 -- this is a full complement of sates, the states array may have less
     states: [],                 // the server will be queried for these on existing properties, or filled with an inital state on new
+    doneText: "#0611AA",
+    doneBG: "#e0f0ff",
+    notStartedText: "#888888",
+    notStartedBG: "#e0e0e0",
+    inProgressText: "#11AA11",
+    inProgressBG: "#e0ffe0",
 };
+
+function initializeStateRecord() {
+    var time0 = new Date("Jan 1, 1970");
+    var now = new Date();
+    var rec = {
+        SIID: 0,
+        PRID: 0,
+        InitiatorUID: app.uid,
+        InitiatorDt: now,
+        InitiatorName: app.name,
+        ApproverUID: 0,
+        ApproverDt: time0,
+        ApproverName: "",
+        FlowState: 1,
+        Reason: "",
+        FLAGS: 0,
+        LastModTime: now,
+        LastModBy: app.uid,
+        CreateTime: now,
+        CreateBy: app.uid,
+        CreateByName: "",
+        LastModByName:"",
+    };
+    return rec;
+}
 
 function initializePropertyRecord() {
     var time0 = new Date("Jan 1, 1970");
@@ -210,6 +241,8 @@ function buildPropertyUIElements() {
             f.url = "";
             f.refresh();
             propData.PRID = 0;  // new entry
+            var s = initializeStateRecord();
+            propData.states = [s];
             w2ui.propertyFormLayout.content('main', w2ui.propertyForm);
             w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
             w2ui.toplayout.content('right', w2ui.propertyFormLayout);
