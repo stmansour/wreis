@@ -1,0 +1,79 @@
+<html>
+
+<head>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td colspan="2" height="10"></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">PROPERTY STATE MANAGEMENT</td>
+        </tr>
+
+        <tr><td colspan="2" height="10"></td></tr>
+
+        <tr>
+            <td align="right">
+                <div id="smApprove">Approve and advance to <span id="smNextState1">next state</span>
+                --------------------------------------------->
+                </div>
+            </td>
+            <td>
+                <button>Approve</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td align="right" valign="bottom" id="smReject">
+                Reject because: <textarea id="smReason" rows="6" cols="40" maxlength="256" width="234"> </textarea>
+            </td>
+            <td valign="bottom">
+                <button>Reject</button>
+            </td>
+        </tr>
+
+        <tr><td colspan="2" height="20"></td></tr>
+
+        <tr>
+            <td align="right">
+                Approver: <input type="text" id="smApprover" size="41">
+            </td>
+            <td>
+                <button>Set Approver</button>
+            </td>
+        </tr>
+
+        <tr>
+            <td id="smStateOwner" align="right">
+                Owner: <input type="text" id="smNextStateOwner" size="41">
+            </td>
+            <td>
+                <button>Assign</button>
+            </td>
+        </tr>
+
+        <tr><td colspan="2" height="20"></td></tr>
+
+        <tr>
+            <td id="smRevert" align="right">
+                Revert to <span id="smRevertState">previous state:</span>
+                -------------------------------------------------------->
+            </td>
+            <td>
+                <button>Revert</button>
+            </td>
+        </tr>
+
+        <tr><td colspan="2" height="10"></td></tr>
+
+        <tr>
+            <td align="center" colspan="2">
+                <button onclick="closeStateChangeDialog();"> Done </button>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

@@ -26,7 +26,7 @@ type StateInfo struct {
 	Recid         int64             `json:"recid"`
 	SIID          int64             // unique id for this record
 	PRID          int64             // id of property to which this record belongs
-	InitiatorUID  int64             // date/time this state was initiated
+	InitiatorUID  int64             // uid of initiator
 	InitiatorDt   util.JSONDateTime // date/time this state was initiated
 	InitiatorName string            //
 	ApproverUID   int64             // date/time this state was approved

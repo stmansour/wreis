@@ -1,9 +1,40 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document,
-    updatePropertyState, stateStatus,
+    updatePropertyState, stateStatus,closeStateChangeDialog,
 */
 
 "use strict";
+
+function buildStateUIElements() {
+
+    $().w2layout({
+        name: 'propertyStateLayout',
+        padding: 0,
+        panels: [
+            { type: 'left',    size: 0,     hidden: true },
+            { type: 'top',     size: 0,     hidden: true,  content: 'top',  resizable: true, style: app.pstyle },
+            { type: 'main',    size: '60%', hidden: false, content: 'main', resizable: true, style: app.pstyle },
+            { type: 'preview', size: 0,     hidden: true,  content: 'PREVIEW'  },
+            { type: 'bottom',  size: 0,     hidden: true,  content: 'bottom', resizable: false, style: app.pstyle },
+            { type: 'right',   size: 0,     hidden: true,  content: 'right',
+                toolbar: {
+                    items: [
+                        { id: 'btnNotes', type: 'button', icon: 'fa fa-sticky-note-o' },
+                        { id: 'bt3', type: 'spacer' },
+                        { id: 'btnClose', type: 'button', icon: 'fa fa-times' },
+                    ],
+                    onClick: function (event) {
+                        if (event.target == 'btnClose') {
+                            closeStateChangeDialog();
+                        }
+                    },
+                },
+            },
+        ],
+    });
+}
+
+
 
 function propertyStateOnLoad() {
     if (propData.bStateLoaded) {
@@ -49,16 +80,6 @@ function updatePropertyState() {
         return;
     }
     fs = r.FlowState;
-    // for (var i = 1; i <= propData.numStates; i++) {
-    //     color = (r.FlowState >= i ) ? doneText : notStartedText;
-    //     setStateColor('stateStepNo'+i,color);
-    //     setStateColor('stateStepName'+i,color);
-    //     color = (r.FlowState >= i ) ? doneBG : notStartedBG;
-    //     setStateBGColor('stateLabelCell'+i,color);
-    //     setStateBGColor('stateDataCell'+i,color);
-    //     color = (r.FlowState >= i ) ? "black" : notStartedText;
-    //     setStateLabelColor(color,i);
-    // }
     if (propData.states != null) {
         for (var i = 0; i < propData.states.length; i++) {
             var s = "";
@@ -93,6 +114,9 @@ function updatePropertyState() {
             dt = new Date(propData.states[i].LastModTime);
             s = propData.states[i].LastModByName + ", " + dt.toDateString();
             setHTMLByID(id,s);
+            if (propData.states[i].FlowState == w2ui.propertyForm.record.FlowState) {
+                setStateChange(w2ui.propertyForm.record.FlowState);
+            }
         }
     }
 }
@@ -182,5 +206,16 @@ function setStateLabelColor(color,j) {
     if (x == null) {return;}
     for (var i=0; i<x.length; i++) {
         x[i].style.color = color;
+    }
+}
+
+// INPUTS
+//   x = state number
+function setStateChange(y) {
+    //var s = `<button class="w2ui-btn" onclick="w2popup.load({url:'/static/html/statechg.html',showMax:true})">Change...</button>`;
+    var s = `<br><button class="w2ui-btn" onclick="propertyStateChgOnLoad();">Change...</button>`;
+    var x = document.getElementById("stateChange"+y);
+    if (x != null) {
+        x.innerHTML = s;
     }
 }

@@ -387,6 +387,9 @@ function buildPropertyUIElements() {
             {
                 type: 'bottom', size: 60, // style: 'background-color: white;  border-top: 1px solid silver; text-align: center; padding: 15px;',
             },
+            {
+                type: 'right', size: 0,
+            },
         ],
     });
 
@@ -606,12 +609,14 @@ function propertySaveDoneCB() {
 function setPropertyLayout(tab) {
     w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
 
+
     switch (tab) {
 
     case "proptabState":
-        w2ui.propertyFormLayout.load('main', '/static/html/formState.html', null,propertyStateOnLoad);
+        // w2ui.propertyFormLayout.load('main', '/static/html/formState.html', null,propertyStateOnLoad);
+        w2ui.propertyStateLayout.load('main','/static/html/formState.html', null, propertyStateOnLoad);
+        w2ui.propertyFormLayout.content('main', w2ui.propertyStateLayout);
         setTimeout(propertyStateOnLoad, 100 );
-        // setTimeout(propertyStateOnLoad, 1000 );
         break;
 
     case "proptabGeneral":
