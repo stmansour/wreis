@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 	db "wreis/db/lib"
+	"wreis/session"
 	util "wreis/util/lib"
 )
 
@@ -14,8 +15,27 @@ const (
 	ln = "user ??"
 )
 
-// StateInfoGrid contains the data from StateInfo that is targeted to the UI Grid that displays
-// a list of StateInfo structs
+// StateInfo deals with state changes to the StateInfo structs. The states are:
+//
+//		1. New Record Entry
+//		2. First Task List
+//		3. Marketing Package
+//		4. Ready To List
+//		5. Listed
+//		6. Under Contract
+//		7. Closed
+//
+// The following actions apply to states:
+//
+// 		Approve          Approve this state and advance to the next state
+//      Reject           Do not advance the state, add a reason for rejection
+//      Ready            Lets the approver know the owner believes the property
+//                       is ready to progress to the next state
+//      Assign Approver  Set the approver
+//      Assign Owner     Set the owner
+//      Revert           Set the current state of the property back one
+//
+//
 
 //-------------------------------------------------------------------
 //                        **** SEARCH ****
@@ -34,7 +54,7 @@ type StateInfo struct {
 	ApproverName  string            //
 	FlowState     int64             // state being described
 	Reason        string            // if rejected, why
-	FLAGS         uint64            // 1<<0 :  0 -> Opt is valid, 1 -> Dt is valid
+	FLAGS         uint64            // 1<a :  0 -> Opt is valid, 1 -> Dt is valid
 	LastModTime   util.JSONDateTime // when was the record last written
 	LastModBy     int64             // id of user that did the modify
 	CreateTime    util.JSONDateTime // when was this record created
@@ -100,6 +120,18 @@ func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData)
 			getStateInfo(w, r, d)
 		}
 		break
+	case "reject":
+		saveStateReject(w, r, d)
+		break
+	case "revert":
+		saveStateRevert(w, r, d)
+		break
+	case "approve":
+		saveStateApprove(w, r, d)
+		break
+	case "ready":
+		saveStateReady(w, r, d)
+		break
 	case "save":
 		saveStateInfo(w, r, d)
 		break
@@ -145,7 +177,382 @@ func deleteStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	SvcWriteSuccessResponse(w)
 }
 
-// SaveStateInfo expects as input a full state definition (an array of StateInfo
+func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (SaveStateInfo, db.StateInfo, *session.Session, error) {
+	var foo SaveStateInfo
+	var si db.StateInfo
+	var sess *session.Session
+	var ok bool
+
+	data := []byte(d.data)
+	err := json.Unmarshal(data, &foo)
+
+	if err != nil {
+		return foo, si, sess, fmt.Errorf("Error with json.Unmarshal:  %s", err.Error())
+	}
+
+	if len(foo.Records) != 1 {
+		return foo, si, sess, fmt.Errorf("Error with json.Unmarshal:  %s", err.Error())
+	}
+
+	//---------------------------------------------------------------------
+	// if the id making this save is NOT the approver, then send back an error
+	//---------------------------------------------------------------------
+	if sess, ok = session.GetSessionFromContext(r.Context()); !ok {
+		return foo, si, sess, db.ErrSessionRequired
+	}
+
+	//---------------------------------------------------------------------
+	// get the SIID so we know we start with the last saved version...
+	//---------------------------------------------------------------------
+	if si, err = db.GetStateInfo(r.Context(), foo.Records[0].SIID); err != nil {
+		return foo, si, sess, err
+	}
+
+	//---------------------------------------------------------------------
+	// make sure we're not working on something that's already completed
+	//---------------------------------------------------------------------
+	if si.FLAGS&0x4 != 0 {
+		return foo, si, sess, fmt.Errorf("This is not the latest state information")
+	}
+
+	return foo, si, sess, nil
+}
+
+// saveStateReady sets the flag to indicate the owner wishes the
+// to approve the state and advance to the next state
+//
+// Here we expect to read the command "requestapprove" and an array of records
+// containing precisely one StateInfo struct, the latest one for
+// the state in question.
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	foo, si, sess, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// Only the owner can ask for approval
+	//--------------------------------------------------------------------------
+	util.Console("sess.UID = %d, InitiatorUID = %d\n", sess.UID, foo.Records[0].InitiatorUID)
+	if si.InitiatorUID != sess.UID {
+		e := fmt.Errorf("Only the owner can request approval")
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// before we save it, make sure that there is an approver
+	//--------------------------------------------------------------------------
+	if si.ApproverUID < 1 {
+		e := fmt.Errorf("An approver must be assigned first")
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// mark this version as ready to be approved...  The request approval flag
+	// (that is bit 1).
+	// we'll set the lower byte to (not approved, no request being made, work concluded )
+	//--------------------------------------------------------------------------
+	si.FLAGS |= 0x2
+	if err = db.UpdateStateInfo(r.Context(), &si); err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
+}
+
+// saveStateApprove approve the proposal to advance the property to the next
+// state.
+//
+// Here we expect to read the command "approve" and an array of records
+// containing precisely one StateInfo struct, the latest one for
+// the state in question.
+//
+// We need to update this SIID with the reason and create a new one with
+// all the same info as in the current SIID, but not yet accepted/rejected.
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "saveStateApprove"
+	util.Console("Entered %s\n", funcname)
+
+	_, si, sess, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	if sess.UID != si.ApproverUID {
+		err = fmt.Errorf("You are not the current Approver for this state")
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	a := si
+	a.FLAGS &= si.FLAGS & 0xeffffffffffffff0
+	a.FLAGS |= 0x4
+	a.ApproverDt = time.Now()
+
+	if err = db.UpdateStateInfo(ctx, &a); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	// now create the new next StateInfo
+	if a.FlowState < 7 {
+		a.FlowState++
+		a.SIID = 0
+		a.FLAGS = 0
+		a.InitiatorDt = time.Now()
+		a.ApproverDt = util.TIME0
+		if _, err = db.InsertStateInfo(ctx, &a); err != nil {
+			tx.Rollback()
+			SvcErrorReturn(w, err)
+			return
+		}
+
+		util.Console("New stateinfo created: SIID = %d\n", a.SIID)
+
+		// Now we need to update the property's state...
+		prop, err := db.GetProperty(ctx, a.PRID)
+		if err != nil {
+			tx.Rollback()
+			SvcErrorReturn(w, err)
+			return
+		}
+
+		prop.FlowState = a.FlowState
+		if err = db.UpdateProperty(ctx, &prop); err != nil {
+			tx.Rollback()
+			SvcErrorReturn(w, err)
+			return
+		}
+	}
+
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
+}
+
+// saveStateReject reject the proposal to advance the property to the next
+// and save the reason for the rejection.
+//
+// Here we expect to read the command "reject" and an array of records
+// containing precisely one StateInfo struct, the latest one for
+// the state in question.  It should contain the Reason why it was rejected.
+//
+// We need to update this SIID with the reason and create a new one with
+// all the same info as in the current SIID, but not yet accepted/rejected.
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "saveStateReject"
+
+	foo, si, sess, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	if sess.UID != si.ApproverUID {
+		err = fmt.Errorf("You are not the current Approver for this state")
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// before we save it, make sure that there is a reason...
+	//--------------------------------------------------------------------------
+	if len(foo.Records[0].Reason) < 1 {
+		e := fmt.Errorf("%s: You must supply the reason for the reject", funcname)
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+	//--------------------------------------------------------------------------
+	// mark this version as rejected...  The reject is to set flags bit 0 to 1
+	// 		0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+	// 		1  0 = no request is being made,       1 = request approval for this state
+	// 		2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+	// we'll set the lower byte to (not approved, no request being made, work concluded )
+	//--------------------------------------------------------------------------
+	reject := si
+	reject.FLAGS &= si.FLAGS & 0xeffffffffffffff0
+	reject.FLAGS |= 0x5
+	reject.Reason = foo.Records[0].Reason
+	reject.ApproverDt = time.Now()
+	if err = db.UpdateStateInfo(ctx, &reject); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// create the new "current" version.
+	//--------------------------------------------------------------------------
+	reject.SIID = 0
+	reject.FLAGS = 0
+	reject.InitiatorDt = time.Now()
+	reject.ApproverDt = util.TIME0
+	reject.Reason = ""
+
+	if _, err = db.InsertStateInfo(ctx, &reject); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
+}
+
+// saveStateRevert moves the property to its previous state
+//
+// Here we expect to read the command "revert" and an array of records
+// containing precisely one StateInfo struct, the latest one for
+// the state in question.  It should contain the Reason why it
+// it is being reverted.
+//
+// We need to update this SIID with the reason and create a new one with
+// all the same info as in the current SIID, but not yet accepted/rejected.
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "saveStateRevert"
+
+	foo, si, sess, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	if sess.UID != si.ApproverUID {
+		err = fmt.Errorf("You are not the current Approver for this state")
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	if si.FlowState == 1 {
+		err = fmt.Errorf("You cannot revert from this state")
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// before we save it, make sure that there is a reason...
+	//--------------------------------------------------------------------------
+	if len(foo.Records[0].Reason) < 1 {
+		e := fmt.Errorf("%s: You must supply the reason", funcname)
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// mark this version as reverted...  The revert sets flags bits 0:3 to 0xC
+	//    bit  description
+	//    ---  ---------------------------------------------------------------------------
+	// 		2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+	//      3  0 = not reverted                    1 = reverted
+	// we'll set the lower byte to (work concluded, reverted)
+	//--------------------------------------------------------------------------
+	revert := si
+	revert.FLAGS &= si.FLAGS & 0xeffffffffffffff0
+	revert.FLAGS |= 0xc
+	revert.Reason = foo.Records[0].Reason
+	revert.ApproverDt = time.Now()
+	if err = db.UpdateStateInfo(ctx, &revert); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// create the new "current" version.
+	//--------------------------------------------------------------------------
+	revert.SIID = 0
+	revert.FLAGS = 0
+	revert.InitiatorDt = time.Now()
+	revert.ApproverDt = util.TIME0
+	revert.Reason = ""
+	revert.FlowState = si.FlowState - 1
+
+	if _, err = db.InsertStateInfo(ctx, &revert); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
+}
+
+// saveStateInfo expects as input a full state definition (an array of StateInfo
 //     structs that describes the state of a property).  It will efficiently
 //     add / update / delete StateInfo records so that the database reflects the
 //     array supplied
@@ -156,8 +563,7 @@ func deleteStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateInfo"
 	util.Console("Entered %s\n", funcname)
-
-	util.Console("record data = %s\n", d.data)
+	// util.Console("record data = %s\n", d.data)
 
 	var foo SaveStateInfo
 	data := []byte(d.data)
