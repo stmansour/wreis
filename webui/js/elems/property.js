@@ -33,9 +33,9 @@ function initializeStateRecord() {
     var rec = {
         SIID: 0,
         PRID: 0,
-        InitiatorUID: app.uid,
-        InitiatorDt: now,
-        InitiatorName: app.name,
+        OwnerUID: app.uid,
+        OwnerDt: now,
+        OwnerName: app.name,
         ApproverUID: 0,
         ApproverDt: time0,
         ApproverName: "",

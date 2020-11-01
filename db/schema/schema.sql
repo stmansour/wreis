@@ -163,13 +163,23 @@ CREATE TABLE Traffic (
     PRIMARY KEY (TID)
 );
 
+/*
+**  FLAGS
+**
+**  bit  Description
+**  ---  ----------------------------------------------------------------------
+      0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+      1  0 = work is in progress, 1 = request approval for this state
+      2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+      3  0 = this state has not been reverted.  1 = this state was reverted
+*/
 CREATE TABLE StateInfo (
     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID
     PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
     FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
     FlowState BIGINT NOT NULL DEFAULT 0,                    --
-    InitiatorUID BIGINT NOT NULL DEFAULT 0,                 --
-    InitiatorDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00', -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    OwnerUID BIGINT NOT NULL DEFAULT 0,                 --
+    OwnerDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00', -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
     ApproverUID BIGINT NOT NULL DEFAULT 0,                  --
     ApproverDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',  -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
     Reason VARCHAR(256) NOT NULL DEFAULT '',                -- if FLAGS bit 0 is 1, this is the reason it was not approved

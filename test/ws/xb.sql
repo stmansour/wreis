@@ -376,8 +376,8 @@ CREATE TABLE `StateInfo` (
   `PRID` bigint(20) NOT NULL DEFAULT '0',
   `FLAGS` bigint(20) NOT NULL DEFAULT '0',
   `FlowState` bigint(20) NOT NULL DEFAULT '0',
-  `InitiatorUID` bigint(20) NOT NULL DEFAULT '0',
-  `InitiatorDt` date NOT NULL DEFAULT '1970-01-01',
+  `OwnerUID` bigint(20) NOT NULL DEFAULT '0',
+  `OwnerDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `ApproverUID` bigint(20) NOT NULL DEFAULT '0',
   `ApproverDt` date NOT NULL DEFAULT '1970-01-01',
   `Reason` varchar(256) NOT NULL DEFAULT '',
@@ -438,4 +438,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-13 15:38:04
+-- Dump completed on 2020-11-01 14:41:58

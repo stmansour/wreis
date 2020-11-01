@@ -98,9 +98,9 @@ function updatePropertyState() {
             color = (r.FlowState >= j ) ? "black" : propData.notStartedText;
             setStateLabelColor(color,j);
 
-            if (propData.states[i].InitiatorUID > 0) {
-                dt = new Date(propData.states[i].InitiatorDt);
-                s = propData.states[i].InitiatorName + ', ' + dt.toDateString();
+            if (propData.states[i].OwnerUID > 0) {
+                dt = new Date(propData.states[i].OwnerDt);
+                s = propData.states[i].OwnerName + ', ' + dt.toDateString();
                 id = "stateCreateUser" + j;
                 setHTMLByID(id,s);
             }

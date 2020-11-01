@@ -46,9 +46,9 @@ type StateInfo struct {
 	Recid         int64             `json:"recid"`
 	SIID          int64             // unique id for this record
 	PRID          int64             // id of property to which this record belongs
-	InitiatorUID  int64             // uid of initiator
-	InitiatorDt   util.JSONDateTime // date/time this state was initiated
-	InitiatorName string            //
+	OwnerUID  int64             // uid of Owner
+	OwnerDt   util.JSONDateTime // date/time this state was initiated
+	OwnerName string            //
 	ApproverUID   int64             // date/time this state was approved
 	ApproverDt    util.JSONDateTime // date/time this state was approved
 	ApproverName  string            //
@@ -238,8 +238,8 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	// Only the owner can ask for approval
 	//--------------------------------------------------------------------------
-	util.Console("sess.UID = %d, InitiatorUID = %d\n", sess.UID, foo.Records[0].InitiatorUID)
-	if si.InitiatorUID != sess.UID {
+	util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
+	if si.OwnerUID != sess.UID {
 		e := fmt.Errorf("Only the owner can request approval")
 		SvcErrorReturn(w, e)
 		return
@@ -323,7 +323,7 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		a.FlowState++
 		a.SIID = 0
 		a.FLAGS = 0
-		a.InitiatorDt = time.Now()
+		a.OwnerDt = time.Now()
 		a.ApproverDt = util.TIME0
 		if _, err = db.InsertStateInfo(ctx, &a); err != nil {
 			tx.Rollback()
@@ -430,7 +430,7 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	reject.SIID = 0
 	reject.FLAGS = 0
-	reject.InitiatorDt = time.Now()
+	reject.OwnerDt = time.Now()
 	reject.ApproverDt = util.TIME0
 	reject.Reason = ""
 
@@ -529,7 +529,7 @@ func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	revert.SIID = 0
 	revert.FLAGS = 0
-	revert.InitiatorDt = time.Now()
+	revert.OwnerDt = time.Now()
 	revert.ApproverDt = util.TIME0
 	revert.Reason = ""
 	revert.FlowState = si.FlowState - 1
@@ -626,18 +626,18 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 					//----------------------------------------
 					// Compare the two StateInfo items...
 					//----------------------------------------
-					if (foo.Records[i].InitiatorUID != a[j].InitiatorUID) ||
+					if (foo.Records[i].OwnerUID != a[j].OwnerUID) ||
 						(foo.Records[i].ApproverUID != a[j].ApproverUID) ||
 						(foo.Records[i].FLAGS != a[j].FLAGS) ||
-						util.EqualDtToJSONDateTime(&a[j].InitiatorDt, &foo.Records[i].InitiatorDt) ||
+						util.EqualDtToJSONDateTime(&a[j].OwnerDt, &foo.Records[i].OwnerDt) ||
 						util.EqualDtToJSONDateTime(&a[j].ApproverDt, &foo.Records[i].ApproverDt) { // if anything relevant changed
 						//----------------------------------------
 						// update a[j] to db...
 						//----------------------------------------
 						util.Console("MOD: foo.Records[i].SIID = %d\n", foo.Records[i].SIID)
-						a[j].InitiatorUID = foo.Records[i].InitiatorUID
+						a[j].OwnerUID = foo.Records[i].OwnerUID
 						a[j].ApproverUID = foo.Records[i].ApproverUID
-						a[j].InitiatorDt = time.Time(foo.Records[i].InitiatorDt)
+						a[j].OwnerDt = time.Time(foo.Records[i].OwnerDt)
 						a[j].ApproverDt = time.Time(foo.Records[i].ApproverDt)
 						a[j].FLAGS = foo.Records[i].FLAGS
 						if err = db.UpdateStateInfo(ctx, &a[j]); err != nil {
@@ -724,14 +724,14 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		util.MigrateStructVals(&a[i], &gg)
 		gg.Recid = gg.SIID
 		g.Records = append(g.Records, gg)
-		// util.Console("after migrate: gg.InitiatorUID = %d, gg.ApproverUID = %d, gg.CreateBy = %d, gg.LastModBy = %d\n", gg.InitiatorUID, gg.ApproverUID, gg.CreateBy, gg.LastModBy)
+		// util.Console("after migrate: gg.OwnerUID = %d, gg.ApproverUID = %d, gg.CreateBy = %d, gg.LastModBy = %d\n", gg.OwnerUID, gg.ApproverUID, gg.CreateBy, gg.LastModBy)
 
 		// Keep track of the users we need, we'll pull them down after the
 		// loop completes...
 		//-------------------------------------------------------------------
-		if gg.InitiatorUID > 0 {
-			mm[gg.InitiatorUID] = 1
-			// util.Console("+ mm[%d]\n", mm[gg.InitiatorUID])
+		if gg.OwnerUID > 0 {
+			mm[gg.OwnerUID] = 1
+			// util.Console("+ mm[%d]\n", mm[gg.OwnerUID])
 		}
 		if gg.ApproverUID > 0 {
 			mm[gg.ApproverUID] = 1
@@ -782,14 +782,14 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			// util.Console("NO USER INFO FOR UID = %d\n", j)
 		}
 		g.Records[i].ApproverName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
-		j = g.Records[i].InitiatorUID
+		j = g.Records[i].OwnerUID
 		if ui, ok = mmm[j]; !ok {
 			ui.FirstName = fn
 			ui.LastName = ln
 			mmm[j] = ui
 			// util.Console("NO USER INFO FOR UID = %d\n", j)
 		}
-		g.Records[i].InitiatorName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
+		g.Records[i].OwnerName = fmt.Sprintf("%s %s", ui.FirstName, ui.LastName)
 		if ui, ok = mmm[g.Records[i].CreateBy]; !ok {
 			ui.FirstName = fn
 			ui.LastName = ln

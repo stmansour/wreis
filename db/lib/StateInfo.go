@@ -8,21 +8,27 @@ import (
 )
 
 // StateInfo defines information about a particular state for a property.
+//
+// FLAGS
+// 0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+// 1  0 = work is in progress, 1 = request approval for this state
+// 2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+// 3  0 = this state has not been reverted.  1 = this state was reverted
 //-----------------------------------------------------------------------------
 type StateInfo struct {
-	SIID         int64     // unique id for this record
-	PRID         int64     // property to which this info belongs
-	InitiatorUID int64     // date/time this state was initiated
-	InitiatorDt  time.Time // date/time this state was initiated
-	ApproverUID  int64     // date/time this state was approved
-	ApproverDt   time.Time // date/time this state was approved
-	FlowState    int64     // state being described
-	Reason       string    // if FLAGS bit 0 is 1, this is the reason it was not approved.
-	FLAGS        uint64    // 1<<0 :  valid if ApproverUID > 0,  0 = approved, 1 = not approved
-	LastModTime  time.Time // when was the record last written
-	LastModBy    int64     // id of user that did the modify
-	CreateTime   time.Time // when was this record created
-	CreateBy     int64     // id of user that created it
+	SIID        int64     // unique id for this record
+	PRID        int64     // property to which this info belongs
+	OwnerUID    int64     // date/time this state was initiated
+	OwnerDt     time.Time // date/time this state was initiated
+	ApproverUID int64     // date/time this state was approved
+	ApproverDt  time.Time // date/time this state was approved
+	FlowState   int64     // state being described
+	Reason      string    // if FLAGS bit 0 is 1, this is the reason it was not approved.
+	FLAGS       uint64    // see definition above
+	LastModTime time.Time // when was the record last written
+	LastModBy   int64     // id of user that did the modify
+	CreateTime  time.Time // when was this record created
+	CreateBy    int64     // id of user that created it
 }
 
 // DeleteStateInfo deletes the StateInfo with the specified id from the database
@@ -118,8 +124,8 @@ func InsertStateInfo(ctx context.Context, a *StateInfo) (int64, error) {
 	}
 	fields := []interface{}{
 		a.PRID,
-		a.InitiatorUID,
-		a.InitiatorDt,
+		a.OwnerUID,
+		a.OwnerDt,
 		a.ApproverUID,
 		a.ApproverDt,
 		a.FlowState,
@@ -149,8 +155,8 @@ func ReadStateInfo(row *sql.Row, a *StateInfo) error {
 	err := row.Scan(
 		&a.SIID,
 		&a.PRID,
-		&a.InitiatorUID,
-		&a.InitiatorDt,
+		&a.OwnerUID,
+		&a.OwnerDt,
 		&a.ApproverUID,
 		&a.ApproverDt,
 		&a.FlowState,
@@ -180,8 +186,8 @@ func ReadStateInfoItem(rows *sql.Rows, a *StateInfo) error {
 	err := rows.Scan(
 		&a.SIID,
 		&a.PRID,
-		&a.InitiatorUID,
-		&a.InitiatorDt,
+		&a.OwnerUID,
+		&a.OwnerDt,
 		&a.ApproverUID,
 		&a.ApproverDt,
 		&a.FlowState,
@@ -212,8 +218,8 @@ func UpdateStateInfo(ctx context.Context, a *StateInfo) error {
 	}
 	fields := []interface{}{
 		a.PRID,
-		a.InitiatorUID,
-		a.InitiatorDt,
+		a.OwnerUID,
+		a.OwnerDt,
 		a.ApproverUID,
 		a.ApproverDt,
 		a.FlowState,

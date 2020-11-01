@@ -65,6 +65,9 @@ DBNAME="wreis"
 # ALTER TABLE StateInfo ADD InitiatorDt DATE NOT NULL DEFAULT '1970-01-01 00:00:00' AFTER InitiatorUID;
 # ALTER TABLE StateInfo ADD Reason VARCHAR(256) NOT NULL DEFAULT '' AFTER ApproverDt;
 
+# ALTER TABLE StateInfo CHANGE InitiatorUID OwnerUID BIGINT NOT NULL DEFAULT 0;
+# ALTER TABLE StateInfo CHANGE InitiatorDt OwnerDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00';
+
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================

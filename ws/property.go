@@ -558,8 +558,8 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		now := time.Now()
 		var s = db.StateInfo{
 			PRID:         p.PRID,
-			InitiatorUID: sess.UID,
-			InitiatorDt:  now,
+			OwnerUID: sess.UID,
+			OwnerDt:  now,
 			FlowState:    1,
 			FLAGS:        uint64(0),
 		}
