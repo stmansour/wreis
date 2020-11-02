@@ -46,9 +46,9 @@ type StateInfo struct {
 	Recid         int64             `json:"recid"`
 	SIID          int64             // unique id for this record
 	PRID          int64             // id of property to which this record belongs
-	OwnerUID  int64             // uid of Owner
-	OwnerDt   util.JSONDateTime // date/time this state was initiated
-	OwnerName string            //
+	OwnerUID      int64             // uid of Owner
+	OwnerDt       util.JSONDateTime // date/time this state was initiated
+	OwnerName     string            //
 	ApproverUID   int64             // date/time this state was approved
 	ApproverDt    util.JSONDateTime // date/time this state was approved
 	ApproverName  string            //
@@ -135,6 +135,12 @@ func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData)
 	case "save":
 		saveStateInfo(w, r, d)
 		break
+	case "setowner":
+		saveStateOwner(w, r, d)
+		break
+	case "setapprover":
+		saveStateApprover(w, r, d)
+		break
 	case "delete":
 		deleteStateInfo(w, r, d)
 	default:
@@ -216,6 +222,162 @@ func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (Sa
 	}
 
 	return foo, si, sess, nil
+}
+
+// saveStateApprover sets approver of the state.  Anyone can do it. The person making
+// the change will be noted.
+//
+//  ANYONE CAN CHANGE THE APPROVER:  But the person who made the change will be
+//         kept in the audit trail. Changer will be the UID
+//         of LastModBy on this StateInfo, and creator of the StateInfo
+//         with new owner
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateApprover(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	foo, si, _, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// mark this version as finished due to approver change...
+	// 		0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+	// 	*	1  0 = no request is being made,       1 = request approval for this state
+	// 		2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+	//      3  0 = not reverted, 1 = reverted
+	//      4  0 = no owner change, 1 = owner change, changer will be the UID
+	//         of LastModBy on this StateInfo, and creator of the StateInfo
+	//         with new owner
+	//  *   5  0 = no approver change, 1 = approver changed.  changer will be the UID
+	//         of LastModBy on this StateInfo, and creator of the StateInfo
+	//         with new approver
+	// we'll set the lower byte to (not approved, no request being made, work concluded )
+	//--------------------------------------------------------------------------
+	a := si
+	a.FLAGS &= si.FLAGS & 0xefffffffffffffc0
+	util.Console("before: a.FLAGS = %x\n", a.FLAGS)
+	a.FLAGS |= 0x24
+	a.Reason = foo.Records[0].Reason // save the reason
+	util.Console("after: a.FLAGS = %x\n", a.FLAGS)
+	if err = db.UpdateStateInfo(ctx, &a); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// now create the new owner state info...
+	//--------------------------------------------------------------------------
+	a.SIID = 0
+	a.FLAGS = 0
+	a.ApproverUID = foo.Records[0].ApproverUID // this has the new owner
+	a.Reason = ""
+	if _, err = db.InsertStateInfo(ctx, &a); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
+}
+
+// saveStateOwner sets owner of the state.  Anyone can do it. The person making
+// the change will be noted.
+//
+//  ANYONE CAN CHANGE THE OWNER:  But the person who made the change will be
+//         kept in the audit trail. Changer will be the UID
+//         of LastModBy on this StateInfo, and creator of the StateInfo
+//         with new owner
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateOwner(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	foo, si, _, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// mark this version as finished due to owner change...
+	// 		0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+	// 	*	1  0 = no request is being made,       1 = request approval for this state
+	// 		2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+	//      3  0 = not reverted, 1 = reverted
+	//  *   4  0 = no owner change, 1 = owner change, changer will be the UID
+	//         of LastModBy on this StateInfo, and creator of the StateInfo
+	//         with new owner
+	// we'll set the lower byte to (not approved, no request being made, work concluded )
+	//--------------------------------------------------------------------------
+	a := si
+	a.FLAGS &= si.FLAGS & 0xefffffffffffffe0
+	util.Console("before: a.FLAGS = %x\n", a.FLAGS)
+	a.FLAGS |= 0x14
+	a.Reason = foo.Records[0].Reason // save the reason
+	util.Console("after: a.FLAGS = %x\n", a.FLAGS)
+	if err = db.UpdateStateInfo(ctx, &a); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// now create the new owner state info...
+	//--------------------------------------------------------------------------
+	a.SIID = 0
+	a.FLAGS = 0
+	a.OwnerDt = time.Now()
+	a.OwnerUID = foo.Records[0].OwnerUID // this has the new owner
+	a.Reason = ""
+	if _, err = db.InsertStateInfo(ctx, &a); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
 }
 
 // saveStateReady sets the flag to indicate the owner wishes the

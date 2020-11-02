@@ -169,9 +169,10 @@ CREATE TABLE Traffic (
 **  bit  Description
 **  ---  ----------------------------------------------------------------------
       0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
-      1  0 = work is in progress, 1 = request approval for this state
+      1  0 = work is in progress, 1 = READY: request approval for this state
       2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
       3  0 = this state has not been reverted.  1 = this state was reverted
+      4  0 = no owner change, 1 = owner change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new owner
 */
 CREATE TABLE StateInfo (
     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID

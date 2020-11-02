@@ -353,65 +353,80 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     mysql --no-defaults wreis < xh.sql
     login
 
-    # Error case 1
+    # 0. Error case 1
     # try save a reject that we're not listed as the Authorizer
     encodeRequest '{"cmd":"reject","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"Reason":"This is the reason","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":3,"SIID":6,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-Reject-error-case-1"
 
-    # Error case 2
+    # 1. Error case 2
     # try save a reject where we changed the UID to our current UID, but it does not match the one in the database
     encodeRequest '{"cmd":"reject","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":3,"Reason":"This is the reason","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":3,"SIID":6,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-Reject-error-case-2"
 
-    # Error case 3
+    # 2. Error case 3
     # try to save a reject without a reason
     encodeRequest '{"cmd":"reject","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":4,"InitiatorDt":"2020-10-04 10:37:45 UTC","InitiatorUID":92,"PRID":4,"SIID":10,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Reject-error-case-3"
 
-    # save a reject
+    # 3. save a reject
     encodeRequest '{"cmd":"reject","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":4,"Reason":"Listing pictures look bad","InitiatorDt":"2020-10-04 10:37:45 UTC","InitiatorUID":92,"PRID":4,"SIID":10,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Reject"
 
-    # read property 4 to make sure all info is being correctly fetched
+    # 4. read property 4 to make sure all info is being correctly fetched
     encodeRequest '{"cmd":"get"}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "Read-StateInfo"
 
-    # set ready status - Error case - only owner can set READY
+    # 5. set ready status - Error case - only owner can set READY
     encodeRequest '{"cmd":"ready","records":[{"PRID": 4,"Reason": "","SIID": 33,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Ready-Error1"
 
-    # set ready status - this should work as tester is the owner of the task
+    # 6. set ready status - this should work as tester is the owner of the task
     encodeRequest '{"cmd":"ready","records":[{"PRID": 3,"Reason": "","SIID": 6,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverUID": 80,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-Ready"
 
-    # read property 4 to make sure all info is being correctly fetched
+    # 7. read property 3 to make sure all info is being correctly fetched.  We just set the state to READY.  FLAGS should be
     encodeRequest '{"cmd":"get"}'
-    dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "Read-StateInfo"
+    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "Read-StateInfo"
 
-    # save an approval
+    # 8. save an approval.  This should create SIID 34, with FLAGS=0 and FlowState = 5
     encodeRequest '{"cmd":"approve","records":[{"PRID": 4,"Reason": "","SIID": 33,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Approve"
 
-    # save an approval - should cause an error - the work was already completed
+    # 9. save an approval - should cause an error - the work was already completed
     encodeRequest '{"cmd":"approve","records":[{"PRID": 4,"Reason": "","SIID": 33,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Approve-Error"
 
-    # save revert but don't include a reason
+    # 10. save revert but don't include a reason
     encodeRequest '{"cmd":"revert","records":[{"PRID": 4,"Reason": "","SIID": 34,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Revert-Error-case-1"
 
-    # save revert
+    # 11. save revert
     encodeRequest '{"cmd":"revert","records":[{"PRID": 4,"Reason": "Picture shows the wrong elevation of the building","SIID": 34,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Revert"
 
-    # try save a revert that we're not listed as the Authorizer
+    # 12. try save a revert that we're not listed as the Authorizer
     encodeRequest '{"cmd":"revert","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"Reason":"This is the reason","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":3,"SIID":6,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-Revert-error-case-2"
 
-    # try to revert something that's in state 1
+    # 13. try to revert something that's in state 1
     encodeRequest '{"cmd":"revert","records":[{"PRID":1,"SIID":1,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":1,"Reason":"This is the reason","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "StateInfo-Revert-error-case-3"
 
+    # 14. change the owner on a property where we're not the owner or approver
+    encodeRequest '{"cmd":"setowner","records":[{"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"Reason":"We need to get this moving","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":3,"SIID":6,"recid":1}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-setowner"
+
+    # 15. change the approver on a property where we're not the owner or approver - this is an error case as it tries to use a finished state info
+    encodeRequest '{"cmd":"setapprover","records":[{"PRID":3,"SIID":6,"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":72,"FLAGS":0,"FlowState":3,"Reason":"Someone needs to approve this","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"recid":1}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-setapprover-error-case-1"
+
+    # 16. change the approver on a property where we're not the owner or approver - this should work since we are operating on the latest state info
+    encodeRequest '{"cmd":"setapprover","records":[{"PRID":3,"SIID":36,"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":72,"FLAGS":0,"FlowState":3,"Reason":"Someone needs to approve this","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"recid":1}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-setapprover"
+
+    # 17. this should fail as we completed work on SIID 36 in the last command
+    encodeRequest '{"cmd":"setapprover","records":[{"PRID":3,"SIID":36,"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":72,"FLAGS":0,"FlowState":3,"Reason":"Someone needs to approve this","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"recid":1}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-setapprover-error"
 
 fi
 
