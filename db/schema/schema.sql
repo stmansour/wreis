@@ -173,6 +173,7 @@ CREATE TABLE Traffic (
       2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
       3  0 = this state has not been reverted.  1 = this state was reverted
       4  0 = no owner change, 1 = owner change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new owner
+      5  0 = no approver change, 1 = approver change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new approver
 */
 CREATE TABLE StateInfo (
     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID

@@ -1,4 +1,4 @@
 {
-    "message": "Error: You cannot revert from this state\n",
+    "message": "Error: You are not the current Approver for this state\n",
     "status": "error"
 }

@@ -1,4 +1,4 @@
 {
-    "recid": 0,
-    "status": "success"
+    "message": "Error: You cannot revert from this state\n",
+    "status": "error"
 }

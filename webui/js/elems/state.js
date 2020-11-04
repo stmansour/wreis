@@ -81,11 +81,29 @@ function updatePropertyState() {
     }
     fs = r.FlowState;
     if (propData.states != null) {
+        var curState = 1;
+        var s = "<p><table>";
+        var j = 1;
+        var MINYEAR = 2000;
+        var notAnApproval = false;
+        var statusSet = false;
         for (var i = 0; i < propData.states.length; i++) {
-            var s = "";
             var id;
             var dt;
-            var j = propData.states[i].FlowState;
+            var flags = propData.states[i].FLAGS;
+            j = propData.states[i].FlowState;
+
+
+            //---------------------------------------------------------------
+            // Before processing any further, dump the info we have if the
+            // FlowState has changed
+            //---------------------------------------------------------------
+            if (j != curState) {
+                s += "</table>";
+                setHTMLByID("stateDataCell" + curState,s);
+                s = "<p><table>";
+                curState = j;
+            }
 
             color = getStateTextColor(j,fs,0);
             setStateColor('stateStepNo'+j,color);
@@ -97,27 +115,95 @@ function updatePropertyState() {
 
             color = (r.FlowState >= j ) ? "black" : propData.notStartedText;
             setStateLabelColor(color,j);
+            /*
+            **  FLAGS
+            **          bit  Description
+            **          ---  ----------------------------------------------------------------------
+                0x1      0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+                0x2      1  0 = work is in progress, 1 = READY: request approval for this state
+                0x4      2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+                0x8      3  0 = this state has not been reverted.  1 = this state was reverted
+                0x10     4  0 = no owner change, 1 = owner change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new owner
+                0x10     4  0 = no owner change, 1 = owner change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new owner
+            */
+            notAnApproval = false;  // assume it's an Approval
+            statusSet = false;
+            s += '<tr><td align="right">Status:</td><td>';
+            if ((flags & 0x4) != 0) {
+                s += "Done. ";
+                statusSet = true;
+            }
+            if ((flags & 0x2) != 0) {
+                s += "READY ";
+                statusSet = true;
+            }
+            if ((flags & 0x8) != 0) {
+                s += "REVERTED ";
+                notAnApproval = true;  // this would make it not an approval
+                statusSet = true;
+            }
+            if ((flags & 0x10) != 0) {
+                s += "owner changed ";
+                notAnApproval = true;  // this would make it not an approval
+                statusSet = true;
+            }
+            if ((flags & 0x20) != 0) {
+                s += "approver changed ";
+                notAnApproval = true;  // this would make it not an approval
+                statusSet = true;
+            }
+            dt = new Date(propData.states[i].ApproverDt);
+            if (!notAnApproval && propData.states[i].ApproverUID > 0 && dt.getFullYear() > MINYEAR) {
+                s += ((flags & 0x1) != 0) ? "NOT " : "";
+                s += "APPROVED ";
+                statusSet = true;
+            }
+
+            if (!statusSet) {
+                s += 'in progress';
+            }
+            s += '</td></tr>';
 
             if (propData.states[i].OwnerUID > 0) {
                 dt = new Date(propData.states[i].OwnerDt);
-                s = propData.states[i].OwnerName + ', ' + dt.toDateString();
-                id = "stateCreateUser" + j;
-                setHTMLByID(id,s);
+                s += '<tr><td align="right">Owner:</td><td>' + propData.states[i].OwnerName;
+                if (dt.getFullYear() > MINYEAR ) {
+                    s += ', ' + dt.toDateString() + "</td></tr>";
+                }
             }
             if (propData.states[i].ApproverUID > 0) {
-                s = propData.states[i].ApproverName;
-                id = "stateApproveUser" + j;
-                setHTMLByID(id,s);
+                dt = new Date(propData.states[i].ApproverDt);
+                var y = "";
+                if (dt.getFullYear() > MINYEAR) {
+                    y = dt.toDateString();
+                }
+                s += '<tr><td align="right">Approver</td><td>' + propData.states[i].ApproverName;
+                if (dt.getFullYear > MINYEAR) {
+                    s += ', ' + dt.toDateString() + "</td></tr>";
+                }
+            }
+            if (propData.states[i].Reason.length > 0) {
+                s += '<tr><td align="right">Reason:</td><td>' + propData.states[i].Reason + '</td></tr>';
             }
             stateStatus(propData.states[i],r.FlowState);
-            id = "stateLastMod" + j;
+            s += "<tr><td>Last Update:</td><td>";
             dt = new Date(propData.states[i].LastModTime);
-            s = propData.states[i].LastModByName + ", " + dt.toDateString();
-            setHTMLByID(id,s);
+            s += propData.states[i].LastModByName + ", " + dt.toDateString();
+
+            //-----------------------------------------------------------
+            // now add a spacer line
+            //-----------------------------------------------------------
+            s += '<tr><td colspan="2" height="10"></td>';
+
+            //-----------------------------------------------------------
+            // ADD CHANGE BUTTON TO CURRENT STATE...
+            //-----------------------------------------------------------
             if (propData.states[i].FlowState == w2ui.propertyForm.record.FlowState) {
                 setStateChange(w2ui.propertyForm.record.FlowState);
             }
         }
+        s += "</table>";
+        setHTMLByID("stateDataCell" + curState,s);
     }
 }
 

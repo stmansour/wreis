@@ -6,70 +6,82 @@
 <body>
     <table>
         <tr>
-            <td colspan="2" height="10"></td>
+            <td colspan="3" height="10"></td>
         </tr>
         <tr>
-            <td colspan="2" align="center">PROPERTY STATE MANAGEMENT</td>
+            <td colspan="3" align="center">PROPERTY STATE MANAGEMENT</td>
         </tr>
 
-        <tr><td colspan="2" height="10"></td></tr>
+        <tr><td colspan="3" height="10"></td></tr>
 
         <tr>
-            <td align="right">
-                <div id="smApprove">Approve and advance to <span id="smNextState1">next state</span>
-                --------------------------------------------->
+            <td align="right" colspan="2">
+                <div id="smApprove">Ready to advance to the next state
+                ----------------------------->
                 </div>
             </td>
-            <td>
-                <button>Approve</button>
-            </td>
+            <td><button>Ready for Approval</button></td>
         </tr>
 
+        <tr><td colspan="3" height="20"></td></tr>
+
         <tr>
-            <td align="right" valign="bottom" id="smReject">
-                Reject because: <textarea id="smReason" rows="6" cols="40" maxlength="256" width="234"> </textarea>
+            <td align="right" colspan="2">
+                <div id="smApprove">Approve and advance to <span id="smNextState1">next state</span>
+                ------------------------------->
+                </div>
             </td>
+            <td><button>Approve</button></td>
+        </tr>
+
+        <tr><td colspan="3" height="20"></td></tr>
+
+        <tr>
+            <td align="right">Reject because:</td>
+            <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="5" cols="40" maxlength="256" width="234"> </textarea> </td>
             <td valign="bottom">
                 <button>Reject</button>
             </td>
         </tr>
 
-        <tr><td colspan="2" height="20"></td></tr>
+        <tr><td colspan="3" height="20"></td></tr>
 
         <tr>
-            <td align="right">
-                Approver: <input type="text" id="smApprover" size="41">
-            </td>
-            <td>
-                <button>Set Approver</button>
-            </td>
+            <td align="right">New Approver:</td>
+            <td><input type="text" id="smApprover" size="41"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td align="right">Reason:</td>
+            <td align="right" valign="bottom"> <textarea id="smApproverReason" rows="5" cols="40" maxlength="256" width="234"> </textarea> </td>
+            <td valign="bottom"> <button>Set New Approver</button> </td>
         </tr>
 
+        <tr><td colspan="3" height="20"></td></tr>
+
         <tr>
-            <td id="smStateOwner" align="right">
-                Owner: <input type="text" id="smNextStateOwner" size="41">
-            </td>
-            <td>
-                <button>Assign</button>
-            </td>
+            <td align="right">New Owner:</td>
+            <td id="smStateOwner" valign="bottom"> <input type="text" id="smNextStateOwner" size="40"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td align="right">Reason:</td>
+            <td><textarea id="smOwnerReason" rows="5" cols="40" maxlength="256" width="234"> </textarea></td>
+            <td valign="bottom"> <button>Set New Owner</button> </td>
         </tr>
 
-        <tr><td colspan="2" height="20"></td></tr>
+        <tr><td colspan="3" height="20"></td></tr>
 
         <tr>
-            <td id="smRevert" align="right">
-                Revert to <span id="smRevertState">previous state:</span>
-                -------------------------------------------------------->
-            </td>
-            <td>
-                <button>Revert</button>
-            </td>
+            <td align="right">Revert to <span id="smRevertState">previous state</span> because:</td>
+            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="5" cols="40" maxlength="256" width="234"></textarea></td>
+            <td valign="bottom"><button>Revert</button></td>
         </tr>
 
-        <tr><td colspan="2" height="10"></td></tr>
+        <tr><td colspan="3" height="10"></td></tr>
 
         <tr>
-            <td align="center" colspan="2">
+            <td align="center" colspan="3">
                 <button onclick="closeStateChangeDialog();"> Done </button>
             </td>
         </tr>

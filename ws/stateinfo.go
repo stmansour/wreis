@@ -254,10 +254,11 @@ func saveStateApprover(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	//--------------------------------------------------------------------------
 	// mark this version as finished due to approver change...
-	// 		0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+	// 		0  valid only when ApproverUID > 0 and ApproverDt is after 2016, 0 = State Approved, 1 = not approved
 	// 	*	1  0 = no request is being made,       1 = request approval for this state
 	// 		2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
 	//      3  0 = not reverted, 1 = reverted
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	//      4  0 = no owner change, 1 = owner change, changer will be the UID
 	//         of LastModBy on this StateInfo, and creator of the StateInfo
 	//         with new owner
@@ -268,10 +269,10 @@ func saveStateApprover(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	a := si
 	a.FLAGS &= si.FLAGS & 0xefffffffffffffc0
-	util.Console("before: a.FLAGS = %x\n", a.FLAGS)
-	a.FLAGS |= 0x24
-	a.Reason = foo.Records[0].Reason // save the reason
-	util.Console("after: a.FLAGS = %x\n", a.FLAGS)
+	// util.Console("before: a.FLAGS = %x\n", a.FLAGS)
+	a.FLAGS |= 0x24                  // bit 2 = 1 means it's completed, but 5 = 1 means approver set
+	a.Reason = foo.Records[0].Reason // save the reason if it's supplied
+	// util.Console("after: a.FLAGS = %x\n", a.FLAGS)
 	if err = db.UpdateStateInfo(ctx, &a); err != nil {
 		tx.Rollback()
 		SvcErrorReturn(w, err)
@@ -334,9 +335,10 @@ func saveStateOwner(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	// mark this version as finished due to owner change...
 	// 		0  valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
-	// 	*	1  0 = no request is being made,       1 = request approval for this state
-	// 		2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
+	// 		1  0 = no request is being made,       1 = request approval for this state
+	// 	*   2  0 = this state is work in progress, 1 = work is concluded on this StateInfo
 	//      3  0 = not reverted, 1 = reverted
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	//  *   4  0 = no owner change, 1 = owner change, changer will be the UID
 	//         of LastModBy on this StateInfo, and creator of the StateInfo
 	//         with new owner
@@ -493,7 +495,7 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			return
 		}
 
-		util.Console("New stateinfo created: SIID = %d\n", a.SIID)
+		// util.Console("New stateinfo created: SIID = %d\n", a.SIID)
 
 		// Now we need to update the property's state...
 		prop, err := db.GetProperty(ctx, a.PRID)
@@ -701,6 +703,26 @@ func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcErrorReturn(w, err)
 		return
 	}
+	//--------------------------------------------------------------------------
+	// Now we need to update the property's state...
+	//--------------------------------------------------------------------------
+	prop, err := db.GetProperty(ctx, revert.PRID)
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	util.Console("Read property PRID = %d, FlowState = %d\n", prop.PRID, prop.FlowState)
+
+	prop.FlowState = revert.FlowState
+	util.Console("FlowState changed to  %d\n", prop.FlowState)
+	if err = db.UpdateProperty(ctx, &prop); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+	util.Console("Saved property success\n")
 
 	//---------------------------------------
 	// commit

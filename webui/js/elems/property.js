@@ -21,8 +21,8 @@ var propData = {
     states: [],                 // the server will be queried for these on existing properties, or filled with an inital state on new
     doneText: "#0611AA",
     doneBG: "#e0f0ff",
-    notStartedText: "#888888",
-    notStartedBG: "#e0e0e0",
+    notStartedText: "#777777",
+    notStartedBG: "#f8f8f8",
     inProgressText: "#11AA11",
     inProgressBG: "#e0ffe0",
 };
