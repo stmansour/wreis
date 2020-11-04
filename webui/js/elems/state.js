@@ -178,7 +178,7 @@ function updatePropertyState() {
                     y = dt.toDateString();
                 }
                 s += '<tr><td align="right">Approver</td><td>' + propData.states[i].ApproverName;
-                if (dt.getFullYear > MINYEAR) {
+                if (dt.getFullYear() > MINYEAR) {
                     s += ', ' + dt.toDateString() + "</td></tr>";
                 }
             }
