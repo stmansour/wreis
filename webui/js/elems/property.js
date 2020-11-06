@@ -205,10 +205,11 @@ function buildPropertyUIElements() {
         ],
         onClick: function(event) {
             event.onComplete = function (event) {
-                loadPropertyForm(event.recid);
+                loadPropertyForm(w2ui.propertyGrid.records[event.recid].PRID);
 
                 // var f = w2ui.propertyForm;
-                // var rec = w2ui.propertyGrid.get(event.recid);
+                // // var rec = w2ui.propertyGrid.get(event.recid);
+                // var rec = w2ui.propertyGrid.records[event.recid];
                 // w2ui.propertyForm.recid = rec.PRID;
                 // propData.PRID = rec.PRID;
                 //
@@ -553,7 +554,20 @@ function buildPropertyUIElements() {
 
 function loadPropertyForm(PRID) {
     var f = w2ui.propertyForm;
-    var rec = w2ui.propertyGrid.get(PRID);
+    // var rec = w2ui.propertyGrid.records[PRID];
+    var rec = null;
+//
+
+    for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
+        if (w2ui.propertyGrid.records[i].PRID == PRID) {
+            rec = w2ui.propertyGrid.records[i];
+            break;
+        }
+    }
+    if (rec === null) {
+        console.log('could not find PRID = '+PRID+' in property grid records');
+        return;
+    }
     w2ui.propertyForm.recid = rec.PRID;
     propData.PRID = rec.PRID;
     closeStateChangeDialog(); // make sure this is closed
