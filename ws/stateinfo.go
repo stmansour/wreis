@@ -132,6 +132,9 @@ func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData)
 	case "ready":
 		saveStateReady(w, r, d)
 		break
+	case "notready":
+		saveStateNotReady(w, r, d)
+		break
 	case "save":
 		saveStateInfo(w, r, d)
 		break
@@ -385,12 +388,12 @@ func saveStateOwner(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // saveStateReady sets the flag to indicate the owner wishes the
 // to approve the state and advance to the next state
 //
-// Here we expect to read the command "requestapprove" and an array of records
+// Here we expect to read the command "ready" and an array of records
 // containing precisely one StateInfo struct, the latest one for
 // the state in question.
 //
 //	@URL /v1/StateInfo/PRID
-//
+//        cmd = "ready"
 //-----------------------------------------------------------------------------
 func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	foo, si, sess, err := stateInfoHelper(w, r, d)
@@ -424,6 +427,56 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// we'll set the lower byte to (not approved, no request being made, work concluded )
 	//--------------------------------------------------------------------------
 	si.FLAGS |= 0x2
+	if err = db.UpdateStateInfo(r.Context(), &si); err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
+}
+
+// saveStateNotReady unsets the Ready flag.
+//
+// Here we expect to read the command "notready" and an array of records
+// containing precisely one StateInfo struct, the latest one for
+// the state in question.
+//
+//	@URL /v1/StateInfo/PRID
+//        cmd = "notready"
+//-----------------------------------------------------------------------------
+func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	foo, si, sess, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// Only the owner can ask for approval
+	//--------------------------------------------------------------------------
+	util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
+	if si.OwnerUID != sess.UID {
+		e := fmt.Errorf("Only the owner can request approval")
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// before we save it, make sure that there is an approver
+	//--------------------------------------------------------------------------
+	if si.ApproverUID < 1 {
+		e := fmt.Errorf("An approver must be assigned first")
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// mark this version as ready to be approved...  The request approval flag
+	// (that is bit 1).
+	// we'll set the lower byte to (not approved, no request being made, work concluded )
+	//--------------------------------------------------------------------------
+	//            6456484032241608
+	si.FLAGS &= 0xeffffffffffffffd // set bit 1 to 0
 	if err = db.UpdateStateInfo(r.Context(), &si); err != nil {
 		SvcErrorReturn(w, err)
 		return

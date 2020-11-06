@@ -1,7 +1,7 @@
 /*global
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
-    propertyStateOnLoad,setTimeout,
+    propertyStateOnLoad,setTimeout,closeStateChangeDialog,
 */
 
 "use strict";
@@ -147,7 +147,7 @@ function buildPropertyUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
          columns: [
-            {field: 'Recid',                size: '60px', caption: 'Recid', sortable: true, hidden: true},
+            {field: 'recid',                size: '60px', caption: 'recid', sortable: true, hidden: true},
             {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
             {field: 'Name',                 size: '200px', caption: 'Name', sortable: true, hidden: false},
             {field: 'YearsInBusiness',      size: '60px', caption: 'YearsInBusiness', sortable: true, hidden: true},
@@ -205,29 +205,33 @@ function buildPropertyUIElements() {
         ],
         onClick: function(event) {
             event.onComplete = function (event) {
-                var f = w2ui.propertyForm;
-                var rec = w2ui.propertyGrid.get(event.recid);
-                w2ui.propertyForm.recid = rec.PRID;
-                propData.PRID = rec.PRID;
+                loadPropertyForm(event.recid);
 
-                f.url = "/v1/property/"+rec.PRID;
-                f.refresh();
-                f.reload();  // get this going as quickly as possible
-
-                propData.RSLID = rec.RSLID;
-                propData.ROLID = rec.ROLID;
-                propData.bPropLoaded = false;
-                propData.bRentStepsLoaded = false;
-                propData.bRenewOptionsLoaded = false;
-                propData.bTrafficLoaded = false;
-                propData.bStateLoaded = false;
-                w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
-                var l = w2ui.propertyFormLayout.get('main');
-                if (typeof l.tabs != "undefined"){
-                    if (typeof l.tabs.name == "string") {
-                        l.tabs.click('proptabState');
-                    }
-                }
+                // var f = w2ui.propertyForm;
+                // var rec = w2ui.propertyGrid.get(event.recid);
+                // w2ui.propertyForm.recid = rec.PRID;
+                // propData.PRID = rec.PRID;
+                //
+                // closeStateChangeDialog(); // make sure this is closed
+                //
+                // f.url = "/v1/property/"+rec.PRID;
+                // f.refresh();
+                // f.reload();  // get this going as quickly as possible
+                //
+                // propData.RSLID = rec.RSLID;
+                // propData.ROLID = rec.ROLID;
+                // propData.bPropLoaded = false;
+                // propData.bRentStepsLoaded = false;
+                // propData.bRenewOptionsLoaded = false;
+                // propData.bTrafficLoaded = false;
+                // propData.bStateLoaded = false;
+                // w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
+                // var l = w2ui.propertyFormLayout.get('main');
+                // if (typeof l.tabs != "undefined"){
+                //     if (typeof l.tabs.name == "string") {
+                //         l.tabs.click('proptabState');
+                //     }
+                // }
             };
         },
         onRequest: function(event) {
@@ -264,6 +268,9 @@ function buildPropertyUIElements() {
             event.onComplete = function(event) {
                 propData.statefilter = [1,2,3,4,5,6];
                 propertySetPostData();
+                for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
+                    w2ui.propertyGrid.records[i].recid = w2ui.propertyGrid.records[i].PRID;
+                }
             };
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
@@ -541,6 +548,34 @@ function buildPropertyUIElements() {
             }
         },
    });
+
+}
+
+function loadPropertyForm(PRID) {
+    var f = w2ui.propertyForm;
+    var rec = w2ui.propertyGrid.get(PRID);
+    w2ui.propertyForm.recid = rec.PRID;
+    propData.PRID = rec.PRID;
+    closeStateChangeDialog(); // make sure this is closed
+
+    f.url = "/v1/property/"+rec.PRID;
+    f.refresh();
+    f.reload();  // get this going as quickly as possible
+
+    propData.RSLID = rec.RSLID;
+    propData.ROLID = rec.ROLID;
+    propData.bPropLoaded = false;
+    propData.bRentStepsLoaded = false;
+    propData.bRenewOptionsLoaded = false;
+    propData.bTrafficLoaded = false;
+    propData.bStateLoaded = false;
+    w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
+    var l = w2ui.propertyFormLayout.get('main');
+    if (typeof l.tabs != "undefined"){
+        if (typeof l.tabs.name == "string") {
+            l.tabs.click('proptabState');
+        }
+    }
 
 }
 

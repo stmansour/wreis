@@ -129,12 +129,8 @@ function updatePropertyState() {
             notAnApproval = false;  // assume it's an Approval
             statusSet = false;
             s += '<tr><td align="right">Status:</td><td>';
-            if ((flags & 0x4) != 0) {
-                s += "Done. ";
-                statusSet = true;
-            }
             if ((flags & 0x2) != 0) {
-                s += "READY ";
+                s += 'READY <span style="color:#3333DD;font-weight:bold;">(approval pending)</span>';
                 statusSet = true;
             }
             if ((flags & 0x8) != 0) {
@@ -143,12 +139,12 @@ function updatePropertyState() {
                 statusSet = true;
             }
             if ((flags & 0x10) != 0) {
-                s += "owner changed ";
+                s += "OWNER CHANGED ";
                 notAnApproval = true;  // this would make it not an approval
                 statusSet = true;
             }
             if ((flags & 0x20) != 0) {
-                s += "approver changed ";
+                s += "APPROVER CHANGED ";
                 notAnApproval = true;  // this would make it not an approval
                 statusSet = true;
             }
@@ -158,19 +154,20 @@ function updatePropertyState() {
                 s += "APPROVED ";
                 statusSet = true;
             }
+            if ((flags & 0x4) != 0) {
+                s += '<span style="color:#117711;font-weight:bold;">&#10004;</span>';
+                statusSet = true;
+            }
 
             if (!statusSet) {
-                s += 'in progress';
+                s += '<span style="color:#117711;font-weight:bold;">IN PROGRESS</span>';
             }
             s += '</td></tr>';
 
-            if (propData.states[i].OwnerUID > 0) {
-                dt = new Date(propData.states[i].OwnerDt);
-                s += '<tr><td align="right">Owner:</td><td>' + propData.states[i].OwnerName;
-                if (dt.getFullYear() > MINYEAR ) {
-                    s += ', ' + dt.toDateString() + "</td></tr>";
-                }
+            if (propData.states[i].Reason.length > 0) {
+                s += '<tr><td align="right">Reason:</td><td>' + propData.states[i].Reason + '</td></tr>';
             }
+
             if (propData.states[i].ApproverUID > 0) {
                 dt = new Date(propData.states[i].ApproverDt);
                 var y = "";
@@ -182,8 +179,12 @@ function updatePropertyState() {
                     s += ', ' + dt.toDateString() + "</td></tr>";
                 }
             }
-            if (propData.states[i].Reason.length > 0) {
-                s += '<tr><td align="right">Reason:</td><td>' + propData.states[i].Reason + '</td></tr>';
+            if (propData.states[i].OwnerUID > 0) {
+                dt = new Date(propData.states[i].OwnerDt);
+                s += '<tr><td align="right">Owner:</td><td>' + propData.states[i].OwnerName;
+                if (dt.getFullYear() > MINYEAR ) {
+                    s += ', ' + dt.toDateString() + "</td></tr>";
+                }
             }
             stateStatus(propData.states[i],r.FlowState);
             s += "<tr><td>Last Update:</td><td>";
