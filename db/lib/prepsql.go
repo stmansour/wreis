@@ -96,7 +96,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	flds = "PRID,ROLID,RSLID,FlowState,Name,YearsInBusiness,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildDate,FLAGS,Ownership,TenantTradeName,LeaseGuarantor,LeaseType,DeliveryDt,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,TermRemainingOnLease,TermRemainingOnLeaseUnits,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQAddress,HQAddress2,HQCity,HQState,HQPostalCode,HQCountry,Img1,Img2,Img3,Img4,Img5,Img6,Img7,Img8,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["Property"] = flds
-	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property where PRID=?")
+	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property WHERE PRID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertProperty, err = Wdb.DB.Prepare("INSERT INTO Property (" + s1 + ") VALUES(" + s2 + ")")
@@ -111,7 +111,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	flds = "RSID,RSLID,Dt,Opt,Rent,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentStep"] = flds
-	Wdb.Prepstmt.GetRentStep, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentStep where RSID=?")
+	Wdb.Prepstmt.GetRentStep, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentStep WHERE RSID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertRentStep, err = Wdb.DB.Prepare("INSERT INTO RentStep (" + s1 + ") VALUES(" + s2 + ")")
@@ -126,9 +126,9 @@ func BuildPreparedStatements() {
 	//==========================================
 	flds = "RSLID,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentSteps"] = flds
-	Wdb.Prepstmt.GetRentSteps, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentSteps where RSLID=?")
+	Wdb.Prepstmt.GetRentSteps, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentSteps WHERE RSLID=?")
 	Errcheck(err)
-	Wdb.Prepstmt.GetRentStepsItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["RentStep"] + " FROM RentStep where RSLID=?")
+	Wdb.Prepstmt.GetRentStepsItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["RentStep"] + " FROM RentStep WHERE RSLID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertRentSteps, err = Wdb.DB.Prepare("INSERT INTO RentSteps (" + s1 + ") VALUES(" + s2 + ")")
@@ -145,7 +145,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	flds = "ROID,ROLID,Dt,Opt,Rent,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RenewOption"] = flds
-	Wdb.Prepstmt.GetRenewOption, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOption where ROID=?")
+	Wdb.Prepstmt.GetRenewOption, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOption WHERE ROID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertRenewOption, err = Wdb.DB.Prepare("INSERT INTO RenewOption (" + s1 + ") VALUES(" + s2 + ")")
@@ -160,9 +160,9 @@ func BuildPreparedStatements() {
 	//==========================================
 	flds = "ROLID,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RenewOptions"] = flds
-	Wdb.Prepstmt.GetRenewOptions, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOptions where ROLID=?")
+	Wdb.Prepstmt.GetRenewOptions, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOptions WHERE ROLID=?")
 	Errcheck(err)
-	Wdb.Prepstmt.GetRenewOptionsItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["RenewOption"] + " FROM RenewOption where ROLID=?")
+	Wdb.Prepstmt.GetRenewOptionsItems, err = Wdb.DB.Prepare("SELECT " + Wdb.DBFields["RenewOption"] + " FROM RenewOption WHERE ROLID=?")
 	Errcheck(err)
 	s1, s2, s3, _, _ = GenSQLInsertAndUpdateStrings(flds)
 	Wdb.Prepstmt.InsertRenewOptions, err = Wdb.DB.Prepare("INSERT INTO RenewOptions (" + s1 + ") VALUES(" + s2 + ")")

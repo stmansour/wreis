@@ -42,10 +42,27 @@ function setStateChangeDialogValues() {
     //-------------------------------------------------------------------------
     if ((si.FLAGS & 0x2) == 0) {
         setInnerHTML("stateReadyLabel","IN PROGRESS");
-        setInnerHTML("stateReadyButton","Ready For Approval");
+        setInnerHTML("stateReadyButtonLbl","Ready For Approval");
     } else {
         setInnerHTML("stateReadyLabel","READY");
-        setInnerHTML("stateReadyButton","Back To In-Progress");
+        setInnerHTML("stateReadyButtonLbl","Back To In-Progress");
+    }
+
+    var x = document.getElementById("stateReadyButton");
+    if (x != null) {
+        x.disabled = (app.uid != propData.states[i].OwnerUID);
+    }
+    x = document.getElementById("approveStateButton");
+    if (x != null) {
+        x.disabled = (app.uid != propData.states[i].ApproverUID);
+    }
+    x = document.getElementById("approveStateButton");
+    if (x != null) {
+        x.disabled = (app.uid != propData.states[i].ApproverUID);
+    }
+    x = document.getElementById("rejectStateButton");
+    if (x != null) {
+        x.disabled = (app.uid != propData.states[i].ApproverUID);
     }
 
 

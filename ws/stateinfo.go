@@ -947,14 +947,14 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var mm = map[int64]int{}
 	var mmm = map[int64]UserInfo{}
 
-	// util.Console("Getting all state info items for property: %d\n", d.ID)
+	util.Console("Getting all state info items for property: %d\n", d.ID)
 	a, err := db.GetAllStateInfoItems(r.Context(), d.ID)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
 	}
-	// util.Console("Number of state info items found: %d\n", len(a))
-	// util.Console("a = %#v\n", a)
+	util.Console("Number of state info items found: %d\n", len(a))
+	util.Console("a = %#v\n", a)
 
 	for i := 0; i < len(a); i++ {
 		var gg StateInfo

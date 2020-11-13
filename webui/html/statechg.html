@@ -20,7 +20,7 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change ----------------------->
                 </div>
             </td>
-            <td><button onclick="stateReadyForApproval();"><span id="stateReadyButton"></span></button></td>
+            <td><button onclick="stateReadyForApproval();" id="stateReadyButton"><span id="stateReadyButtonLbl"></span></button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -31,7 +31,7 @@
                 ------------------------------->
                 </div>
             </td>
-            <td><button>Approve</button></td>
+            <td><button id="approveStateButton">Approve</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -39,10 +39,18 @@
         <tr>
             <td align="right">Reject because:</td>
             <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="5" cols="40" maxlength="256" width="234"> </textarea> </td>
-            <td valign="bottom"><button>Reject</button></td>
+            <td valign="bottom"><button id="rejectStateButton">Reject</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
+
+        <tr>
+            <td align="right">Revert to <span id="smRevertState">previous state</span> because:</td>
+            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="5" cols="40" maxlength="256" width="234"></textarea></td>
+            <td valign="bottom"><button>Revert</button></td>
+        </tr>
+
+        <tr><td colspan="3" height="10"></td></tr>
 
         <tr>
             <td align="right">New Approver:</td>
@@ -70,14 +78,6 @@
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
-
-        <tr>
-            <td align="right">Revert to <span id="smRevertState">previous state</span> because:</td>
-            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="5" cols="40" maxlength="256" width="234"></textarea></td>
-            <td valign="bottom"><button>Revert</button></td>
-        </tr>
-
-        <tr><td colspan="3" height="10"></td></tr>
 
         <tr>
             <td align="center" colspan="3"><button onclick="closeStateChangeDialog();">Done</button></td>

@@ -67,7 +67,6 @@ function propertyStateOnLoad() {
     .fail(function(data){
             w2ui.propertyGrid.error("Get states failed. " + data);
     });
-
 }
 
 function updatePropertyState() {
@@ -81,12 +80,21 @@ function updatePropertyState() {
     }
     fs = r.FlowState;
     if (propData.states != null) {
+        var f = w2ui.propertyFormBtns;
         var curState = 1;
         var s = "<p><table>";
         var j = 1;
         var MINYEAR = 2000;
         var notAnApproval = false;
         var statusSet = false;
+
+        //--------------------------------------------------------
+        // turn off the Save buttons for this record
+        //--------------------------------------------------------
+        $(f.box).find("button[name=save]").prop( "disabled", true );
+        $(f.box).find("button[name=saveadd]").prop( "disabled", true );
+        $(f.box).find("button[name=delete]").prop( "disabled", true );
+
         for (var i = 0; i < propData.states.length; i++) {
             var id;
             var dt;
