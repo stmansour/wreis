@@ -17,10 +17,15 @@
         <tr>
             <td align="right" colspan="2">
                 Current status: <span id="stateReadyLabel">...</span>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change ----------------------->
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change ---------------->
                 </div>
             </td>
-            <td><button onclick="stateReadyForApproval();" id="stateReadyButton"><span id="stateReadyButtonLbl"></span></button></td>
+            <td>
+                <button onclick="stateReadyForApproval();" id="stateReadyButton" >
+                    <span id="stateReadyButtonLbl"></span>
+                </button>
+                </div>
+            </td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -28,7 +33,7 @@
         <tr>
             <td align="right" colspan="2">
                 <div id="smApprove">Approve and advance to <span id="smNextState1">next state</span>
-                ------------------------------->
+                ---------------------->
                 </div>
             </td>
             <td><button id="approveStateButton">Approve</button></td>
@@ -38,49 +43,76 @@
 
         <tr>
             <td align="right">Reject because:</td>
-            <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="5" cols="40" maxlength="256" width="234"> </textarea> </td>
+            <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="5" cols="40" maxlength="256" style="width:100%;"> </textarea> </td>
             <td valign="bottom"><button id="rejectStateButton">Reject</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
 
         <tr>
-            <td align="right">Revert to <span id="smRevertState">previous state</span> because:</td>
-            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="5" cols="40" maxlength="256" width="234"></textarea></td>
-            <td valign="bottom"><button>Revert</button></td>
+            <td align="right">Revert because:</td>
+            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="5" cols="40" maxlength="256" style="width:100%;"></textarea></td>
+            <td valign="bottom"><button id="revertStateButton">Revert</button></td>
         </tr>
 
         <tr><td colspan="3" height="10"></td></tr>
 
         <tr>
             <td align="right">New Approver:</td>
-            <td><input type="text" id="smStateChgApprover" size="41"></td>
+            <td>
+                <div class="w2ui-field"><input type="enum" name="ApproverName" style="width:100%;"></div>
+            </td>
             <td></td>
         </tr>
+        <!-- <script>
+        $('#smStateChgApprover').w2field('enum', {
+            // ?request=%7B%22search%22%3A%22m%22%2C%22max%22%3A100%7D
+            url: '/v1/usertd',
+            renderItem: function (item) {
+                return item.Name;
+            },
+            renderDrop: function (item) {
+                return item.Name;
+            },
+            compare: function (item, search) {
+                s = item.Name.toLowerCase();
+                var srch = search.toLowerCase();
+                var match = (s.indexOf(srch) >= 0);
+                return match;
+            },
+        });
+        </script> -->
+
         <tr>
             <td align="right">Reason:</td>
-            <td align="right" valign="bottom"> <textarea id="smApproverReason" rows="5" cols="40" maxlength="256" width="234"> </textarea> </td>
-            <td valign="bottom"> <button>Set New Approver</button> </td>
+            <td align="right" valign="bottom">
+                <textarea id="smApproverReason" rows="5" cols="40" maxlength="256" style="width:100%;">
+                </textarea> </td>
+            <td valign="bottom"> <button id="btnSetNewApprover">Set New Approver</button> </td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
 
         <tr>
             <td align="right">New Owner:</td>
-            <td id="smStateOwner" valign="bottom"> <input type="text" id="smStateChgNextStateOwner" size="40"></td>
+            <td id="smStateOwner" valign="bottom">
+                <div class="w2ui-field">
+                    <input type="enum" name="OwnerName" size="40">
+                </div>
+            </td>
             <td></td>
         </tr>
 
         <tr>
             <td align="right">Reason:</td>
-            <td><textarea id="smOwnerReason" rows="5" cols="40" maxlength="256" width="234"> </textarea></td>
-            <td valign="bottom"><button>Set New Owner</button></td>
+            <td><textarea id="smOwnerReason" rows="5" cols="40" maxlength="256" style="width:100%;"> </textarea></td>
+            <td valign="bottom"><button id="btnSetNewOwner">Set New Owner</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
 
         <tr>
-            <td align="center" colspan="3"><button onclick="closeStateChangeDialog();">Done</button></td>
+            <td align="center" colspan="3"><button onclick="closeStateChangeDialog();" id="btnDone">Done</button></td>
         </tr>
     </table>
 </body>

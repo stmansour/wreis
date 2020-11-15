@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document,
-    updatePropertyState, stateStatus,closeStateChangeDialog,
+    updatePropertyState, stateStatus,closeStateChangeDialog,setTimeout,
 */
 
 "use strict";
@@ -31,6 +31,12 @@ function buildStateUIElements() {
                 },
             },
         ],
+        onRender: function(event) {
+            console.log('render propertyStateLayout');
+            if (w2ui.propertyFormLayout.get('main').tabs.active == "proptabState") {
+                setTimeout(updatePropertyState,100);
+            }
+        },
     });
 }
 
@@ -307,7 +313,6 @@ function setStateLabelColor(color,j) {
 // INPUTS
 //   x = state number
 function setStateChange(y) {
-    //var s = `<button class="w2ui-btn" onclick="w2popup.load({url:'/static/html/statechg.html',showMax:true})">Change...</button>`;
     var s = `<br><button class="w2ui-btn" onclick="propertyStateChgOnLoad();">Change...</button>`;
     var x = document.getElementById("stateChange"+y);
     if (x != null) {

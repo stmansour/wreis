@@ -434,6 +434,37 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
 
 fi
 
+#------------------------------------------------------------------------------
+#  TEST j
+#
+#  State Info:
+#       test the user typedown service
+#
+#  Scenario:
+#       A user will either be setting or changing the Owner or Approver in the
+#       stateinfo form.
+#
+#  Expected Results:
+#       It should contact the wreis server, which in turn contacts the directory
+#       service.  The results are returned to the wreis server, which forwards
+#       the results back to the caller.
+#------------------------------------------------------------------------------
+TFILES="j"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xh.sql
+    login
+
+    # do the search for this:  request={"search":"m","max":100}
+    # encodeRequest '{"cmd":"get","search":"m","limit":100}'
+    dojsonGET "http://localhost:8276/v1/usertd?request=%7B%22search%22%3A%22m%22%2C%22max%22%3A100%7D" "${TFILES}${STEP}" "WebService--PeopleTypeDown"
+
+    # same command but search for "ma"
+    dojsonGET "http://localhost:8276/v1/usertd?request=%7B%22search%22%3A%22ma%22%2C%22max%22%3A100%7D" "${TFILES}${STEP}" "WebService--PeopleTypeDown"
+    # same command but search for "ma"
+    dojsonGET "http://localhost:8276/v1/usertd?request=%7B%22search%22%3A%22ste%22%2C%22max%22%3A100%7D" "${TFILES}${STEP}" "WebService--PeopleTypeDown"
+fi
+
 stopWsrv
 echo "WREIS SERVER STOPPED"
 

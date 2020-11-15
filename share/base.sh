@@ -1217,7 +1217,13 @@ dobinPOST () {
 dojsonGET () {
 	((TESTCOUNT++))
 	printf "PHASE %2s  %3s  %s... " ${TESTCOUNT} ${2} ${3}
-	CMD="curl -s ${1}"
+
+	COOK=""
+	if [ "${COOKIES}x" != "x" ]; then
+		COOK="${COOKIES}"
+	fi
+
+	CMD="curl ${COOK} -s ${1}"
 	${CMD} | python -m json.tool >${2} 2>>${LOGFILE}
 
 	incStep

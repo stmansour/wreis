@@ -143,6 +143,7 @@ var Svcs = []ServiceHandler{
 	{Cmd: "traffic", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "trafficitems", AuthNRequired: true, Handler: SvcHandlerTraffic},
 	{Cmd: "userprofile", AuthNRequired: true, Handler: SvcUserProfile},
+	{Cmd: "usertd", AuthNRequired: true, Handler: SvcUserTypeDown},
 }
 
 // SvcInfoType defines general info about the service handler module

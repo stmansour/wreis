@@ -9,10 +9,65 @@
 function propertyStateChgOnLoad() {
     w2ui.propertyStateLayout.sizeTo('right', 450);
     w2ui.propertyStateLayout.show('right');
-    w2ui.propertyStateLayout.load('right', '/static/html/statechg.html', 1, setStateChangeDialogValues);
-    setTimeout(setStateChangeDialogValues, 1000 );
+    // w2ui.propertyStateLayout.load('right', '/static/html/statechg.html', 1, setStateChangeDialogValues);
+    w2ui.propertyStateLayout.content('right', w2ui.stateChangeForm);
+    w2ui.propertyStateLayout.render();
+    setTimeout(setStateChangeDialogValues, 250 );
 }
 
+function buildStateChangeForm() {
+    $().w2form({
+        name: 'stateChangeForm',
+        // style: 'border: 0px; background-color: transparent;',
+        // header: 'State Change Form',
+        formURL: '/static/html/statechg.html',
+        fields: [
+            {name: 'ApproverName',   type: 'enum',       required: true,     html: {caption: "ApproverName"},
+                options: {
+                    url: '/v1/usertd/',
+                    max: 1,
+                    renderItem: function (item) {
+                        return item.Name;
+                    },
+                    renderDrop: function (item) {
+                        return item.Name;
+                    },
+                    compare: function (item, search) {
+                        var s = item.Name.toLowerCase();
+                        var srch = search.toLowerCase();
+                        var match = (s.indexOf(srch) >= 0);
+                        return match;
+                    },
+                    // onRemove: function(event) {
+                    //     event.onComplete = function() {
+                    //         w2ui.RAPeopleSearchForm.actions.reset();
+                    //     };
+                    // }
+                }
+            },
+            {name: 'OwnerName',   type: 'enum',       required: true,     html: {caption: "OwnerName"},
+                options: {
+                    url: '/v1/usertd/',
+                    max: 1,
+                    renderItem: function (item) {
+                        return item.Name;
+                    },
+                    renderDrop: function (item) {
+                        return item.Name;
+                    },
+                    compare: function (item, search) {
+                        var s = item.Name.toLowerCase();
+                        var srch = search.toLowerCase();
+                        var match = (s.indexOf(srch) >= 0);
+                        console.log('' + match + ':  '+item.Name+' to '+srch);
+                        return match;
+                    },
+                }
+            },
+        ],
+    });
+
+}
 
 // setStateChangeDialogValues is called when the state change dialog has rendered.
 // We need to make a few updates based on the current stateInfo
@@ -45,31 +100,65 @@ function setStateChangeDialogValues() {
         setInnerHTML("stateReadyButtonLbl","Ready For Approval");
     } else {
         setInnerHTML("stateReadyLabel","READY");
-        setInnerHTML("stateReadyButtonLbl","Back To In-Progress");
+        setInnerHTML("stateReadyButtonLbl","Back To<br>In-Progress");
     }
 
     var x = document.getElementById("stateReadyButton");
     if (x != null) {
         x.disabled = (app.uid != propData.states[i].OwnerUID);
+        setButtonPadding(x);
     }
     x = document.getElementById("approveStateButton");
     if (x != null) {
         x.disabled = (app.uid != propData.states[i].ApproverUID);
+        setButtonPadding(x);
     }
     x = document.getElementById("approveStateButton");
     if (x != null) {
         x.disabled = (app.uid != propData.states[i].ApproverUID);
+        setButtonPadding(x);
     }
     x = document.getElementById("rejectStateButton");
     if (x != null) {
         x.disabled = (app.uid != propData.states[i].ApproverUID);
+        setButtonPadding(x);
+    }
+    x = document.getElementById("smRejectReason");
+    if (x != null) {
+        x.disabled = (app.uid != propData.states[i].ApproverUID);
+        setButtonPadding(x);
+    }
+    x = document.getElementById("revertStateButton");
+    if (x != null) {
+        setButtonPadding(x);
+    }
+    x = document.getElementById("btnSetNewApprover");
+    if (x != null) {
+        setButtonPadding(x);
+    }
+    x = document.getElementById("btnSetNewOwner");
+    if (x != null) {
+        setButtonPadding(x);
+    }
+    x = document.getElementById("btnDone");
+    if (x != null) {
+        setButtonPadding(x);
     }
 
 
 }
 
+function setButtonPadding(x) {
+    x.style.paddingLeft="4px";
+    x.style.paddingRight="4px";
+    x.style.paddingTop="4px";
+    x.style.paddingBottom="4px";
+    x.style.margin="4px";
+}
+
 function closeStateChangeDialog() {
     w2ui.propertyStateLayout.hide('right');
+    w2ui.propertyStateLayout.render();
 }
 
 function stateReadyForApproval() {
