@@ -475,6 +475,45 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     dojsonGET "http://localhost:8276/v1/usertd?request=%7B%22search%22%3A%22ste%22%2C%22max%22%3A100%7D" "${TFILES}${STEP}" "WebService--PeopleTypeDown"
 fi
 
+
+#------------------------------------------------------------------------------
+#  TEST k
+#
+#  State Info:
+#       test termination
+#
+#  Scenario:
+#       A property may may have started the flow and then the client or WREIS
+#       decides that they will no longer handle the property. In this case,
+#       the property is flagged as Terminated (bit 3 in Property.FLAGS) and
+#       the StateInfo that marks it terminated, the date, who terminated it,
+#       and why.
+#
+#  Expected Results:
+#       See individual comments below
+#------------------------------------------------------------------------------
+TFILES="k"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xh.sql
+    login
+
+    # Try to terminate a property without listing a reason
+    encodeRequest '{"cmd":"terminate","records":[{"PRID":4,"SIID":10,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":4,"InitiatorDt":"2020-10-04 10:37:45 UTC","InitiatorUID":92,"recid":1}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Terminate-error-case-1"
+
+    # Terminate a property
+    encodeRequest '{"cmd":"terminate","records":[{"PRID":4,"SIID":10,"Reason":"Client decided not to sell", "ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":4,"InitiatorDt":"2020-10-04 10:37:45 UTC","InitiatorUID":92,"recid":1}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Terminate-error-case-1"
+
+    # read its info to make sure the flags are correct
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "http://localhost:8276/v1/property/4" "request" "${TFILES}${STEP}"  "Property-read"
+
+fi
+
+
+
 stopWsrv
 echo "WREIS SERVER STOPPED"
 

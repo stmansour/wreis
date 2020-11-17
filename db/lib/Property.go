@@ -33,6 +33,7 @@ type Property struct {
 	//     1<<0  Drive Through?  0 = no, 1 = yes
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
+	//     1<<3  0 = processing/processed. 1 = Terminated
 	FLAGS                     uint64
 	Ownership                 int
 	TenantTradeName           string

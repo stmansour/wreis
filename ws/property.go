@@ -246,7 +246,8 @@ type GetProperty struct {
 // indicates how the properties should be filtered by State
 //--------------------------------------------------------------------------
 type StateFilter struct {
-	States []int64 `json:"statefilter"`
+	States         []int64 `json:"statefilter"`
+	ShowTerminated int64   `json:"showTerminated"`
 }
 
 //-----------------------------------------------------------------------------
@@ -267,7 +268,7 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	switch d.wsSearchReq.Cmd {
 	case "get":
 		if d.ID <= 0 && d.wsSearchReq.Limit > 0 {
-			SvcSearchProperty1(w, r, d) // it is a query for the grid.
+			SvcSearchProperty(w, r, d) // it is a query for the grid.
 		} else {
 			if d.ID < 0 {
 				SvcErrorReturn(w, fmt.Errorf("PropertyID is required but was not specified"))
@@ -288,14 +289,14 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	}
 }
 
-// SvcSearchProperty1 generates a report of all Property records matching the
+// SvcSearchProperty generates a report of all Property records matching the
 // search criteria.
 //
 //	@URL /v1/Property/
 //
 //-----------------------------------------------------------------------------
-func SvcSearchProperty1(w http.ResponseWriter, r *http.Request, d *ServiceData) {
-	funcname := "SvcSearchProperty1"
+func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "SvcSearchProperty"
 	util.Console("Entered %s\n", funcname)
 	var g SearchPropertyResponse
 	var err error
@@ -320,7 +321,15 @@ func SvcSearchProperty1(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 			}
 			statefltr += ")"
 		}
-		util.Console("len(sf.States) = %d\n", len(sf.States))
+		// util.Console("len(sf.States) = %d\n", len(sf.States))
+		switch sf.ShowTerminated {
+		case 0:
+			statefltr += " AND (FLAGS & 8)=0"
+			break
+		case 1:
+			statefltr += " AND (FLAGS & 8)!=0"
+			break
+		}
 	}
 
 	whr := ""
@@ -381,6 +390,8 @@ func SvcSearchProperty1(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	// get formatted query with substitution of select, where, order clause
 	qry := db.RenderSQLQuery(queryWithLimit, qc)
 	util.Console("db query = %s\n", qry)
+
+	util.Console("query = %s\n", qry)
 
 	// execute the query
 	rows, err := db.Wdb.DB.Query(qry)

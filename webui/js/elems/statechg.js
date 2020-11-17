@@ -152,6 +152,10 @@ function setStateChangeDialogValues() {
     if (x != null) {
         setButtonPadding(x);
     }
+    x = document.getElementById("terminateStateButton");
+    if (x != null) {
+        setButtonPadding(x);
+    }
 
     stateChangeFormRedrawInProgress = false;
 }

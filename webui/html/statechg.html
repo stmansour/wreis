@@ -43,7 +43,7 @@
 
         <tr>
             <td align="right">Reject because:</td>
-            <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="5" cols="40" maxlength="256" style="width:100%;"></textarea> </td>
+            <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea> </td>
             <td valign="bottom"><button id="rejectStateButton" onclick="stateRejected();">Reject</button></td>
         </tr>
 
@@ -51,7 +51,7 @@
 
         <tr>
             <td align="right">Revert because:</td>
-            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="5" cols="40" maxlength="256" style="width:100%;"></textarea></td>
+            <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea></td>
             <td valign="bottom"><button id="revertStateButton" onclick="stateReverted();">Revert</button></td>
         </tr>
 
@@ -68,7 +68,7 @@
         <tr>
             <td align="right">Reason:</td>
             <td align="right" valign="bottom">
-                <textarea id="smApproverReason" rows="5" cols="40" maxlength="256" style="width:100%;"></textarea></td>
+                <textarea id="smApproverReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea></td>
             <td valign="bottom"><button id="btnSetNewApprover" onclick="stateSetApprover();">Set New Approver</button></td>
         </tr>
 
@@ -86,8 +86,16 @@
 
         <tr>
             <td align="right">Reason:</td>
-            <td><textarea id="smOwnerReason" rows="5" cols="40" maxlength="256" style="width:100%;"> </textarea></td>
+            <td><textarea id="smOwnerReason" rows="3" cols="40" maxlength="256" style="width:100%;"> </textarea></td>
             <td valign="bottom"><button id="btnSetNewOwner" onclick="stateSetOwner();">Set New Owner</button></td>
+        </tr>
+
+        <tr><td colspan="3" height="10"></td></tr>
+
+        <tr>
+            <td align="right">Terminate because:</td>
+            <td align="left" valign="bottom" id="smTerminate"><textarea id="smTerminateReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea></td>
+            <td valign="bottom"><button id="terminateStateButton" onclick="stateTerminated();">Terminate</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -95,6 +103,8 @@
         <tr>
             <td align="center" colspan="3"><button onclick="closeStateChangeDialog();" id="btnDone">Done</button></td>
         </tr>
+
+
     </table>
 </body>
 

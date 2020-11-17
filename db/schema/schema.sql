@@ -42,6 +42,7 @@ CREATE TABLE Property (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        /* 1<<0  Drive Through?  0 = no, 1 = yes
                                                                1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes
+                                                               1<<3  0 = processing/processed. 1 = Terminated
                                                             */
     Ownership SMALLINT NOT NULL DEFAULT 0,                  -- 0 = fee simple, 1 = leasehold
     TenantTradeName VARCHAR(256) NOT NULL DEFAULT '',       -- trade name of business
@@ -174,6 +175,7 @@ CREATE TABLE Traffic (
       3  0 = this state has not been reverted.  1 = this state was reverted
       4  0 = no owner change, 1 = owner change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new owner
       5  0 = no approver change, 1 = approver change -- changer will be the UID of LastModBy on this StateInfo, and creator of the StateInfo with new approver
+      6  0 = not terminated, 1 = terminated
 */
 CREATE TABLE StateInfo (
     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID

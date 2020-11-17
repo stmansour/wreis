@@ -144,6 +144,9 @@ func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData)
 	case "setapprover":
 		saveStateApprover(w, r, d)
 		break
+	case "terminate":
+		saveStateTerminate(w, r, d)
+		break
 	case "delete":
 		deleteStateInfo(w, r, d)
 	default:
@@ -225,6 +228,88 @@ func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (Sa
 	}
 
 	return foo, si, sess, nil
+}
+
+// saveStateTerminate sets the terminate bit for this StateInfo and Property
+//
+//  ANYONE CAN TERMINATE:  But the person who made the change will be
+//         kept in the audit trail. Changer will be the UID
+//         of LastModBy on this StateInfo, and creator of the StateInfo
+//         with new owner
+//
+//	@URL /v1/StateInfo/PRID
+//
+//-----------------------------------------------------------------------------
+func saveStateTerminate(w http.ResponseWriter, r *http.Request, d *ServiceData) {
+	funcname := "saveStateTerminate"
+	foo, si, _, err := stateInfoHelper(w, r, d)
+	if err != nil {
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// mark this version as terminated
+	//  FLAGS bit 6  -  1 = This property was terminated
+	//--------------------------------------------------------------------------
+	a := si
+	a.FLAGS |= (1 << 6)              // terminated
+	a.FLAGS |= (1 << 2)              // this stateinfo is concluded
+	a.Reason = foo.Records[0].Reason // save the reason
+
+	//--------------------------------------------------------------------------
+	// before we save it, make sure that there is a reason...
+	//--------------------------------------------------------------------------
+	if len(a.Reason) < 1 {
+		e := fmt.Errorf("%s: You must supply the reason for terminating", funcname)
+		SvcErrorReturn(w, e)
+		return
+	}
+
+	//---------------------------------------
+	// start transaction
+	//---------------------------------------
+	tx, ctx, err := db.NewTransactionWithContext(r.Context())
+	if err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	// util.Console("after: a.FLAGS = %x\n", a.FLAGS)
+	if err = db.UpdateStateInfo(ctx, &a); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------------------
+	// get the property and mark it as Terminated
+	//--------------------------------------------------------------------------
+	var prop db.Property
+	if prop, err = db.GetProperty(ctx, a.PRID); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	prop.FLAGS |= (1 << 3) // mark as terminated
+	if err = db.UpdateProperty(ctx, &prop); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	//---------------------------------------
+	// commit
+	//---------------------------------------
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		SvcErrorReturn(w, err)
+		return
+	}
+
+	SvcWriteSuccessResponse(w)
 }
 
 // saveStateApprover sets approver of the state.  Anyone can do it. The person making
