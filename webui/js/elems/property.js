@@ -2,6 +2,7 @@
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
     propertyStateOnLoad,setTimeout,closeStateChangeDialog,setPropertyStatusButtons,
+    closePropertyForm
 */
 
 "use strict";
@@ -141,13 +142,17 @@ function buildPropertyUIElements() {
             toolbarReload   : true,
             toolbarColumns  : true,
         },
+        postData: {
+            statefilter: propData.statefilter,
+            showTerminated: propData.showTerminated,
+        },
         //======================================================================
         // FLAGS
         //     1<<0  Drive Through?  0 = no, 1 = yes
         //	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
-         columns: [
+        columns: [
             {field: 'recid',                size: '60px', caption: 'recid', sortable: true, hidden: true},
             {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
             {field: 'Name',                 size: '200px', caption: 'Name', sortable: true, hidden: false},
@@ -209,10 +214,6 @@ function buildPropertyUIElements() {
                 loadPropertyForm(w2ui.propertyGrid.records[event.recid].PRID);
             };
         },
-        onRequest: function(event) {
-            // Include any postData needed
-            // w2ui.propertyGrid.postData = {groupName: app.groupFilter};
-        },
         onAdd: function (/*event*/) {
             var f = w2ui.propertyForm;
             f.record = initializePropertyRecord();
@@ -235,18 +236,15 @@ function buildPropertyUIElements() {
                 }
             }
         },
-        onRefresh: function(/*event*/) {
-            // console.log('propertyGrid.onRefresh')
-            //document.getElementById('mojoGroupFilter').value = app.groupFilter;
+        onRequest: function(/*event*/) {
+            propData.statefilter = [1,2,3,4,5,6];
+            propData.showTerminated = 0;
+            propertySetPostData();
         },
         onLoad: function(event) {
-            event.onComplete = function(event) {
-                propData.statefilter = [1,2,3,4,5,6];
-                propertySetPostData();
                 for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
                     w2ui.propertyGrid.records[i].recid = w2ui.propertyGrid.records[i].PRID;
                 }
-            };
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
         onSearch: function(event) {
@@ -315,8 +313,7 @@ function buildPropertyUIElements() {
                     onClick: function (event) {
                         switch(event.target) {
                         case 'btnClose':
-                            w2ui.toplayout.hide('right', true);
-                            w2ui.propertyGrid.render();
+                            closePropertyForm();
                             break;
                         }
                     },
@@ -718,4 +715,10 @@ function setPropertyStatusButtons(t) {
     $(f.box).find("button[name=save]").prop( "disabled", x );
     $(f.box).find("button[name=saveadd]").prop( "disabled", x );
     $(f.box).find("button[name=delete]").prop( "disabled", x );
+}
+
+
+function closePropertyForm() {
+    w2ui.toplayout.hide('right', true);
+    w2ui.propertyGrid.render();
 }

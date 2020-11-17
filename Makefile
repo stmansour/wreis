@@ -16,3 +16,5 @@ package:
 
 all: clean wreis package test
 	echo "Completed"
+
+build: clean wreis package

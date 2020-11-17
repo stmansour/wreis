@@ -1,7 +1,7 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document,
     updatePropertyState, stateStatus, setTimeout, setInnerHTML, setStateChangeDialogValues,
-    loadPropertyForm,
+    loadPropertyForm, closePropertyForm,
 */
 
 "use strict";
@@ -252,6 +252,30 @@ function stateReverted() {
     }
     finishStateChange(si,"revert");
 }
+
+// stateTerminated calls the server with a request to terminate a property
+//----------------------------------------------------------------------------
+function stateTerminated() {
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    if (si == null) {
+        console.log('Could not determine the current stateInfo object');
+        return;
+    }
+
+    si.Reason = "";
+    var x = document.getElementById("smTerminateReason");
+    if (x != null) {
+        si.Reason = x.value;
+    }
+    if (si.Reason.length < 2) {
+        w2ui.stateChangeForm.error('ERROR: You must supply a reason');
+        return;
+    }
+    finishStateChange(si,"terminate");
+    closePropertyForm();
+}
+
 
 // stateSetApprover calls the server with a request to change the approver to
 // the newly selected user
