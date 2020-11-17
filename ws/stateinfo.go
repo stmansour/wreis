@@ -514,6 +514,14 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
+	//--------------------------------------------------------------
+	// Don't continue if it is not marked as ready-to-be-approved
+	//--------------------------------------------------------------
+	if si.FLAGS&0x2 == 0 {
+		SvcErrorReturn(w, fmt.Errorf("The owner has not requested approval yet"))
+		return
+	}
+
 	//---------------------------------------
 	// start transaction
 	//---------------------------------------
@@ -597,6 +605,14 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	foo, si, sess, err := stateInfoHelper(w, r, d)
 	if err != nil {
 		SvcErrorReturn(w, err)
+		return
+	}
+
+	//--------------------------------------------------------------
+	// Don't continue if it is not marked as ready-to-be-approved
+	//--------------------------------------------------------------
+	if si.FLAGS&0x2 == 0 {
+		SvcErrorReturn(w, fmt.Errorf("The owner has not requested approval yet"))
 		return
 	}
 

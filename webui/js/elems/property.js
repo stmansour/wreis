@@ -36,9 +36,9 @@ function initializeStateRecord() {
         OwnerUID: app.uid,
         OwnerDt: now,
         OwnerName: app.name,
-        ApproverUID: 0,
+        ApproverUID: app.uid,
         ApproverDt: time0,
-        ApproverName: "",
+        ApproverName: app.name,
         FlowState: 1,
         Reason: "",
         FLAGS: 0,
@@ -206,33 +206,6 @@ function buildPropertyUIElements() {
         onClick: function(event) {
             event.onComplete = function (event) {
                 loadPropertyForm(w2ui.propertyGrid.records[event.recid].PRID);
-
-                // var f = w2ui.propertyForm;
-                // // var rec = w2ui.propertyGrid.get(event.recid);
-                // var rec = w2ui.propertyGrid.records[event.recid];
-                // w2ui.propertyForm.recid = rec.PRID;
-                // propData.PRID = rec.PRID;
-                //
-                // closeStateChangeDialog(); // make sure this is closed
-                //
-                // f.url = "/v1/property/"+rec.PRID;
-                // f.refresh();
-                // f.reload();  // get this going as quickly as possible
-                //
-                // propData.RSLID = rec.RSLID;
-                // propData.ROLID = rec.ROLID;
-                // propData.bPropLoaded = false;
-                // propData.bRentStepsLoaded = false;
-                // propData.bRenewOptionsLoaded = false;
-                // propData.bTrafficLoaded = false;
-                // propData.bStateLoaded = false;
-                // w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
-                // var l = w2ui.propertyFormLayout.get('main');
-                // if (typeof l.tabs != "undefined"){
-                //     if (typeof l.tabs.name == "string") {
-                //         l.tabs.click('proptabState');
-                //     }
-                // }
             };
         },
         onRequest: function(event) {
@@ -554,9 +527,7 @@ function buildPropertyUIElements() {
 
 function loadPropertyForm(PRID) {
     var f = w2ui.propertyForm;
-    // var rec = w2ui.propertyGrid.records[PRID];
     var rec = null;
-//
 
     for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
         if (w2ui.propertyGrid.records[i].PRID == PRID) {
@@ -573,7 +544,6 @@ function loadPropertyForm(PRID) {
     closeStateChangeDialog();
 
     f.url = "/v1/property/"+rec.PRID;
-    f.refresh();
     f.reload();  // get this going as quickly as possible
 
     propData.RSLID = rec.RSLID;
@@ -590,7 +560,6 @@ function loadPropertyForm(PRID) {
             l.tabs.click('proptabState');
         }
     }
-
 }
 
 // savePropertyForm grabs all the data that is associated with the propertForm,

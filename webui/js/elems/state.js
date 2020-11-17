@@ -4,6 +4,7 @@
 */
 
 "use strict";
+var stateRenderInProgress = false;
 
 function buildStateUIElements() {
 
@@ -32,15 +33,25 @@ function buildStateUIElements() {
             },
         ],
         onRender: function(event) {
-            console.log('render propertyStateLayout');
             if (w2ui.propertyFormLayout.get('main').tabs.active == "proptabState") {
+                if (stateRenderInProgress) {
+                    return;
+                }
                 setTimeout(updatePropertyState,100);
             }
         },
     });
 }
 
+function handleStateRender() {
+    if (stateRenderInProgress) {
+        console.log('LOOP DETECTED in rendering property state');
+        return;
+    }
+    updatePropertyState();
+    stateRenderInProgress = false;
 
+}
 
 function propertyStateOnLoad() {
     if (propData.bStateLoaded) {
@@ -76,12 +87,19 @@ function propertyStateOnLoad() {
 }
 
 function updatePropertyState() {
+    if (stateRenderInProgress) {
+        console.log('updatePropertyState is in progress');
+        return;
+    }
+    stateRenderInProgress = true;
+
     var x;
     var color;
     var r = w2ui.propertyForm.record;
     var fs;
     if (r == null) {
         console.log('r is null.  w2ui.propertyForm.record =  ' + w2ui.propertyForm.record);
+        stateRenderInProgress = false;
         return;
     }
     fs = r.FlowState;
@@ -220,6 +238,7 @@ function updatePropertyState() {
         s += "</table>";
         setHTMLByID("stateDataCell" + curState,s);
     }
+    stateRenderInProgress = false;
 }
 
 // getStateTextColor describes the status of the state.

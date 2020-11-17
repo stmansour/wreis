@@ -557,11 +557,12 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 		now := time.Now()
 		var s = db.StateInfo{
-			PRID:         p.PRID,
-			OwnerUID: sess.UID,
-			OwnerDt:  now,
-			FlowState:    1,
-			FLAGS:        uint64(0),
+			PRID:        p.PRID,
+			OwnerUID:    sess.UID,
+			ApproverUID: sess.UID,
+			OwnerDt:     now,
+			FlowState:   1,
+			FLAGS:       uint64(0),
 		}
 		if _, err := db.InsertStateInfo(r.Context(), &s); err != nil {
 			SvcErrorReturn(w, err)

@@ -6,13 +6,15 @@
 
 "use strict";
 
+var stateChangeFormRedrawInProgress = false;
+
 function propertyStateChgOnLoad() {
     w2ui.propertyStateLayout.sizeTo('right', 450);
     w2ui.propertyStateLayout.show('right');
     // w2ui.propertyStateLayout.load('right', '/static/html/statechg.html', 1, setStateChangeDialogValues);
     w2ui.propertyStateLayout.content('right', w2ui.stateChangeForm);
     w2ui.propertyStateLayout.render();
-    setTimeout(setStateChangeDialogValues, 250 );
+    setTimeout(setStateChangeDialogValues, 150 );
 }
 
 function buildStateChangeForm() {
@@ -76,6 +78,12 @@ function setStateChangeDialogValues() {
     var si = 0;
     var s = "";
 
+    if (stateChangeFormRedrawInProgress) {
+        console.log("LOOP: stateChangeForm redraw in progress");
+        return;
+    }
+
+    stateChangeFormRedrawInProgress = true;
     for (var i = 0; i < propData.states.length; i++) {
         // look for current flow state, not done
         if (propData.states[i].FlowState == FlowState && (propData.states[i].FLAGS & 0x4) == 0) {
@@ -145,7 +153,7 @@ function setStateChangeDialogValues() {
         setButtonPadding(x);
     }
 
-
+    stateChangeFormRedrawInProgress = false;
 }
 
 function setButtonPadding(x) {
@@ -161,39 +169,173 @@ function closeStateChangeDialog() {
     w2ui.propertyStateLayout.render();
 }
 
-function stateReadyForApproval() {
-    // Find the "in progress" record for the state selected...
+function getCurrentStateInfo() {
     var FlowState = w2ui.propertyForm.record.FlowState;
     var si = 0;
     for (var i = 0; i < propData.states.length; i++) {
         // look for the one that matches current flow state and is NOT done
         if (propData.states[i].FlowState == FlowState && (propData.states[i].FLAGS & 0x4) == 0) {
-            si = propData.states[i];
-            break;
+            return propData.states[i];
         }
     }
-    if (typeof si === "number") {
+    return null;
+}
+
+function stateReadyForApproval() {
+    // Find the "in progress" record for the state selected...
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    if (si == null) {
         console.log('Could not determine the current stateInfo object');
         return;
     }
 
+    finishStateChange(si,"ready");
+}
+
+// stateApproved calls the server with a request to approve the current state
+//----------------------------------------------------------------------------
+function stateApproved() {
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    if (si == null) {
+        console.log('Could not determine the current stateInfo object');
+        return;
+    }
+    finishStateChange(si,"approve");
+}
+
+// stateRejected calls the server with a request to reject the current state
+//----------------------------------------------------------------------------
+function stateRejected() {
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    if (si == null) {
+        console.log('Could not determine the current stateInfo object');
+        return;
+    }
+
+    si.Reason = "";
+    var x = document.getElementById("smRejectReason");
+    if (x != null) {
+        si.Reason = x.value;
+    }
+    if (si.Reason.length < 2) {
+        w2ui.stateChangeForm.error('ERROR: You must supply a reason');
+        return;
+    }
+    finishStateChange(si,"reject");
+}
+
+// stateReverted calls the server with a request to revert the current state
+// to the previous state.
+//----------------------------------------------------------------------------
+function stateReverted() {
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    if (si == null) {
+        console.log('Could not determine the current stateInfo object');
+        return;
+    }
+    si.Reason = "";
+    var x = document.getElementById("smRevertReason");
+    if (x != null) {
+        si.Reason = x.value;
+    }
+    if (si.Reason.length < 2) {
+        w2ui.stateChangeForm.error('ERROR: You must supply a reason');
+        return;
+    }
+    finishStateChange(si,"revert");
+}
+
+// stateSetApprover calls the server with a request to change the approver to
+// the newly selected user
+//----------------------------------------------------------------------------
+function stateSetApprover() {
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    if (si == null) {
+        console.log('Could not determine the current stateInfo object');
+        return;
+    }
+    if (typeof w2ui.stateChangeForm.record.ApproverName == "object") {
+        if (w2ui.stateChangeForm.record.ApproverName.length > 0) {
+            uid = w2ui.stateChangeForm.record.ApproverName[0].UID;
+        }
+    }
+    if (uid == 0) {
+        w2ui.stateChangeForm.error('ERROR: You must select a valid user');
+        return;
+    }
+    si.ApproverUID = uid;
+    si.Reason = "";
+    var x = document.getElementById("smApproverReason");
+    if (x != null) {
+        si.Reason = x.value;
+    }
+    if (si.Reason.length < 2) {
+        w2ui.stateChangeForm.error('ERROR: You must supply a reason');
+        return;
+    }
+    finishStateChange(si,"setapprover");
+}
+
+// stateSetOwner calls the server with a request to change the approver to
+// the newly selected user
+//----------------------------------------------------------------------------
+function stateSetOwner() {
+    var FlowState = w2ui.propertyForm.record.FlowState;
+    var si = getCurrentStateInfo();
+    var uid = 0;
+
+    if (si == null) {
+        console.log('Could not determine the current stateInfo object');
+        return;
+    }
+    if (typeof w2ui.stateChangeForm.record.OwnerName == "object") {
+        if (w2ui.stateChangeForm.record.OwnerName.length > 0) {
+            uid = w2ui.stateChangeForm.record.OwnerName[0].UID;
+        }
+    }
+    if (uid == 0) {
+        w2ui.stateChangeForm.error('ERROR: You must select a valid user');
+        return;
+    }
+    si.OwnerUID = uid;
+    si.Reason = "";
+    var x = document.getElementById("smOwnerReason");
+    if (x != null) {
+        si.Reason = x.value;
+    }
+    if (si.Reason.length < 2) {
+        w2ui.stateChangeForm.error('ERROR: You must supply a reason');
+        return;
+    }
+    finishStateChange(si,"setowner");
+}
+
+// finishStateChange performs the repetitive tasks for a state update.
+//
+// INPUTS:
+// si = stateinfo object to update
+// c = command name
+//---------------------------------------------------------------------------
+function finishStateChange(si,c) {
     //-----------------------------------------------------------------------
     // if the current state is in-progress, change to READY, and vice-versa
     //-----------------------------------------------------------------------
     var params = {
-        cmd: "ready",
+        cmd: c,
         records: [si],
     };
-    if ((si.FLAGS & 0x2) != 0) {
-        params.cmd = "notready";
-    }
     var dat = JSON.stringify(params);
     var url = '/v1/stateinfo/' + w2ui.propertyForm.record.PRID;
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
         if (data.status === "error") {
-            w2ui.propertyGrid.error('ERROR: '+ data.message);
+            w2ui.stateChangeForm.error('ERROR: '+ data.message);
             return;
         }
         var prid = propData.PRID;
@@ -201,6 +343,7 @@ function stateReadyForApproval() {
     })
     .fail(function(data){
         var err = JSON.parse(data.responseText);
-        w2ui.propertyGrid.error("Update failed: " + err.message);
+        w2ui.stateChangeForm.error("Update failed: " + err.message);
     });
+
 }

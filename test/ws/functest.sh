@@ -388,6 +388,9 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     encodeRequest '{"cmd":"get"}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "Read-StateInfo"
 
+    # need to update the FLAGS to indicate it's ready for approval...
+    echo "UPDATE StateInfo SET FLAGS=2 WHERE SIID=33;" | mysql --no-defaults wreis
+
     # 8. save an approval.  This should create SIID 34, with FLAGS=0 and FlowState = 5
     encodeRequest '{"cmd":"approve","records":[{"PRID": 4,"Reason": "","SIID": 33,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Approve"
@@ -432,6 +435,13 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     encodeRequest '{"cmd":"setapprover","records":[{"PRID":3,"SIID":36,"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":72,"FLAGS":0,"FlowState":3,"Reason":"Someone needs to approve this","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-setapprover-error"
 
+    # 19. try to approve a state that has not been marked as completed...
+    encodeRequest '{"cmd":"approve","records":[{"PRID": 4,"Reason": "","SIID": 35,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Approve"
+
+    # 19. try to reject a state that has not been marked as completed...
+    encodeRequest '{"cmd":"reject","records":[{"PRID": 4,"Reason": "","SIID": 35,"ApproverDt": "1900-01-01 00:00:00 UTC","ApproverName": "William Tester","ApproverUID": 269,"CreateBy": 269,"CreateByName": "William Tester","CreateTime": "2020-10-30 22:29:08 UTC","FLAGS": 0,"FlowState": 4,"InitiatorDt": "2020-10-31 00:00:00 UTC","InitiatorName": "Patrick Long","InitiatorUID": 92,"LastModBy": 269,"LastModByName": "William Tester","LastModTime": "2020-10-30 22:29:08 UTC","recid": 33}]}'
+    dojsonPOST "http://localhost:8276/v1/stateinfo/4" "request" "${TFILES}${STEP}"  "StateInfo-Reject"
 fi
 
 #------------------------------------------------------------------------------
