@@ -412,15 +412,16 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     dojsonPOST "http://localhost:8276/v1/property/4" "request" "${TFILES}${STEP}"  "Property-read"
 
     # 13. try save a revert that we're not listed as the Authorizer
+    #     This has been changed.  Anyone can revert it now.
     encodeRequest '{"cmd":"revert","records":[{"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"Reason":"This is the reason","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":3,"SIID":6,"recid":1}]}'
-    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-Revert-error-case-2"
+    dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-Revert-case-2"
 
     # 14. try to revert something that's in state 1
     encodeRequest '{"cmd":"revert","records":[{"PRID":1,"SIID":1,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":269,"FLAGS":0,"FlowState":1,"Reason":"This is the reason","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"recid":1}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/1" "request" "${TFILES}${STEP}"  "StateInfo-Revert-error-case-3"
 
     # 15. change the owner on a property where we're not the owner or approver
-    encodeRequest '{"cmd":"setowner","records":[{"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"Reason":"We need to get this moving","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211,"PRID":3,"SIID":6,"recid":1}]}'
+    encodeRequest '{"cmd":"setowner","records":[{"PRID":3,"SIID":37,"recid":1,"OwnerUID":47,"ApproverDt":"1970-01-01 00:00:00 UTC","ApproverUID":203,"FLAGS":0,"FlowState":3,"Reason":"We need to get this moving","InitiatorDt":"2020-10-01 10:37:45 UTC","InitiatorUID":211}]}'
     dojsonPOST "http://localhost:8276/v1/stateinfo/3" "request" "${TFILES}${STEP}"  "StateInfo-setowner"
 
     # 16. change the approver on a property it tries to use a finished state info
