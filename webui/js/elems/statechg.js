@@ -180,7 +180,7 @@ function setButtonPadding(x) {
 
 function closeStateChangeDialog() {
     w2ui.propertyStateLayout.hide('right');
-    w2ui.propertyStateLayout.render();
+    //w2ui.propertyStateLayout.render();
 }
 
 function getCurrentStateInfo() {

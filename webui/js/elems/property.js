@@ -213,6 +213,7 @@ function buildPropertyUIElements() {
         ],
         onClick: function(event) {
             event.onComplete = function (event) {
+                setPropertyNotLoaded();
                 loadPropertyForm(w2ui.propertyGrid.records[event.recid].PRID);
             };
         },
@@ -534,6 +535,16 @@ function buildPropertyUIElements() {
 
 }
 
+function setPropertyNotLoaded() {
+    propData.bPropLoaded = false;
+    propData.bRentStepsLoaded = false;
+    propData.bRenewOptionsLoaded = false;
+    propData.bTrafficLoaded = false;
+    propData.bStateLoaded = false;
+    propData.states = [];
+
+}
+
 function loadPropertyForm(PRID) {
     var f = w2ui.propertyForm;
     var rec = null;
@@ -556,14 +567,7 @@ function loadPropertyForm(PRID) {
     f.url = "/v1/property/"+rec.PRID;
     f.reload();  // get this going as quickly as possible
 
-    propData.RSLID = rec.RSLID;
-    propData.ROLID = rec.ROLID;
-    propData.bPropLoaded = false;
-    propData.bRentStepsLoaded = false;
-    propData.bRenewOptionsLoaded = false;
-    propData.bTrafficLoaded = false;
-    propData.bStateLoaded = false;
-    propData.states = [];
+    setPropertyNotLoaded();
     w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
     var l = w2ui.propertyFormLayout.get('main');
     if (typeof l.tabs != "undefined"){
