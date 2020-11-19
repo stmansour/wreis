@@ -18,6 +18,7 @@ var propData = {
     bStateLoaded: false,        // " for state info
     statefilter: [1,2,3,4,5,6], // how to filter properties  (1-6) = open, (7) = closed
     showTerminated: 0,          // 0 = don't show terminated properties, 1 = show terminated properties
+    myQueue: 0,                 // 0 = don't show my queue, 1 = show my queue
     formWidth: 575,             // how wide is the entry / edit form
     numStates: 7,               // states go from 1 to 7 -- this is a full complement of sates, the states array may have less
     states: [],                 // the server will be queried for these on existing properties, or filled with an inital state on new
@@ -145,6 +146,7 @@ function buildPropertyUIElements() {
         postData: {
             statefilter: propData.statefilter,
             showTerminated: propData.showTerminated,
+            myQueue: propData.myQueue,
         },
         //======================================================================
         // FLAGS
@@ -237,8 +239,9 @@ function buildPropertyUIElements() {
             }
         },
         onRequest: function(/*event*/) {
-            propData.statefilter = [1,2,3,4,5,6];
-            propData.showTerminated = 0;
+            // propData.statefilter = [1,2,3,4,5,6];
+            // propData.showTerminated = 0;
+            // propData.myQueue = 0;
             propertySetPostData();
         },
         onLoad: function(event) {
@@ -254,21 +257,24 @@ function buildPropertyUIElements() {
 
     w2ui.propertyGrid.toolbar.add([
         { type: 'break' },
+        { type: 'check', id: 'myQueue', text: 'Queue', checked: false },
+        { type: 'break' },
         { type: 'radio', id: 'openProperties', group: '1', text: 'Open', /* icon: 'fa fa-star',*/ checked: true },
         { type: 'radio', id: 'closedProperties', group: '1', text: 'Closed', /*icon: 'fa fa-heart'*/ },
         { type: 'radio', id: 'allProperties', group: '1', text: 'All', /*icon: 'fa fa-heart'*/ },
         { type: 'break' },
-        { type: 'check', id: 'showTerminated', text: 'Show Terminated', /*icon: 'fa fa-heart'*/ },
+        { type: 'check', id: 'showTerminated', text: 'Terminated', /*icon: 'fa fa-heart'*/ },
     ]);
 
     w2ui.propertyGrid.toolbar.onClick = function(event) {
         event.onComplete = function (event) {
             var found = false;
             switch (event.item.id) {
-            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6];   break;
-            case "closedProperties": found=true; propData.statefilter    = [7];             break;
-            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7]; break;
+            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6];                   break;
+            case "closedProperties": found=true; propData.statefilter    = [7];                             break;
+            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7];                 break;
             case "showTerminated":   found=true; propData.showTerminated = propData.showTerminated ? 0 : 1; break;
+            case "myQueue":          found=true; propData.myQueue        = (propData.myQueue == 1) ? 0 : 1; break;
             }
             if (found) {
                 propertySetPostData();
@@ -281,6 +287,7 @@ function buildPropertyUIElements() {
         w2ui.propertyGrid.postData = {
             statefilter: propData.statefilter,
             showTerminated: propData.showTerminated,
+            myQueue: propData.myQueue,
         };
     }
 
@@ -531,6 +538,7 @@ function loadPropertyForm(PRID) {
     var f = w2ui.propertyForm;
     var rec = null;
 
+
     for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
         if (w2ui.propertyGrid.records[i].PRID == PRID) {
             rec = w2ui.propertyGrid.records[i];
@@ -555,6 +563,7 @@ function loadPropertyForm(PRID) {
     propData.bRenewOptionsLoaded = false;
     propData.bTrafficLoaded = false;
     propData.bStateLoaded = false;
+    propData.states = [];
     w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
     var l = w2ui.propertyFormLayout.get('main');
     if (typeof l.tabs != "undefined"){

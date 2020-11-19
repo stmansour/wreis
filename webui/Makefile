@@ -7,7 +7,7 @@ COUNTOL=${TOP}/tools/bashtools/countol.sh
 webui:
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
-	# insert steps here...
+	@# insert steps here...
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed webui ***"
 

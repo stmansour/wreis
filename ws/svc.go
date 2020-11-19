@@ -129,6 +129,7 @@ type ServiceHandler struct {
 // Svcs is the table of all service handlers
 var Svcs = []ServiceHandler{
 	{Cmd: "authn", AuthNRequired: false, Handler: SvcAuthenticate},
+	{Cmd: "dashboard", AuthNRequired: true, Handler: SvcHandlerDashboard},
 	{Cmd: "discon", AuthNRequired: true, Handler: SvcDisableConsole},
 	{Cmd: "sessions", AuthNRequired: true, Handler: SvcDumpSessions},
 	{Cmd: "encon", AuthNRequired: true, Handler: SvcEnableConsole},

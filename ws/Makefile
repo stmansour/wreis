@@ -3,7 +3,7 @@ BINDIR=${TOP}/dist/wreis
 THISDIR="ws"
 COUNTOL=${TOP}/tools/bashtools/countol.sh
 
-ws: ver.go *.go config.json
+ws: ver.go *.go
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
 	@${COUNTOL} "go vet"
@@ -12,10 +12,6 @@ ws: ver.go *.go config.json
 	go install
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed ws ***"
-
-config.json:
-	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
-	cp confdev.json config.json
 
 ver.go:
 	./mkver.sh

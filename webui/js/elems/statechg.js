@@ -8,7 +8,17 @@
 
 var stateChangeFormRedrawInProgress = false;
 
+function newStateChangeRecord() {
+    var rec = {
+        ApproverName: {},
+        OwnerName: {},
+    };
+    return rec;
+}
+
 function propertyStateChgOnLoad() {
+    // first, clear out any associated values
+    w2ui.stateChangeForm.record = newStateChangeRecord();  // clean it out, every time
     w2ui.propertyStateLayout.sizeTo('right', 450);
     w2ui.propertyStateLayout.show('right');
     // w2ui.propertyStateLayout.load('right', '/static/html/statechg.html', 1, setStateChangeDialogValues);
@@ -283,11 +293,13 @@ function stateTerminated() {
 function stateSetApprover() {
     var FlowState = w2ui.propertyForm.record.FlowState;
     var si = getCurrentStateInfo();
+    var uid = 0;
+
     if (si == null) {
         console.log('Could not determine the current stateInfo object');
         return;
     }
-    if (typeof w2ui.stateChangeForm.record.ApproverName == "object") {
+    if (typeof w2ui.stateChangeForm.record.ApproverName == "object" && w2ui.stateChangeForm.record.ApproverName != null) {
         if (w2ui.stateChangeForm.record.ApproverName.length > 0) {
             uid = w2ui.stateChangeForm.record.ApproverName[0].UID;
         }
@@ -321,7 +333,7 @@ function stateSetOwner() {
         console.log('Could not determine the current stateInfo object');
         return;
     }
-    if (typeof w2ui.stateChangeForm.record.OwnerName == "object") {
+    if (typeof w2ui.stateChangeForm.record.OwnerName == "object" && w2ui.stateChangeForm.record.OwnerName != null) {
         if (w2ui.stateChangeForm.record.OwnerName.length > 0) {
             uid = w2ui.stateChangeForm.record.OwnerName[0].UID;
         }

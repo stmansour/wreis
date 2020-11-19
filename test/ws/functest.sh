@@ -512,6 +512,33 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
 
 fi
 
+#------------------------------------------------------------------------------
+#  TEST l
+#
+#  State Info:
+#       test termination
+#
+#  Scenario:
+#       A property may may have started the flow and then the client or WREIS
+#       decides that they will no longer handle the property. In this case,
+#       the property is flagged as Terminated (bit 3 in Property.FLAGS) and
+#       the StateInfo that marks it terminated, the date, who terminated it,
+#       and why.
+#
+#  Expected Results:
+#       See individual comments below
+#------------------------------------------------------------------------------
+TFILES="l"
+STEP=0
+if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
+    mysql --no-defaults wreis < xh.sql
+    login
+
+    # Try to terminate a property without listing a reason
+    encodeRequest '{"cmd":"get"}'
+    dojsonPOST "http://localhost:8276/v1/dashboard/" "request" "${TFILES}${STEP}"  "Get-Dashboard-data"
+fi
+
 
 
 stopWsrv

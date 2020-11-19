@@ -248,6 +248,7 @@ type GetProperty struct {
 type StateFilter struct {
 	States         []int64 `json:"statefilter"`
 	ShowTerminated int64   `json:"showTerminated"`
+	MyQueue        int64   `json:"myQueue"`
 }
 
 //-----------------------------------------------------------------------------
@@ -302,33 +303,54 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var err error
 	var sf StateFilter
 	var statefltr string
+	var joinwhere string
+	var joins string
+	var whereClause, orderClause string
+
+	sess, ok := session.GetSessionFromContext(r.Context())
+	if !ok {
+		SvcErrorReturn(w, db.ErrSessionRequired)
+		return
+	}
 
 	if strings.Index(d.data, "statefilter") >= 0 {
-		util.Console("Unmarshal statefilter:  d.data = %s\n", d.data)
+		// util.Console("Unmarshal statefilter:  d.data = %s\n", d.data)
 		err = json.Unmarshal([]byte(d.data), &sf)
 		if err != nil {
 			e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
 			SvcErrorReturn(w, e)
 			return
 		}
-		if len(sf.States) > 0 {
-			statefltr = " FLOWSTATE IN ("
-			for j := 0; j < len(sf.States); j++ {
-				statefltr += fmt.Sprintf("%d", sf.States[j])
-				if j+1 < len(sf.States) {
-					statefltr += ","
+		util.Console("sf = %#v\n", sf)
+		if sf.MyQueue > 0 {
+			joins = " LEFT JOIN StateInfo ON (StateInfo.FlowState = Property.FlowState)"
+			joinwhere = fmt.Sprintf(`
+				WHERE (StateInfo.FLAGS & 0x4)=0
+				AND
+				((%d = StateInfo.OwnerUID AND (StateInfo.FLAGS & 2)=0)
+				  OR
+				 (%d = ApproverUID AND (StateInfo.FLAGS & 2)=2)
+				)`, sess.UID, sess.UID)
+		} else {
+			if len(sf.States) > 0 {
+				statefltr = " FLOWSTATE IN ("
+				for j := 0; j < len(sf.States); j++ {
+					statefltr += fmt.Sprintf("%d", sf.States[j])
+					if j+1 < len(sf.States) {
+						statefltr += ","
+					}
 				}
+				statefltr += ")"
 			}
-			statefltr += ")"
-		}
-		// util.Console("len(sf.States) = %d\n", len(sf.States))
-		switch sf.ShowTerminated {
-		case 0:
-			statefltr += " AND (FLAGS & 8)=0"
-			break
-		case 1:
-			statefltr += " AND (FLAGS & 8)!=0"
-			break
+			// util.Console("len(sf.States) = %d\n", len(sf.States))
+			switch sf.ShowTerminated {
+			case 0:
+				statefltr += " AND (FLAGS & 8)=0"
+				break
+			case 1:
+				statefltr += " AND (FLAGS & 8)!=0"
+				break
+			}
 		}
 	}
 
@@ -336,23 +358,32 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	order := `Property.Name ASC` // default ORDER
 
 	// get where clause and order clause for sql query
-	util.Console("len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
+	// util.Console("len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
 	HandleBlankSearchField(d, propDefaultFields)
-	util.Console("AFTER HandleBlankSearchField:  len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
-	whereClause, orderClause := GetSearchAndSortSQL(d, propFieldsMap)
-	if len(statefltr) > 0 {
-		if len(whereClause) > 0 {
-			whereClause += " AND "
+	// util.Console("AFTER HandleBlankSearchField:  len(d.wsSearchReq.Search) = %d\n", len(d.wsSearchReq.Search))
+
+	//------------------------------------------------------
+	// use MyQueue if present, otherwise use generic...
+	//------------------------------------------------------
+	whereClause, orderClause = GetSearchAndSortSQL(d, propFieldsMap)
+	if sf.MyQueue > 0 {
+		whr = joins + " " + joinwhere
+	} else {
+		if len(statefltr) > 0 {
+			if len(whereClause) > 0 {
+				whereClause += " AND "
+			}
+			whereClause += statefltr
 		}
-		whereClause += statefltr
+		if len(whereClause) > 0 {
+			whr += "WHERE " + whereClause
+		}
 	}
-	if len(whereClause) > 0 {
-		whr += "WHERE " + whereClause
-	}
-	util.Console("whereClause = %s\n", whereClause)
 	if len(orderClause) > 0 {
 		order = orderClause
 	}
+	util.Console("whr = %s\n", whr)
+	util.Console("order = %s\n", order)
 
 	query := `
 	SELECT {{.SelectClause}}
@@ -366,12 +397,14 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	}
 
 	countQuery := db.RenderSQLQuery(query, qc)
+
+	util.Console("countQuery = %s\n", countQuery)
 	g.Total, err = db.GetQueryCount(countQuery)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
 	}
-	util.Console("g.Total = %d\n", g.Total)
+	// util.Console("g.Total = %d\n", g.Total)
 
 	// FETCH the records WITH LIMIT AND OFFSET
 	// limit the records to fetch from server, page by page
@@ -390,8 +423,6 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// get formatted query with substitution of select, where, order clause
 	qry := db.RenderSQLQuery(queryWithLimit, qc)
 	util.Console("db query = %s\n", qry)
-
-	util.Console("query = %s\n", qry)
 
 	// execute the query
 	rows, err := db.Wdb.DB.Query(qry)

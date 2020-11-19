@@ -17,51 +17,8 @@
 /*globals $:false */
 "use strict";
 
-function getPropertyCount() {
-    $.post('/v1/peoplestats/')
-    .done(function(data) {
-        if (typeof data == 'string') {  // it's weird, a successful data add gets parsed as an object, an error message does not
-            var msg = JSON.parse(data);
-            console.log('Response to peoplestats: ' + msg.status);
-            return;
-        }
-        if (data.status == 'success') {
-            document.getElementById('wreisPropCount').innerHTML = '' + data.record.Count;
-            document.getElementById('wreisPropCompleted').innerHTML = '' + data.record.OptOut;
-            document.getElementById('wreisPropActive').innerHTML = '' + data.record.Bounced;
-            document.getElementById('wreisComplaintAddresses').innerHTML = '' + data.record.Complaint;
-            document.getElementById('wreisSuppressedAddresses').innerHTML = '' + data.record.Suppressed;
-        } else {
-            console.log('data.status = ' + data.status);
-        }
-    })
-    .fail(function(data) {
-        console.log('data = ' + data);
-    });
-}
-function getGroupCount() {
-    $.post('/v1/groupcount/')
-    .done(function(data) {
-        if (typeof data == 'string') {  // it's weird, a successful data add gets parsed as an object, an error message does not
-            var msg = JSON.parse(data);
-            console.log('Response to groupcount: ' + msg.status);
-            return;
-        }
-        if (data.status == 'success') {
-            var c = data.record.Count;
-            var e = document.getElementById('wreisGroupCount');
-            e.innerHTML = '' + c;
-        } else {
-            console.log('data.status = ' + data.status);
-        }
-    })
-    .fail(function(data) {
-        console.log('data = ' + data);
-    });
-}
 $(function () {
-    // getPeopleCount();
-    // getGroupCount();
+    getDashboard();
 }
 );
 
@@ -70,13 +27,15 @@ $(function () {
 </head>
 <body>
 
-<table cellspacing="4">
+<table cellspacing="4" align="center">
 <tr><td width="30"></td><td colspan="2"><p class="title1">WREIS Database Statistics</p></td></tr>
-<tr class="mojorow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Property count:</span></td><td><span class="wreisStatValue" id="wreisPropCount"></span></td></tr>
+<tr class="mojorow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Property count:</span></td><td><span class="wreisStatValue" id="PropertyCount"></span></td></tr>
 <tr><td colspan=3 height="8"></td></tr>
-<tr class="wreisrow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Properties completed:</span></td><td><span class="wreisStatValue" id="wreisPropCompleted"></span></td></tr>
+<tr class="wreisrow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Properties completed:</span></td><td><span class="wreisStatValue" id="CompletedProperties"></span></td></tr>
 <tr><td colspan=3 height="8"></td></tr>
-<tr class="wreisrow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Active Properties:</span></td><td><span class="wreisStatValue" id="wreisPropActive"></span></td></tr>
+<tr class="wreisrow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Active Properties:</span></td><td><span class="wreisStatValue" id="ActiveProperties"></span></td></tr>
+<tr><td colspan=3 height="8"></td></tr>
+<tr class="wreisrow"><td width="30"></td><td align="baseline"><span class="wreisStatLabel">Your Queue:</span></td><td><span class="wreisStatValue" id="YourQueue"></span></td></tr>
 <tr><td colspan=3 height="8"></td></tr>
 </table>
 

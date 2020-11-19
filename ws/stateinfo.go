@@ -185,7 +185,7 @@ func SvcSearchStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 func deleteStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "deleteStateInfo"
 	util.Console("Entered %s\n", funcname)
-	util.Console("record data = %s\n", d.data)
+	// util.Console("record data = %s\n", d.data)
 	SvcWriteSuccessResponse(w)
 }
 
@@ -434,10 +434,10 @@ func saveStateOwner(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	a := si
 	a.FLAGS &= si.FLAGS & 0xefffffffffffffe0
-	util.Console("before: a.FLAGS = %x\n", a.FLAGS)
+	// util.Console("before: a.FLAGS = %x\n", a.FLAGS)
 	a.FLAGS |= 0x14
 	a.Reason = foo.Records[0].Reason // save the reason
-	util.Console("after: a.FLAGS = %x\n", a.FLAGS)
+	// util.Console("after: a.FLAGS = %x\n", a.FLAGS)
 	if err = db.UpdateStateInfo(ctx, &a); err != nil {
 		tx.Rollback()
 		SvcErrorReturn(w, err)
@@ -530,7 +530,7 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 //        cmd = "notready"
 //-----------------------------------------------------------------------------
 func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
-	foo, si, sess, err := stateInfoHelper(w, r, d)
+	_, si, sess, err := stateInfoHelper(w, r, d)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
@@ -539,7 +539,7 @@ func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	// Only the owner can ask for approval
 	//--------------------------------------------------------------------------
-	util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
+	// util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
 	if si.OwnerUID != sess.UID {
 		e := fmt.Errorf("Only the owner can request approval")
 		SvcErrorReturn(w, e)
@@ -867,16 +867,16 @@ func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
-	util.Console("Read property PRID = %d, FlowState = %d\n", prop.PRID, prop.FlowState)
+	// util.Console("Read property PRID = %d, FlowState = %d\n", prop.PRID, prop.FlowState)
 
 	prop.FlowState = revert.FlowState
-	util.Console("FlowState changed to  %d\n", prop.FlowState)
+	// util.Console("FlowState changed to  %d\n", prop.FlowState)
 	if err = db.UpdateProperty(ctx, &prop); err != nil {
 		tx.Rollback()
 		SvcErrorReturn(w, err)
 		return
 	}
-	util.Console("Saved property success\n")
+	// util.Console("Saved property success\n")
 
 	//---------------------------------------
 	// commit
@@ -923,7 +923,7 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
-	util.Console("read %d StateInfo\n", len(foo.Records))
+	// util.Console("read %d StateInfo\n", len(foo.Records))
 
 	//------------------------------------------------------------------------
 	// Read the existing StateInfo list first. We will compare what's being
@@ -934,14 +934,14 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	if d.ID > 0 {
 		a, err = db.GetAllStateInfoItems(ctx, d.ID)
 		if err != nil {
-			util.Console("%s: B\n", funcname)
+			// util.Console("%s: B\n", funcname)
 			tx.Rollback()
 			SvcErrorReturn(w, err)
 			return
 		}
 	}
 
-	util.Console("%s: PRID = %d  num items = %d\n", funcname, d.ID, len(a))
+	// util.Console("%s: PRID = %d  num items = %d\n", funcname, d.ID, len(a))
 
 	//------------------------------------------------------------------------
 	// Now loop through and compare what was sent to what is in the db...
@@ -949,10 +949,10 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	for i := 0; i < len(foo.Records); i++ {
 		if foo.Records[i].SIID < 0 { // SIID < 0 means it's a new entry
 			var x db.StateInfo
-			util.Console("ADD: foo.Records[i].SIID = %d\n", foo.Records[i].SIID)
+			// util.Console("ADD: foo.Records[i].SIID = %d\n", foo.Records[i].SIID)
 			util.MigrateStructVals(&foo.Records[i], &x)
 			x.PRID = d.ID
-			util.Console("\tx = %#v\n", x)
+			// util.Console("\tx = %#v\n", x)
 			if _, err = db.InsertStateInfo(ctx, &x); err != nil {
 				tx.Rollback()
 				SvcErrorReturn(w, err)
@@ -972,7 +972,7 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 						//----------------------------------------
 						// update a[j] to db...
 						//----------------------------------------
-						util.Console("MOD: foo.Records[i].SIID = %d\n", foo.Records[i].SIID)
+						// util.Console("MOD: foo.Records[i].SIID = %d\n", foo.Records[i].SIID)
 						a[j].OwnerUID = foo.Records[i].OwnerUID
 						a[j].ApproverUID = foo.Records[i].ApproverUID
 						a[j].OwnerDt = time.Time(foo.Records[i].OwnerDt)
@@ -1000,7 +1000,7 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			}
 		}
 		if !found {
-			util.Console("DEL: a[i].SIID = %d\n", a[i].SIID)
+			// util.Console("DEL: a[i].SIID = %d\n", a[i].SIID)
 			if err = db.DeleteStateInfo(ctx, a[i].SIID); err != nil {
 				tx.Rollback()
 				SvcErrorReturn(w, err)
@@ -1048,14 +1048,14 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var mm = map[int64]int{}
 	var mmm = map[int64]UserInfo{}
 
-	util.Console("Getting all state info items for property: %d\n", d.ID)
+	// util.Console("Getting all state info items for property: %d\n", d.ID)
 	a, err := db.GetAllStateInfoItems(r.Context(), d.ID)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
 	}
-	util.Console("Number of state info items found: %d\n", len(a))
-	util.Console("a = %#v\n", a)
+	// util.Console("Number of state info items found: %d\n", len(a))
+	// util.Console("a = %#v\n", a)
 
 	for i := 0; i < len(a); i++ {
 		var gg StateInfo
