@@ -14,7 +14,18 @@ test:
 package:
 	for dir in $(DIRS); do make -C $$dir package;done
 
-all: clean wreis package test
+all: clean wreis package test stats
 	echo "Completed"
 
 build: clean wreis package
+
+stats:
+	@echo
+	@echo "-------------------------------------------------------------------------------"
+	@echo "GO SOURCE CODE STATISTICS"
+	@find . -name "*.go" | srcstats
+	@echo "-------------------------------------------------------------------------------"
+	@echo "JAVASCRIPT"
+	@wc -l dist/wreis/static/js/wreis.js
+	@echo "-------------------------------------------------------------------------------"
+	@cat test/testreport.txt

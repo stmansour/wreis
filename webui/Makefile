@@ -44,3 +44,6 @@ images:
 
 secure:
 	@rm -f config.json confdev.json confprod.json
+
+jshint:
+	jshint --extract=always ./webui/html/*.html ./webui/js/elems/*.js
