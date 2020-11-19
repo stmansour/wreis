@@ -199,12 +199,22 @@ function stateReadyForApproval() {
     // Find the "in progress" record for the state selected...
     var FlowState = w2ui.propertyForm.record.FlowState;
     var si = getCurrentStateInfo();
+    var cmd = "";
     if (si == null) {
         console.log('Could not determine the current stateInfo object');
         return;
     }
-
-    finishStateChange(si,"ready");
+    if ((si.FLAGS & 0x2) == 0) {
+        // currently marked as NOT READY, change to READY
+        si.FLAGS |= 0x2;
+        cmd = "ready";
+    } else {
+        // currently marked as ready, change to not ready
+        si.FLAGS &= 0xeffffffffffffffd;
+        cmd = "notready";
+    }
+    propData.bStateLoaded = false;
+    finishStateChange(si,cmd);
 }
 
 // stateApproved calls the server with a request to approve the current state
