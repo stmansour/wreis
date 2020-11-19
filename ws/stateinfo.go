@@ -786,17 +786,17 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateRevert"
 
-	foo, si, sess, err := stateInfoHelper(w, r, d)
+	foo, si, _, err := stateInfoHelper(w, r, d)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
 	}
 
-	if sess.UID != si.ApproverUID {
-		err = fmt.Errorf("You are not the current Approver for this state")
-		SvcErrorReturn(w, err)
-		return
-	}
+	// if sess.UID != si.ApproverUID {
+	// 	err = fmt.Errorf("You are not the current Approver for this state")
+	// 	SvcErrorReturn(w, err)
+	// 	return
+	// }
 
 	if si.FlowState == 1 {
 		err = fmt.Errorf("You cannot revert from this state")

@@ -381,6 +381,9 @@ function finishStateChange(si,c) {
     };
     var dat = JSON.stringify(params);
     var url = '/v1/stateinfo/' + w2ui.propertyForm.record.PRID;
+    // console.log('url = ' + url);
+    // console.log('data = ' + dat);
+    // console.log(" ");
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
