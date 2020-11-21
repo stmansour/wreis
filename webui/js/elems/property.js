@@ -251,9 +251,9 @@ function buildPropertyUIElements() {
                 }
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
-        onSearch: function(event) {
-            console.log('onSearch event fired. event = ' + event);
-        }
+        // onSearch: function(event) {
+        //     console.log('onSearch event fired. event = ' + event);
+        // }
     });
 
     w2ui.propertyGrid.toolbar.add([
@@ -667,7 +667,7 @@ function setPropertyLayout(tab) {
             w2ui.propertyRentStepsGrid.url = '';
         } else {
             w2ui.propertyRentStepsGrid.clear();
-            w2ui.propertyRentStepsGrid.url = '/v1/rentsteps/' + propData.RSLID;
+            w2ui.propertyRentStepsGrid.url = '/v1/rentsteps/' + w2ui.propertyForm.record.RSLID;
         }
         w2ui.rentStepsLayout.content('main',w2ui.propertyRentStepsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.rentStepsLayout);
@@ -679,7 +679,7 @@ function setPropertyLayout(tab) {
             w2ui.propertyRenewOptionsGrid.url = '';
         } else {
             w2ui.propertyRenewOptionsGrid.clear();
-            w2ui.propertyRenewOptionsGrid.url = '/v1/renewoptions/' + propData.ROLID;
+            w2ui.propertyRenewOptionsGrid.url = '/v1/renewoptions/' + w2ui.propertyForm.record.ROLID;
         }
         w2ui.renewOptionsLayout.content('main',w2ui.propertyRenewOptionsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.renewOptionsLayout);

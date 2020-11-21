@@ -6,6 +6,7 @@
 
 var RenewOptionModule = {
     id: 0,
+    maxOpt: 0,
 };
 
 function getNextRenewOptionID() {
@@ -69,8 +70,15 @@ function buildRenewOptionsUIElements() {
             event.onComplete = function() {
                 propData.bRenewOptionsLoaded = true;
                 w2ui.propertyRenewOptionsGrid.url = ''; // don't go back to the server until we're ready to save
+                RenewOptionModule.maxOpt = 0;
                 for (var i = 0; i < w2ui.propertyRenewOptionsGrid.records.length; i++) {
                     w2ui.propertyRenewOptionsGrid.records[i].recid = w2ui.propertyRenewOptionsGrid.records[i].ROID;
+                    if (typeof w2ui.propertyRenewOptionsGrid.records[i].Opt == "string") {
+                        var x = parseInt(w2ui.propertyRenewOptionsGrid.records[i].Opt);
+                        if (RenewOptionModule.maxOpt < x) {
+                            RenewOptionModule.maxOpt = x;
+                        }
+                    }
                 }
                 SetRenewOptionColumns(GetRenewOptionsOptTextMode());  // since all records are the same in BIT 0, just look at first
             };
@@ -279,22 +287,26 @@ function saveRenewOptions() {
     //-----------------------------------------------------------------------
     var params = {
         cmd: "save",
+        PRID: w2ui.propertyForm.record.PRID,
         records: w2ui.propertyRenewOptionsGrid.records
     };
     for (var i = 0; i < params.records.length; i++) {
         var d = new Date(params.records[i].Dt);
         params.records[i].Dt = d.toUTCString();
+        if (params.records[i].Opt == "0") {
+            RenewOptionModule.maxOpt++;
+            params.records[i].Opt = '' + RenewOptionModule.maxOpt;
+        }
     }
     var dat = JSON.stringify(params);
     var url = '/v1/renewoptions/' + w2ui.propertyForm.record.ROLID;
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
-        // if (data.status === "success") {
-        // }
         if (data.status === "error") {
             w2ui.propertyGrid.error('ERROR: '+ data.message);
         }
+        propData.bRenewOptionsLoaded = false;
     })
     .fail(function(data){
             w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
