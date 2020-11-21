@@ -139,7 +139,7 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	var foo SaveRenewOptions
 	data := []byte(d.data)
-	util.Console("data to unmarshal:  %s\n", string(data))
+	// util.Console("data to unmarshal:  %s\n", string(data))
 	err := json.Unmarshal(data, &foo)
 
 	if err != nil {
@@ -161,21 +161,21 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//------------------------------------------------------------------------
 	// Make sure we have a list for this set of RenewOptions
 	//------------------------------------------------------------------------
-	util.Console("len(foo.Records) = %d\n", len(foo.Records))
+	// util.Console("len(foo.Records) = %d\n", len(foo.Records))
 	if len(foo.Records) > 0 {
-		util.Console("foo.Records[0].ROLID = %d\n", foo.Records[0].ROLID)
+		// util.Console("foo.Records[0].ROLID = %d\n", foo.Records[0].ROLID)
 
 		if foo.Records[0].ROLID < 1 {
 			var ROLID int64
 			var list db.RenewOptions
-			util.Console("Create new RenewOptions\n")
+			// util.Console("Create new RenewOptions\n")
 			if ROLID, err = db.InsertRenewOptions(ctx, &list); err != nil {
 				tx.Rollback()
 				SvcErrorReturn(w, err)
 				return
 			}
-			util.Console("New ROLID = %d\n", ROLID)
-			util.Console("foo.PRID = %d\n", foo.PRID)
+			// util.Console("New ROLID = %d\n", ROLID)
+			// util.Console("foo.PRID = %d\n", foo.PRID)
 
 			//---------------------------------------------------
 			// now update this property to point to the list...
@@ -186,16 +186,16 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			util.Console("successfully got PRID = %d\n", prop.PRID)
+			// util.Console("successfully got PRID = %d\n", prop.PRID)
 
 			prop.ROLID = ROLID
-			util.Console("set prop.ROLID = %d\n", prop.ROLID)
+			// util.Console("set prop.ROLID = %d\n", prop.ROLID)
 			if err = db.UpdateProperty(ctx, &prop); err != nil {
 				tx.Rollback()
 				SvcErrorReturn(w, err)
 				return
 			}
-			util.Console("Updated! Will now save all RenewOption records\n")
+			// util.Console("Updated! Will now save all RenewOption records\n")
 
 			//---------------------------------------------------
 			// now update each renew option...
@@ -203,7 +203,7 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			for i := 0; i < len(foo.Records); i++ {
 				foo.Records[i].ROLID = ROLID
 				var x db.RenewOption
-				util.Console("ADD: foo.Records[i].ROID = %d\n", foo.Records[i].ROID)
+				// util.Console("ADD: foo.Records[i].ROID = %d\n", foo.Records[i].ROID)
 				util.MigrateStructVals(&foo.Records[i], &x)
 				if _, err = db.InsertRenewOption(ctx, &x); err != nil {
 					tx.Rollback()
@@ -212,7 +212,7 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				}
 
 			}
-			util.Console("Done.  We can commit the txn and exit at this point\n")
+			// util.Console("Done.  We can commit the txn and exit at this point\n")
 			//---------------------------------------
 			// commit
 			//---------------------------------------

@@ -41,6 +41,7 @@ type SearchRentStepsResponse struct {
 // SaveRentSteps is sent to save one of open time slots as a reservation
 type SaveRentSteps struct {
 	Cmd     string     `json:"cmd"`
+	PRID    int64      `json:"PRID"`
 	Records []RentStep `json:"records"`
 }
 
@@ -166,7 +167,69 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
-	// util.Console("read %d RentSteps\n", len(foo.Records))
+	util.Console("A\n")
+	//------------------------------------------------------------------------
+	// Make sure we have a list for this set of RenewOptions
+	//------------------------------------------------------------------------
+	if len(foo.Records) > 0 {
+		util.Console("B\n")
+
+		if foo.Records[0].RSLID < 1 {
+			var RSLID int64
+			var list db.RentSteps
+			if RSLID, err = db.InsertRentSteps(ctx, &list); err != nil {
+				tx.Rollback()
+				SvcErrorReturn(w, err)
+				return
+			}
+			util.Console("C\n")
+
+			//---------------------------------------------------
+			// now update this property to point to the list...
+			//---------------------------------------------------
+			var prop db.Property
+			if prop, err = db.GetProperty(ctx, foo.PRID); err != nil {
+				tx.Rollback()
+				SvcErrorReturn(w, err)
+				return
+			}
+			util.Console("D\n")
+
+			prop.RSLID = RSLID
+			if err = db.UpdateProperty(ctx, &prop); err != nil {
+				tx.Rollback()
+				SvcErrorReturn(w, err)
+				return
+			}
+			util.Console("E\n")
+
+			//---------------------------------------------------
+			// now update each renew option...
+			//---------------------------------------------------
+			for i := 0; i < len(foo.Records); i++ {
+				foo.Records[i].RSLID = RSLID
+				var x db.RentStep
+				util.MigrateStructVals(&foo.Records[i], &x)
+				if _, err = db.InsertRentStep(ctx, &x); err != nil {
+					tx.Rollback()
+					SvcErrorReturn(w, err)
+					return
+				}
+
+			}
+			util.Console("F:   RSLID = %d\n", RSLID)
+			//---------------------------------------
+			// commit
+			//---------------------------------------
+			if err := tx.Commit(); err != nil {
+				tx.Rollback()
+				SvcErrorReturn(w, err)
+				return
+			}
+			SvcWriteSuccessResponse(w)
+			return
+		}
+	}
 
 	//------------------------------------------------------------------------
 	// if RSID < 0 it is newly added.  For the rest, check to see if they've

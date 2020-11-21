@@ -309,6 +309,6 @@ function saveRenewOptions() {
         propData.bRenewOptionsLoaded = false;
     })
     .fail(function(data){
-            w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
+            w2ui.propertyGrid.error("Save RenewOptions failed. " + data);
     });
 }

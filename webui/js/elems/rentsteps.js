@@ -284,6 +284,7 @@ function saveRentSteps() {
     //-----------------------------------------------------------------------
     var params = {
         cmd: "save",
+        PRID: w2ui.propertyForm.record.PRID,
         records: w2ui.propertyRentStepsGrid.records
     };
     for (var i = 0; i < params.records.length; i++) {
@@ -300,8 +301,9 @@ function saveRentSteps() {
         if (data.status === "error") {
             w2ui.propertyGrid.error('ERROR: '+ data.message);
         }
+        propData.bRentStepsLoaded = false;
     })
     .fail(function(data){
-            w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
+            w2ui.propertyGrid.error("Save RentSteps failed. " + data);
     });
 }
