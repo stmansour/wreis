@@ -167,12 +167,10 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
-	util.Console("A\n")
 	//------------------------------------------------------------------------
 	// Make sure we have a list for this set of RenewOptions
 	//------------------------------------------------------------------------
 	if len(foo.Records) > 0 {
-		util.Console("B\n")
 
 		if foo.Records[0].RSLID < 1 {
 			var RSLID int64
@@ -182,7 +180,6 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			util.Console("C\n")
 
 			//---------------------------------------------------
 			// now update this property to point to the list...
@@ -193,7 +190,6 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			util.Console("D\n")
 
 			prop.RSLID = RSLID
 			if err = db.UpdateProperty(ctx, &prop); err != nil {
@@ -201,7 +197,6 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			util.Console("E\n")
 
 			//---------------------------------------------------
 			// now update each renew option...
@@ -217,7 +212,6 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				}
 
 			}
-			util.Console("F:   RSLID = %d\n", RSLID)
 			//---------------------------------------
 			// commit
 			//---------------------------------------

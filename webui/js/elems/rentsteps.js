@@ -22,7 +22,7 @@ function newRentStepRecord() {
         Opt: 0,
         Dt: new Date(),
         Rent: 0,
-        FLAGS: GetRentStepOptionTextMode(),
+        FLAGS: propData.rsType,
     };
     return rs;
 }
@@ -65,26 +65,27 @@ function buildRentStepsUIElements() {
             {field: 'LastModTime', caption: 'LastModTime',size: '60px', sortable: true, hidden: true},
             {field: 'LastModBy',   caption: 'LastModBy',  size: '60px', sortable: true, hidden: true},
         ],
-         onLoad: function(event) {
+        onLoad: function(event) {
             event.onComplete = function() {
                 propData.bRentStepsLoaded = true;
                 w2ui.propertyRentStepsGrid.url = ''; // don't go back to the server until we're ready to save
                 for (var i = 0; i < w2ui.propertyRentStepsGrid.records.length; i++) {
                     w2ui.propertyRentStepsGrid.records[i].recid = w2ui.propertyRentStepsGrid.records[i].RSID;
                 }
-                SetRentStepColumns(GetRentStepOptionTextMode());  // since all records are the same in BIT 0, just look at first
+                SetRentStepColumns(propData.rsType);  // since all records are the same in BIT 0, just look at first
             };
         },
         onAdd: function(event) {
             w2ui.propertyRentStepForm.record = newRentStepRecord();
-            w2ui.propertyRentStepsGrid.add(w2ui.propertyRentStepForm.record);
+            var ev = {
+                type: "click",
+                target: ((w2ui.propertyRentStepForm.record.FLAGS & 1) == 0) ? "rsListType:rsListOpt" : "rsListType:rsListDate",
+            };
+            RentStepTypeChange(ev); // make sure the opt vs date mode is set correctly
             showRentStepForm();
         },
         onClick: function(event) {
             event.onComplete = function(event) {
-                // if (typeof w2ui.propertyRentStepForm.record === "undefined") {
-                //     w2ui.propertyRentStepForm.record = newRentStepRecord();
-                // }
                 var r = w2ui.propertyRentStepForm.record;
                 var x = this.getSelection();
                 if (x.length < 1) {return;}
@@ -134,7 +135,6 @@ function buildRentStepsUIElements() {
         },
         onRefresh: function(event) {
             event.onComplete = function(event) {
-                // console.log('propertyRentStepForm: Refresh completed');
                 EnableRentStepFormFields();
             };
         },
@@ -167,8 +167,8 @@ function finishRentStepsGridToolbar() {
             },
             selected: 'rsListOpt',
             items: [
-                { id: 'rsListOpt', text: 'Period', icon: 'fa fa-tachometer' },
-                { id: 'rsListDate', text: 'Date', icon: 'fa fa-tachometer' },
+                { id: 'rsListOpt',  text: 'Period', icon: 'fa fa-tachometer' },
+                { id: 'rsListDate', text: 'Date',   icon: 'fa fa-tachometer' },
             ]
         },
     ]);
@@ -179,7 +179,7 @@ function RentStepDelete() {
     var r = w2ui.propertyRentStepForm.record;
     var g = w2ui.propertyRentStepsGrid;
     var i = g.get(r.recid,true);
-    if (i >= 0) {
+    if (typeof i == "number" && i >= 0) {
         var removed = g.records.splice(i,1);
         // console.log('removed = ' + removed);
     }
@@ -190,6 +190,11 @@ function RentStepDelete() {
 function RentStepSave() {
     var r = w2ui.propertyRentStepForm.record;
     var g = w2ui.propertyRentStepsGrid;
+
+    if (r.RSID < 0) {
+        w2ui.propertyRentStepsGrid.add(r);
+        w2ui.propertyRentStepForm.record.RSID = 0;  // to make sure that this one won't be added again
+    }
     g.set(r.recid,r);
 
     w2ui.rentStepsLayout.hide('right',true);
@@ -205,10 +210,12 @@ function RentStepTypeChange(event) {
     case "rsListType:rsListOpt":
         SetRentStepColumns(0);
         SetRentStepFLAGs(0);
+        propData.rsType = 0;
         break;
     case "rsListType:rsListDate":
         SetRentStepColumns(1);
         SetRentStepFLAGs(1);
+        propData.rsType = 1;
         break;
     }
 }
@@ -228,33 +235,25 @@ function SetRentStepColumns(FLAGS) {
     w2ui.propertyRentStepsGrid.toolbar.refresh();
 }
 
+// INPUTS
+//   FLAGS =  0 means use Options
+//            1 means use Dates
+//-----------------------------------------------------------------------
 function SetRentStepFLAGs(FLAGS) {
     for (var i = 0; i < w2ui.propertyRentStepsGrid.records.length; i++) {
-        w2ui.propertyRentStepsGrid.records[i].FLAGS &= (~1);
+        w2ui.propertyRentStepsGrid.records[i].FLAGS &= 0xeffffffffffffffe;
         w2ui.propertyRentStepsGrid.records[i].FLAGS |= FLAGS;
     }
 }
 
 function EnableRentStepFormFields() {
-    var f = w2ui.propertyRentStepForm;
-    if (GetRentStepOptionTextMode()) {
+    if (1 == propData.rsType) {
         $('#Opt').prop('disabled', true);
         $('#Dt').prop('disabled', false);
-        // $(f.box).find("#Opt").hide();
-        // $(f.box).find("input[name=Dt]").reClass("hidden");
     } else {
         $('#Opt').prop('disabled', false);
         $('#Dt').prop('disabled', true);
     }
-}
-
-// GetRentStepOptionTextMode return 0 if the mode is Opt, or 1 if it is Date
-function GetRentStepOptionTextMode() {
-    var FLAGS = 0;
-    if (w2ui.propertyRentStepsGrid.records.length > 0) {
-        FLAGS = w2ui.propertyRentStepsGrid.records[0].FLAGS;  // since all records are the same in BIT 0, just look at first
-    }
-    return FLAGS & 0x1;
 }
 
 function showRentStepForm() {
@@ -290,6 +289,8 @@ function saveRentSteps() {
     for (var i = 0; i < params.records.length; i++) {
         var d = new Date(params.records[i].Dt);
         params.records[i].Dt = d.toUTCString();
+        var y = params.records[i].Opt;
+        params.records[i].Opt = y.toString();  // need to make sure this is a string
     }
     var dat = JSON.stringify(params);
     var url = '/v1/rentsteps/' + w2ui.propertyForm.record.RSLID;

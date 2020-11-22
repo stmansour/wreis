@@ -22,6 +22,8 @@ var propData = {
     formWidth: 575,             // how wide is the entry / edit form
     numStates: 7,               // states go from 1 to 7 -- this is a full complement of sates, the states array may have less
     states: [],                 // the server will be queried for these on existing properties, or filled with an inital state on new
+    rsType: 0,                  // 0 = options, 1 = date
+    roType: 0,                  // 0 = options, 1 = date
     doneText: "#0611AA",
     doneBG: "#e0f0ff",
     notStartedText: "#777777",

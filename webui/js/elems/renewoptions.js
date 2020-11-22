@@ -6,7 +6,6 @@
 
 var RenewOptionModule = {
     id: 0,
-    maxOpt: 0,
 };
 
 function getNextRenewOptionID() {
@@ -23,7 +22,7 @@ function newRenewOptionRecord() {
         Opt: 0,
         Dt: new Date(),
         Rent: 0,
-        FLAGS: GetRenewOptionsOptTextMode(),
+        FLAGS: propData.roType,
     };
     return rs;
 }
@@ -66,27 +65,23 @@ function buildRenewOptionsUIElements() {
             {field: 'LastModTime', caption: 'LastModTime',size: '60px', sortable: true, hidden: true},
             {field: 'LastModBy',   caption: 'LastModBy',  size: '60px', sortable: true, hidden: true},
         ],
-         onLoad: function(event) {
+        onLoad: function(event) {
             event.onComplete = function() {
                 propData.bRenewOptionsLoaded = true;
                 w2ui.propertyRenewOptionsGrid.url = ''; // don't go back to the server until we're ready to save
-                RenewOptionModule.maxOpt = 0;
                 for (var i = 0; i < w2ui.propertyRenewOptionsGrid.records.length; i++) {
                     w2ui.propertyRenewOptionsGrid.records[i].recid = w2ui.propertyRenewOptionsGrid.records[i].ROID;
-                    if (typeof w2ui.propertyRenewOptionsGrid.records[i].Opt == "string") {
-                        var x = parseInt(w2ui.propertyRenewOptionsGrid.records[i].Opt);
-                        if (RenewOptionModule.maxOpt < x) {
-                            RenewOptionModule.maxOpt = x;
-                        }
-                    }
                 }
-                SetRenewOptionColumns(GetRenewOptionsOptTextMode());  // since all records are the same in BIT 0, just look at first
+                SetRenewOptionColumns(propData.roType);  // since all records are the same in BIT 0, just look at first
             };
         },
         onAdd: function(event) {
             w2ui.propertyRenewOptionForm.record = newRenewOptionRecord();
-            w2ui.propertyRenewOptionForm.record.FLAGS = GetRenewOptionsOptTextMode();
-            w2ui.propertyRenewOptionsGrid.add(w2ui.propertyRenewOptionForm.record);
+            var ev = {
+                type: "click",
+                target: ((w2ui.propertyRenewOptionForm.record.FLAGS & 1) == 0) ? "roListType:roListOpt" : "roListType:roListDate",
+            };
+            RenewOptionTypeChange(ev); // make sure the opt vs date mode is set correctly
             showRenewOptionForm();
         },
         onClick: function(event) {
@@ -184,7 +179,7 @@ function RenewOptionDelete() {
     var r = w2ui.propertyRenewOptionForm.record;
     var g = w2ui.propertyRenewOptionsGrid;
     var i = g.get(r.recid,true);
-    if (i >= 0) {
+    if (typeof i == "number" && i >= 0) {
         var removed = g.records.splice(i,1);
         // console.log('removed = ' + removed);
     }
@@ -195,7 +190,11 @@ function RenewOptionDelete() {
 function RenewOptionSave() {
     var r = w2ui.propertyRenewOptionForm.record;
     var g = w2ui.propertyRenewOptionsGrid;
-    r.FLAGS = GetRenewOptionsOptTextMode();
+
+    if (r.ROID < 0) {
+        w2ui.propertyRenewOptionsGrid.add(r);
+        w2ui.propertyRenewOptionForm.record.ROID = 0;  // to make sure that this one won't be added again
+    }
     g.set(r.recid,r);
 
     w2ui.renewOptionsLayout.hide('right',true);
@@ -211,10 +210,12 @@ function RenewOptionTypeChange(event) {
     case "roListType:roListOpt":
         SetRenewOptionColumns(0);
         SetRenewOptionFLAGs(0);
+        propData.roType = 0;
         break;
     case "roListType:roListDate":
         SetRenewOptionColumns(1);
         SetRenewOptionFLAGs(1);
+        propData.roType = 1;
         break;
     }
 }
@@ -234,30 +235,25 @@ function SetRenewOptionColumns(FLAGS) {
     w2ui.propertyRenewOptionsGrid.toolbar.refresh();
 }
 
+// INPUTS
+//   FLAGS =  0 means use Options
+//            1 means use Dates
+//-----------------------------------------------------------------------
 function SetRenewOptionFLAGs(FLAGS) {
     for (var i = 0; i < w2ui.propertyRenewOptionsGrid.records.length; i++) {
-        w2ui.propertyRenewOptionsGrid.records[i].FLAGS &= 0xefffffe;
+        w2ui.propertyRenewOptionsGrid.records[i].FLAGS &= 0xeffffffffffffffe;
         w2ui.propertyRenewOptionsGrid.records[i].FLAGS |= FLAGS;
     }
 }
 
 function EnableRenewOptionFormFields() {
-    if (GetRenewOptionsOptTextMode()) {
+    if (1 == propData.roType) {
         $('#Opt').prop('disabled', true);
         $('#Dt').prop('disabled', false);
     } else {
         $('#Opt').prop('disabled', false);
         $('#Dt').prop('disabled', true);
     }
-}
-
-// GetRenewOptionsOptTextMode return 0 if the mode is Opt, or 1 if it is Date
-function GetRenewOptionsOptTextMode() {
-    var FLAGS = 0;
-    if (w2ui.propertyRenewOptionsGrid.records.length > 0) {
-        FLAGS = w2ui.propertyRenewOptionsGrid.records[0].FLAGS;  // since all records are the same in BIT 0, just look at first
-    }
-    return FLAGS & 0x1;
 }
 
 function showRenewOptionForm() {
