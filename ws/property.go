@@ -329,7 +329,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				AND
 				((%d = StateInfo.OwnerUID AND (StateInfo.FLAGS & 2)=0)
 				  OR
-				 (%d = ApproverUID AND (StateInfo.FLAGS & 2)=2)
+				 (%d = StateInfo.ApproverUID AND (StateInfo.FLAGS & 2)=2)
 				)`, sess.UID, sess.UID)
 		} else {
 			if len(sf.States) > 0 {
