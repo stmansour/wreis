@@ -255,7 +255,7 @@ function updatePropertyState() {
             //-----------------------------------------------------------
             // ADD CHANGE BUTTON TO CURRENT STATE...
             //-----------------------------------------------------------
-            if (propData.states[i].FlowState == w2ui.propertyForm.record.FlowState) {
+            if (r.PRID > 0 && propData.states[i].FlowState == w2ui.propertyForm.record.FlowState) {
                 setStateChange(w2ui.propertyForm.record.FlowState);
             }
         }
