@@ -42,7 +42,10 @@ CREATE TABLE Property (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        /* 1<<0  Drive Through?  0 = no, 1 = yes
                                                                1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes
-                                                               1<<3  0 = processing/processed. 1 = Terminated
+                                                               1<<3  (unused at this time)
+                                                               1<<4  (unused at this time)
+                                                               1<<5  (unused at this time)
+                                                               1<<6  (TERMINATED - consistent with StateInfo)
                                                             */
     Ownership SMALLINT NOT NULL DEFAULT 0,                  -- 0 = fee simple, 1 = leasehold
     TenantTradeName VARCHAR(256) NOT NULL DEFAULT '',       -- trade name of business
@@ -180,7 +183,7 @@ CREATE TABLE Traffic (
 CREATE TABLE StateInfo (
     SIID BIGINT NOT NULL AUTO_INCREMENT,                    -- State Info ID
     PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = valid only when ApproverUID > 0, 0 = State Approved, 1 = not approved
+    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- see table above
     FlowState BIGINT NOT NULL DEFAULT 0,                    --
     OwnerUID BIGINT NOT NULL DEFAULT 0,                 --
     OwnerDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00', -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1

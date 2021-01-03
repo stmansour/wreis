@@ -1,6 +1,7 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document,
     updatePropertyState, stateStatus,closeStateChangeDialog,setTimeout,
+    setInnerHTML,
 */
 
 "use strict";
@@ -108,9 +109,32 @@ function updatePropertyState() {
         var curState = 1;
         var s = "<p><table>";
         var j = 1;
+        var i;
         var MINYEAR = 2000;
         var notAnApproval = false;
         var statusSet = false;
+
+        //--------------------------------------------------------
+        // Indicate if this Property is  TERMINATED
+        //--------------------------------------------------------
+        if ( (r.FLAGS)&0x64 == 0) {
+            // ACTIVE - leave this area blank
+            setInnerHTML("stateTerminatedLabel","");
+        } else {
+            // ACTIVE - show indicators
+            //----------------------------------------------------
+            // find the state where the termination occurred
+            //----------------------------------------------------
+            var str = "";
+            for (i = 0; i < propData.states.length; i++) {
+                if ( (propData.states[i].FLAGS & 64) != 0 ) {
+                    str = "TERMINATED<br>by " + propData.states[i].LastModByName +
+                        " " + propData.states[i].LastModTime +
+                        "<br>Reason: " + propData.states[i].Reason;
+                }
+            }
+            setInnerHTML("stateTerminatedLabel",str);
+        }
 
         //--------------------------------------------------------
         // turn off the Save buttons for this record
@@ -119,7 +143,7 @@ function updatePropertyState() {
         $(f.box).find("button[name=saveadd]").prop( "disabled", true );
         $(f.box).find("button[name=delete]").prop( "disabled", true );
 
-        for (var i = 0; i < propData.states.length; i++) {
+        for (i = 0; i < propData.states.length; i++) {
             var id;
             var dt;
             var flags = propData.states[i].FLAGS;

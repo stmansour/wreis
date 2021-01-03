@@ -333,7 +333,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				)`, sess.UID, sess.UID)
 		} else {
 			if len(sf.States) > 0 {
-				statefltr = " FLOWSTATE IN ("
+				statefltr = " Property.FlowState IN ("
 				for j := 0; j < len(sf.States); j++ {
 					statefltr += fmt.Sprintf("%d", sf.States[j])
 					if j+1 < len(sf.States) {
@@ -343,12 +343,13 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				statefltr += ")"
 			}
 			// util.Console("len(sf.States) = %d\n", len(sf.States))
+			// The terminate bit is 1<<6  == 64.  If that bit is set then the property is terminated
 			switch sf.ShowTerminated {
 			case 0:
-				statefltr += " AND (FLAGS & 8)=0"
+				statefltr += " AND ((Property.FLAGS & 64)=0)"
 				break
 			case 1:
-				statefltr += " AND (FLAGS & 8)!=0"
+				statefltr += " AND ((Property.FLAGS & 64)!=0)"
 				break
 			}
 		}

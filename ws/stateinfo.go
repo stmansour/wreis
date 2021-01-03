@@ -233,7 +233,9 @@ func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (Sa
 // saveStateTerminate sets the terminate bit for this StateInfo and Property
 //
 //  ANYONE CAN TERMINATE:  But the person who made the change will be
-//         kept in the audit trail. Changer will be the UID
+//         kept in the audit trail.
+//
+//			Changer will be the UID
 //         of LastModBy on this StateInfo, and creator of the StateInfo
 //         with new owner
 //
@@ -293,7 +295,7 @@ func saveStateTerminate(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 		return
 	}
 
-	prop.FLAGS |= (1 << 3) // mark as terminated
+	prop.FLAGS |= (1 << 6) // mark as terminated
 	if err = db.UpdateProperty(ctx, &prop); err != nil {
 		tx.Rollback()
 		SvcErrorReturn(w, err)
