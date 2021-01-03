@@ -568,7 +568,11 @@ function loadPropertyForm(PRID) {
     propData.PRID = rec.PRID;
     closeStateChangeDialog();
 
-    f.header = rec.Name + "  (" + rec.PRID + ")";
+    if (rec.PRID < 1) {
+        f.header = "New Record";
+    } else {
+        f.header = rec.Name + "  (" + rec.PRID + ")";
+    }
     f.url = "/v1/property/"+rec.PRID;
     f.reload();  // get this going as quickly as possible
 
