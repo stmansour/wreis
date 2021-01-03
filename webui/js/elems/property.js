@@ -252,7 +252,7 @@ function buildPropertyUIElements() {
                 for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
                     w2ui.propertyGrid.records[i].recid = w2ui.propertyGrid.records[i].PRID;
                 }
-                f.header = f.record.Name + "  (" + f.record.PRID + ")";
+                setPropertyHeader();
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
         // onSearch: function(event) {
@@ -549,6 +549,17 @@ function setPropertyNotLoaded() {
 
 }
 
+function setPropertyHeader() {
+    var f = w2ui.propertyForm;
+    var r = f.record;
+
+    if (r.PRID < 1) {
+        f.header = "New Record";
+    } else {
+        f.header = r.Name + "  (" + r.PRID + ")";
+    }
+}
+
 function loadPropertyForm(PRID) {
     var f = w2ui.propertyForm;
     var rec = null;
@@ -568,11 +579,7 @@ function loadPropertyForm(PRID) {
     propData.PRID = rec.PRID;
     closeStateChangeDialog();
 
-    if (rec.PRID < 1) {
-        f.header = "New Record";
-    } else {
-        f.header = rec.Name + "  (" + rec.PRID + ")";
-    }
+    setPropertyHeader();
     f.url = "/v1/property/"+rec.PRID;
     f.reload();  // get this going as quickly as possible
 
