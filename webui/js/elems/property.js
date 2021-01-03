@@ -283,6 +283,7 @@ function buildPropertyUIElements() {
             }
             if (found) {
                 propertySetPostData();
+                closePropertyForm();
                 w2ui.propertyGrid.reload();
             }
         };
