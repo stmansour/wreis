@@ -2,7 +2,7 @@
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
     propertyStateOnLoad,setTimeout,closeStateChangeDialog,setPropertyStatusButtons,
-    closePropertyForm
+    closePropertyForm, saveTraffic,
 */
 
 "use strict";
@@ -481,14 +481,19 @@ function buildPropertyUIElements() {
                 r.LeaseExpirationDt = dateFmtStr(y);
                 r.CapRate *= 100;
                 r.AvgCap *= 100;
+
+                propData.bPropLoaded = true;
+                propertyStateOnLoad(); // need to call this now that we know the state
+            };
+        },
+        onRefresh: function(event) {
+            event.onComplete = function() {
+                var r = w2ui.propertyForm.record;
                 setDropDownSelectedIndex("LotSizeUnitsDD",r.LotSizeUnits);
                 setDropDownSelectedIndex("OwnershipDD",r.Ownership);
                 setDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD",r.TermRemainingOnLeaseUnits);
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
-
-                propData.bPropLoaded = true;
-                propertyStateOnLoad(); // need to call this now that we know the state
             };
         },
     });
@@ -547,7 +552,6 @@ function setPropertyNotLoaded() {
     propData.bTrafficLoaded = false;
     propData.bStateLoaded = false;
     propData.states = [];
-
 }
 
 function setPropertyHeader() {
