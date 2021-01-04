@@ -19,6 +19,12 @@ all: clean wreis package test stats
 
 build: clean wreis package
 
+release:
+	/usr/local/accord/bin/release.sh wreis
+
+snapshot:
+	cd dist ; rm -f wreis.tar.gz ; tar cvfz wreis.tar.gz wreis ; cd ..
+
 stats:
 	@echo
 	@echo "-------------------------------------------------------------------------------"
