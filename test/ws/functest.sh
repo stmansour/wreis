@@ -540,30 +540,6 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     dojsonPOST "http://localhost:8276/v1/dashboard/" "request" "${TFILES}${STEP}"  "Get-Dashboard-data"
 fi
 
-#------------------------------------------------------------------------------
-#  TEST m
-#
-#  UI Issue Test:
-#       test for invalid SQL
-#
-#  Scenario:
-#       Clicking on a property to bring it up in the Property Form caused
-#       an error.
-#
-#  Expected Results:
-#       See individual comments below
-#------------------------------------------------------------------------------
-TFILES="m"
-STEP=0
-if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
-    mysql --no-defaults wreis < xh.sql
-    login
-
-    # Try to terminate a property without listing a reason
-    encodeRequest '{"cmd":"get","recid":3,"name":"propertyForm"}'
-    dojsonPOST "http://localhost:8276/v1/property/3" "request" "${TFILES}${STEP}"  "Get-property-data"
-fi
-
 
 
 stopWsrv
