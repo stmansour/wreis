@@ -330,7 +330,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			}
 			joinwhere = fmt.Sprintf(`
 				WHERE
-					(StateInfo.FLAGS & 0x4)=0 AND (StateInfo.FLAGS & 64)=%d
+					(StateInfo.FLAGS & 0x4)=0 AND (StateInfo.FLAGS & 64)!=%d
 					AND
 					(
 						(%d = StateInfo.OwnerUID AND (StateInfo.FLAGS & 2)=0)
