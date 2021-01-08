@@ -323,14 +323,14 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		}
 		util.Console("sf = %#v\n", sf)
 		if sf.MyQueue > 0 {
-			joins = " LEFT JOIN StateInfo ON (StateInfo.FlowState = Property.FlowState)"
-			var findterminated int
+			joins = " LEFT JOIN StateInfo ON (StateInfo.PRID=Property.PRID AND StateInfo.FlowState = Property.FlowState)"
+			var findterminated = 0
 			if sf.ShowTerminated == 1 {
-				findterminated = 0x40
+				findterminated = 64
 			}
 			joinwhere = fmt.Sprintf(`
 				WHERE
-					(StateInfo.FLAGS & 0x4)=0 AND (StateInfo.FLAGS & 64)!=%d
+					(StateInfo.FLAGS & 0x4)=0 AND (StateInfo.FLAGS & 64)=%d
 					AND
 					(
 						(%d = StateInfo.OwnerUID AND (StateInfo.FLAGS & 2)=0)
