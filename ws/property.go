@@ -324,13 +324,20 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		util.Console("sf = %#v\n", sf)
 		if sf.MyQueue > 0 {
 			joins = " LEFT JOIN StateInfo ON (StateInfo.FlowState = Property.FlowState)"
+			var findterminated int
+			if sf.ShowTerminated == 1 {
+				findterminated = 0x40
+			}
 			joinwhere = fmt.Sprintf(`
-				WHERE (StateInfo.FLAGS & 0x4)=0
-				AND
-				((%d = StateInfo.OwnerUID AND (StateInfo.FLAGS & 2)=0)
-				  OR
-				 (%d = StateInfo.ApproverUID AND (StateInfo.FLAGS & 2)=2)
-				)`, sess.UID, sess.UID)
+				WHERE
+					(StateInfo.FLAGS & 0x4)=0 AND (StateInfo.FLAGS & 64)=%d
+					AND
+					(
+						(%d = StateInfo.OwnerUID AND (StateInfo.FLAGS & 2)=0)
+				  		OR
+				 		(%d = StateInfo.ApproverUID AND (StateInfo.FLAGS & 2)=2)
+					)
+				`, findterminated, sess.UID, sess.UID)
 		} else {
 			if len(sf.States) > 0 {
 				statefltr = " Property.FlowState IN ("
@@ -387,7 +394,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	util.Console("order = %s\n", order)
 
 	query := `
-	SELECT {{.SelectClause}}
+	SELECT DISTINCT {{.SelectClause}}
 	FROM Property {{.WhereClause}}
 	ORDER BY {{.OrderClause}}`
 
@@ -423,7 +430,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	// get formatted query with substitution of select, where, order clause
 	qry := db.RenderSQLQuery(queryWithLimit, qc)
-	util.Console("db query = %s\n", qry)
+	util.Console("SvcSearchProperty: db query = %s\n", qry)
 
 	// execute the query
 	rows, err := db.Wdb.DB.Query(qry)
