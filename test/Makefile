@@ -19,6 +19,8 @@ test:
 	@date >> testreport.txt
 	@echo "*** TEST completed in test ***"
 	@cat testreport.txt
+	# Put usable data in the database...
+	@mysql --no-defaults wreis < ws/xh.sql
 
 package:
 	for dir in $(DIRS); do make -C $$dir package;done

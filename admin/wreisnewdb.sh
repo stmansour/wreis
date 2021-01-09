@@ -3,27 +3,32 @@ MYSQLOPTS="--no-defaults"
 DBBACKUP="WreisBackupDB.sql"
 DBNAME="wreis"
 if [ -f /usr/local/bin/mysql ]; then
-	MYSQL="/usr/local/bin/mysql"
+        MYSQL="/usr/local/bin/mysql"
 elif [ -f /usr/bin/mysql ]; then
-	MYSQL="/usr/bin/mysql"
+        MYSQL="/usr/bin/mysql"
 else
-	MYSQL="mysql"
+        MYSQL="mysql"
 fi
 
 function MakeProdDB() {
-	MYSQLOPTS=
+        MYSQLOPTS=
 
-	HOST=$(grep "WREISDbhost" config.json | sed -e 's/.*"WREISDbhost"[ \t]*:[ \t]*"//' | sed -e 's/",$//')
-	PORT=$(grep "WREISDbport" config.json | sed -e 's/.*"WREISDbport"[ \t]*:[ \t]*//' | sed -e 's/[ \t]*,[ \t]*$//')
-	MYSQLDUMP="${MYSQL}dump"
-	${MYSQLDUMP} -h ${HOST} -P ${PORT} ${DBNAME} >${DBBACKUP}
-	RC=$?
-	if [ $RC == 0 ]; then
-		echo "WREIS database existed. A backup was made to ${DBBACKUP}."
-	else
-		${MYSQL} -h ${HOST} -P ${PORT} <schema.sql
-		echo "WREIS database was created."
-	fi
+        HOST=$(grep "WREISDbhost" config.json | sed -e 's/.*"WREISDbhost"[ \t]*:[ \t]*"//' | sed -e 's/",$//')
+        PORT=$(grep "WREISDbport" config.json | sed -e 's/.*"WREISDbport"[ \t]*:[ \t]*//' | sed -e 's/[ \t]*,[ \t]*$//')
+
+        # echo "HOST = ${HOST}, PORT = ${PORT}"
+
+        MYSQLDUMP="${MYSQL}dump"
+        echo "execute: ${MYSQLDUMP} -h ${HOST} -P ${PORT} ${DBNAME} >${DBBACKUP}"
+        ${MYSQLDUMP} -h "${HOST}" -P "${PORT}" "${DBNAME}" >${DBBACKUP}
+        RC=$?
+        if [ $RC == 0 ]; then
+                echo "WREIS database existed. A backup was made to ${DBBACKUP}."
+        else
+                # echo "execute: ${MYSQL} -h ${HOST} -P ${PORT} <schema.sql"
+                ${MYSQL} -h "${HOST}" -P "${PORT}" <schema.sql
+                echo "WREIS database was created."
+        fi
 }
 
 SOURCE="${BASH_SOURCE[0]}"
@@ -34,11 +39,11 @@ while [ -h "${SOURCE}" ]; do # resolve ${SOURCE} until the file is no longer a s
 done
 DIR="$( cd -P "$( dirname "${SOURCE}" )" && pwd )"
 
-pushd ${DIR}
-PROD=$(grep '"Env"' config.json | grep 1 | wc -l)   # if this is production then PROD == 1, otherwise PROD == 0
+pushd "${DIR}" || exit 2
+PROD=$(grep '"Env"' config.json | grep -c 1)   # if this is production then PROD == 1, otherwise PROD == 0
 if [ "${PROD}" = "1" ]; then
-	MakeProdDB
+        MakeProdDB
 else
-	mysql ${MYSQLOPTS} <schema.sql
+        mysql "${MYSQLOPTS}" <schema.sql
 fi
-popd
+popd || exit 2

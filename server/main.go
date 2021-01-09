@@ -78,6 +78,7 @@ func main() {
 	defer App.LogFile.Close()
 	log.SetOutput(App.LogFile)
 	util.Ulog("*** WREIS WERTZ REAL ESTATE INVESTMENT SERVICES ***\n")
+	util.Ulog("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 
 	// Get the database...
 	// s := "<awsdbusername>:<password>@tcp(<rdsinstancename>:3306)/accord"
@@ -99,7 +100,6 @@ func main() {
 	db.BuildPreparedStatements()    // the prepared statement for db access
 	initHTTP()
 	util.Ulog("wsrv initiating HTTP service on port %d\n", App.Port)
-	util.Ulog("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 	fmt.Printf("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 
 	//go http.ListenAndServeTLS(fmt.Sprintf(":%d", App.Port+1), App.CertFile, App.KeyFile, nil)
