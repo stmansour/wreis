@@ -1,21 +1,21 @@
 #!/bin/bash
-PORT=8275
+PORT=8276
 CHECKINGPERIOD=10                  # seconds
-LOGFILE="mojowatchdog.log"
+LOGFILE="wreiswatchdog.log"
 
 #----------------------------------------------------
-#  Main loop:   
-#  Ping mojosrv on localhost:8275.
+#  Main loop:
+#  Ping wsrv on localhost:8275.
 #  If we don't hear back, then restart
 #----------------------------------------------------
 while [ 1=1 ];
 do
-	R=$(curl -s http://localhost:${PORT}/v1/ping | grep "Accord Mojo" | wc -l)
+	R=$(curl -s http://localhost:${PORT}/v1/ping | grep "WREIS - Version" | wc -l)
 	if [ 0 = ${R} ]; then
-		echo -n "Ping to mojosrv failed at " >> ${LOGFILE}
+		echo -n "Ping to wsrv failed at " >> ${LOGFILE}
 		date >>  ${LOGFILE}
 		echo -n "Restart..." >> ${LOGFILE}
-		pkill mojosrv
+		pkill wreis
 		./activate.sh start
 	fi
 

@@ -13,13 +13,13 @@ DATABASENAME="${PROGNAME}"
 DBUSER="ec2-user"
 SERVERNAME="wreis"
 IAM=$(whoami)
-RENTROLLHOME="/home/ec2-user/apps/${PROGNAME}"
-WATCHDOG="mojowatchdog.sh"
+APPHOME="/home/ec2-user/apps/${PROGNAME}"
+WATCHDOG="wreiswatchdog.sh"
 
 
 usage() {
     cat <<ZZEOF
-Wreis activation script.
+WREIS activation script.
 Usage:   activate.sh [OPTIONS] CMD
 
 This is the Wreis activation script. It is designed to work in two environments.
@@ -155,7 +155,8 @@ stop() {
 status() {
 	ST=$(curl -s http://${HOST}:${PORT}/v1/ping/ | wc -c)
 	case "${ST}" in
-	"33")
+	"27")
+        echo "Running and accepting commands"
 		exit 0
 		;;
 	"0")
@@ -204,7 +205,7 @@ while getopts ":p:qih:N:Tb" o; do
 done
 shift $((OPTIND-1))
 
-# cd "${RENTROLLHOME}"
+# cd "${APPHOME}"
 PBPATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 cd ${PBPATH}
 
@@ -246,6 +247,9 @@ for arg do
 		;;
 	"makedev")
 		makeDevNode
+		;;
+	"status")
+		status
 		;;
 	*)
 		echo "Unrecognized command: $arg"

@@ -23,8 +23,8 @@ release:
 	/usr/local/accord/bin/release.sh wreis
 
 snapshot:
-	cd dist ; rm -f wreis.tar.gz ; tar cvfz wreis.tar.gz wreis ; cd ..
-
+	cd dist ; rm -f wreis.tar.gz ; tar cvfz wreis.tar.gz wreis ; /usr/local/accord/bin/snapshot.sh wreis.tar.gz ; cd ..
+	
 stats:
 	@echo
 	@echo "-------------------------------------------------------------------------------"
