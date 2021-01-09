@@ -26,7 +26,7 @@ pushconf: confdev.json
 
 package: server
 	mkdir -p ${BINDIR}
-	cp server ${BINDIR}/wsrv
+	cp server ${BINDIR}/wreis
 	cp confdev.json ${BINDIR}/config.json
 
 build: server package

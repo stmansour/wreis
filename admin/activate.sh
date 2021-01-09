@@ -11,7 +11,7 @@ WATCHDOGOPTS=""
 GETFILE="/usr/local/accord/bin/getfile.sh"
 DATABASENAME="${PROGNAME}"
 DBUSER="ec2-user"
-SERVERNAME="wsrv"
+SERVERNAME="wreis"
 IAM=$(whoami)
 RENTROLLHOME="/home/ec2-user/apps/${PROGNAME}"
 WATCHDOG="mojowatchdog.sh"
@@ -22,7 +22,7 @@ usage() {
 Wreis activation script.
 Usage:   activate.sh [OPTIONS] CMD
 
-This is the Accord Wreis activation script. It is designed to work in two environments.
+This is the Wreis activation script. It is designed to work in two environments.
 First, it works with Plum - Accord's test environment automation infrastructure
 Second, it can work as a service script in /etc/init.d
 
@@ -77,8 +77,8 @@ start() {
 	fi
 
 	if [ ${IAM} == "root" ]; then
-		if [ ! -f "wsrv.log" ]; then
-			touch wsrv.log
+		if [ ! -f "${PROGNAME}.log" ]; then
+			touch ${PROGNAME}.log
 			touch wreiswatchdog.log
 		fi
 		chown -R ec2-user:ec2-user *
@@ -91,7 +91,7 @@ start() {
 
 	x=$(pgrep "${SERVERNAME}")
 	if [ "${X}x" == "x" ]; then
-		./${SERVERNAME} >log.out 2>&1 &
+		./${SERVERNAME} >startuplog.out 2>&1 &
 	fi
 
 	# make sure it can survive a reboot...

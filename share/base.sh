@@ -78,7 +78,7 @@ else
 fi
 
 TREPORT="${WSRVBIN}/../../test/testreport.txt"
-WSRV="${WSRVBIN}/wsrv"
+WSRV="${WSRVBIN}/wreis"
 
 RENTROLL="${RRBIN}/rentroll -A ${NOCONSOLE} -noauth"
 CSVLOAD="${RRBIN}/rrloadcsv ${NOCONSOLE} -noauth"
@@ -915,12 +915,12 @@ stopRentRollServer() {
 startWsrv() {
 	if [ ${MANAGESERVER} -eq 1 ]; then
 		stopWsrv
-		cmd="${WSRV} > ${WSRVBIN}/wsrvlog 2>&1 &"
+		cmd="${WSRV} > ${WSRVBIN}/wreislog 2>&1 &"
 		echo "${cmd}"
-		${WSRV} > ${WSRVBIN}/wsrvlog 2>&1 &
+		${WSRV} > ${WSRVBIN}/wreislog 2>&1 &
 		sleep 1
-		rm -f wsrvlog
-		ln -s ${WSRVBIN}/wsrvlog slog
+		rm -f wreislog
+		ln -s ${WSRVBIN}/wreislog slog
 	fi
 }
 
@@ -930,7 +930,7 @@ startWsrv() {
 #########################################################
 stopWsrv() {
 	if [ ${MANAGESERVER} -eq 1 ]; then
-		killall wsrv > /dev/null 2>&1
+		killall wreis > /dev/null 2>&1
 		sleep 1
 	fi
 }
