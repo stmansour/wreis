@@ -5,14 +5,14 @@ LOGFILE="wreiswatchdog.log"
 
 #----------------------------------------------------
 #  Main loop:
-#  Ping wsrv on localhost:8275.
+#  Ping wreis on localhost:8275.
 #  If we don't hear back, then restart
 #----------------------------------------------------
 while [ 1=1 ];
 do
 	R=$(curl -s http://localhost:${PORT}/v1/ping | grep "WREIS - Version" | wc -l)
 	if [ 0 = ${R} ]; then
-		echo -n "Ping to wsrv failed at " >> ${LOGFILE}
+		echo -n "Ping to wreis failed at " >> ${LOGFILE}
 		date >>  ${LOGFILE}
 		echo -n "Restart..." >> ${LOGFILE}
 		pkill wreis
