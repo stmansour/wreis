@@ -24,12 +24,13 @@ release:
 	/usr/local/accord/bin/release.sh wreis
 
 tarzip:
-		cd ${DIST};if [ -f ./wreis/config.json ]; then mv ./wreis/config.json .; fi
-		cd ${DIST};rm -f wreis.tar*;tar czf wreis.tar.gz wreis
-		cd ${DIST};if [ -f ./config.json ]; then mv ./config.json ./wreis/config.json; fi
+	cd ${DIST};if [ -f ./wreis/config.json ]; then mv ./wreis/config.json .; fi
+	cd ${DIST};rm -f wreis.tar*;tar czf wreis.tar.gz wreis
+	cd ${DIST};if [ -f ./config.json ]; then mv ./config.json ./wreis/config.json; fi
 
 snapshot: tarzip
-	
+	cd ${DIST}; /usr/local/accord/bin/snapshot.sh wreis.tar.gz
+
 stats:
 	@echo
 	@echo "-------------------------------------------------------------------------------"
