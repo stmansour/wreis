@@ -88,10 +88,13 @@ func main() {
 		fmt.Printf("sql.Open for database=%s, dbuser=%s: Error = %v\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, err)
 		os.Exit(1)
 	}
+	util.Ulog("successfully opened database %s as user %s on %s\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, db.Wdb.Config.WREISDbname)
 	defer App.db.Close()
 
 	err = App.db.Ping()
 	if nil != err {
+		util.Ulog("could not ping database %s as user %s on %s\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, db.Wdb.Config.WREISDbname)
+		util.Ulog("error: %s\n", err.Error())
 		fmt.Printf("App.db.Ping for database=%s, dbuser=%s: Error = %v\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, err)
 		os.Exit(1)
 	}
