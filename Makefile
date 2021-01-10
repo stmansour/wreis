@@ -1,4 +1,5 @@
 DIRS=util session db csv ws server admin webui test
+DIST=dist
 .PHONY: test
 
 wreis:
@@ -22,8 +23,12 @@ build: clean wreis package
 release:
 	/usr/local/accord/bin/release.sh wreis
 
-snapshot:
-	cd dist ; rm -f wreis.tar.gz ; tar cvfz wreis.tar.gz wreis ; /usr/local/accord/bin/snapshot.sh wreis.tar.gz ; cd ..
+tarzip:
+		cd ${DIST};if [ -f ./wreis/config.json ]; then mv ./wreis/config.json .; fi
+		cd ${DIST};rm -f wreis.tar*;tar czf wreis.tar.gz wreis
+		cd ${DIST};if [ -f ./config.json ]; then mv ./config.json ./wreis/config.json; fi
+
+snapshot: tarzip
 	
 stats:
 	@echo
@@ -32,6 +37,6 @@ stats:
 	@find . -name "*.go" | srcstats
 	@echo "-------------------------------------------------------------------------------"
 	@echo "JAVASCRIPT"
-	@wc -l dist/wreis/static/js/wreis.js
+	@wc -l ${DIST}/wreis/static/js/wreis.js
 	@echo "-------------------------------------------------------------------------------"
 	@cat test/testreport.txt
