@@ -51,7 +51,7 @@ func initHTTP() {
 }
 
 func readCommandLineArgs() {
-	portPtr := flag.Int("p", 8276, "port on which wsrv server listens")
+	portPtr := flag.Int("p", 8276, "port on which wreis server listens")
 	vptr := flag.Bool("v", false, "Show version, then exit")
 	flag.Parse()
 	if *vptr {
@@ -73,7 +73,7 @@ func main() {
 	//==============================================
 	// Open the logfile and begin logging...
 	//==============================================
-	App.LogFile, err = os.OpenFile("wsrv.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	App.LogFile, err = os.OpenFile("wreis.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	lib.Errcheck(err)
 	defer App.LogFile.Close()
 	log.SetOutput(App.LogFile)
@@ -99,7 +99,7 @@ func main() {
 	session.Init(10, db.Wdb.Config) // we must have login sessions
 	db.BuildPreparedStatements()    // the prepared statement for db access
 	initHTTP()
-	util.Ulog("wsrv initiating HTTP service on port %d\n", App.Port)
+	util.Ulog("wreis initiating HTTP service on port %d\n", App.Port)
 	fmt.Printf("Using database: %s , host = %s, port = %d\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbhost, db.Wdb.Config.WREISDbport)
 
 	//go http.ListenAndServeTLS(fmt.Sprintf(":%d", App.Port+1), App.CertFile, App.KeyFile, nil)
