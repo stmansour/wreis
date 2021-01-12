@@ -9,12 +9,12 @@ PROGNAME="wreis"
 PORT=8276
 WATCHDOGOPTS=""
 GETFILE="/usr/local/accord/bin/getfile.sh"
-DATABASENAME="${PROGNAME}"
-DBUSER="ec2-user"
 SERVERNAME="wreis"
 IAM=$(whoami)
-APPHOME="/home/ec2-user/apps/${PROGNAME}"
 WATCHDOG="wreiswatchdog.sh"
+# DATABASENAME="${PROGNAME}"
+# DBUSER="ec2-user"
+# APPHOME="/home/ec2-user/apps/${PROGNAME}"
 
 
 usage() {
@@ -76,26 +76,26 @@ start() {
 		makeDevNode
 	fi
 
-	if [ ${IAM} == "root" ]; then
+	if [ "${IAM}" == "root" ]; then
 		if [ ! -f "${PROGNAME}.log" ]; then
 			touch ${PROGNAME}.log
 			touch wreiswatchdog.log
 		fi
-		chown -R ec2-user:ec2-user *
+		chown -R ec2-user:ec2-user ./*
 		# chmod u+s ${PROGNAME} pbwatchdog
-		if [ $(uname) == "Linux" -a ! -f "/etc/init.d/${PROGNAME}" ]; then
-			cp ./activate.sh /etc/init.d/${PROGNAME}
-			chkconfig --add ${PROGNAME}
+		if [ "$(uname)" == "Linux" ] && [ ! -f "/etc/init.d/${PROGNAME}" ]; then
+			cp ./activate.sh /etc/init.d/"${PROGNAME}"
+			chkconfig --add "${PROGNAME}"
 		fi
 	fi
 
-	x=$(pgrep "${SERVERNAME}")
+	X=$(pgrep "${SERVERNAME}")
 	if [ "${X}x" == "x" ]; then
 		./${SERVERNAME} >startuplog.out 2>&1 &
 	fi
 
 	# make sure it can survive a reboot...
-	if [ ${IAM} == "root" ]; then
+	if [ "${IAM}" == "root" ]; then
 		if [ ! -d /var/run/${SERVERNAME} ]; then
 			mkdir /var/run/${SERVERNAME}
 		fi
@@ -109,9 +109,9 @@ start() {
 	#---------------------------------------------------
 	# If the watchdog is NOT running, then start it...
 	#---------------------------------------------------
-	W=$(ps -ef | grep "${WATCHDOG}" | grep "bash" | wc -l)
-	if [ ${W} == 0 ]; then
-		./${WATCHDOG} &
+	W=$(ps -ef | grep "${WATCHDOG}" | grep -c "bash")
+	if [ "${W}" == 0 ]; then
+		./${WATCHDOG} "${WATCHDOGOPTS}" &
 	fi
 }
 
@@ -119,8 +119,8 @@ stop() {
 	#---------------------------------------------------
 	# stop watchdog first
 	#---------------------------------------------------
-	W=$(ps -ef | grep "${WATCHDOG}" | grep "bash" | wc -l)
-	if [ ${W} == 1 ]; then
+	W=$(ps -ef | grep "${WATCHDOG}" | grep -c "bash")
+	if [ "${W}" == 1 ]; then
 		case "${OS}" in
 		"Darwin")
 			pid=$(ps -ef | grep "${WATCHDOG}" | grep "bash" | sed -e 's/[ \t]*[0-9][0-9]*[ \t][ \t]*\([0-9][0-9]*\)[ \t].*/\1/')
@@ -133,7 +133,7 @@ stop() {
 			exit 1
 			;;
 		esac
-		kill ${pid}
+		kill "${pid}"
 	fi
 
 	#---------------------------------------------------
@@ -146,7 +146,7 @@ stop() {
 		killall -9 ${SERVERNAME}
 	fi
 
-	if [ ${IAM} == "root" ]; then
+	if [ "${IAM}" == "root" ]; then
 		sleep 1
 		rm -f /var/run/${SERVERNAME}/${SERVERNAME}.pid /var/lock/${SERVERNAME}
 	fi
@@ -162,10 +162,10 @@ status() {
 	"0")
 		# ${SERVERNAME} is not responsive or not running.  Exit status as described in
 		# http://refspecs.linuxbase.org/LSB_3.1.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
-		if [ ${IAM} == "root" -a -f /var/run/${SERVERNAME}/${SERVERNAME}.pid ]; then
+		if [ "${IAM}" == "root" ] && [ -f /var/run/${SERVERNAME}/${SERVERNAME}.pid ]; then
 			exit 1
 		fi
-		if [ ${IAM} == "root" -a -f /var/lock/${SERVERNAME} ]; then
+		if [ "${IAM}" == "root" ] && [ -f /var/lock/${SERVERNAME} ]; then
 			exit 2
 		fi
 		exit 3
@@ -180,7 +180,7 @@ restart() {
 	start
 }
 
-while getopts ":p:qih:N:Tb" o; do
+while getopts ":p:qih:Tb" o; do
     case "${o}" in
        b)
             WATCHDOGOPTS="-b"
@@ -190,10 +190,10 @@ while getopts ":p:qih:N:Tb" o; do
             HOST=${OPTARG}
             echo "HOST set to: ${HOST}"
             ;;
-        N)
-            DATABASENAME=${OPTARG}
-            # echo "DATABASENAME set to: ${DATABASENAME}"
-            ;;
+        # N)
+        #     DATABASENAME=${OPTARG}
+        #     # echo "DATABASENAME set to: ${DATABASENAME}"
+        #     ;;
         p)
             PORT=${OPTARG}
 	    	# echo "PORT set to: ${PORT}"
@@ -206,12 +206,12 @@ done
 shift $((OPTIND-1))
 
 # cd "${APPHOME}"
-PBPATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
-cd ${PBPATH}
+PBPATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+cd "${PBPATH}" || exit
 
 for arg do
 	# echo '--> '"\`$arg'"
-	cmd=$(echo ${arg}|tr "[:upper:]" "[:lower:]")
+	cmd=$(echo "${arg}"|tr "[:upper:]" "[:lower:]")
     case "$cmd" in
 	"start")
 		start
@@ -224,8 +224,8 @@ for arg do
 		exit 0
 		;;
 	"ready")
-		R=$(curl -s http://localhost:${PORT}/v1/ping | grep "WREIS" | wc -l)
-		if [ 1 = ${R} ]; then
+		R=$(curl -s http://localhost:"${PORT}"/v1/ping | grep -c "WREIS")
+		if [ 1 = "${R}" ]; then
 			echo "OK"
 		else
 			echo "No response to ping"
