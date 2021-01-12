@@ -6,7 +6,8 @@
 DROP DATABASE IF EXISTS wreis;
 CREATE DATABASE wreis;
 USE wreis;
-GRANT ALL PRIVILEGES ON wreis.* TO 'ec2-user'@'localhost';
+GRANT ALL PRIVILEGES ON wreis.* TO 'ec2-user'@'%';
+GRANT ALL PRIVILEGES ON wreis.* TO 'adbuser'@'%';
 set GLOBAL sql_mode='ALLOW_INVALID_DATES';
 
 
