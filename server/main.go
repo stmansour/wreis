@@ -85,10 +85,12 @@ func main() {
 	s := extres.GetSQLOpenString(db.Wdb.Config.WREISDbname, &db.Wdb.Config)
 	App.db, err = sql.Open("mysql", s)
 	if nil != err {
+
 		fmt.Printf("sql.Open for database=%s, dbuser=%s: Error = %v\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, err)
 		os.Exit(1)
 	}
 	util.Ulog("successfully opened database %q as user %q on %s\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, db.Wdb.Config.WREISDbhost)
+	fmt.Printf("db open string:  %s\n", s)
 	defer App.db.Close()
 
 	err = App.db.Ping()
