@@ -15,7 +15,7 @@ DEBUG=0
 #
 #############################################################################
 function decho {
-	if (( ${DEBUG} == 1 )); then
+	if (( DEBUG == 1 )); then
 		echo
 		echo "${1}"
 	fi
@@ -37,11 +37,11 @@ function decho {
 #
 #############################################################################
 readConfig() {
-    RELDIR=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
+    RELDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
     CONF="${RELDIR}/config.json"
-    REPOUSER=$(grep RepoUser ${CONF} | awk '{print $2;}' | sed -e 's/[,"]//g')
-    APIKEY=$(grep RepoPass ${CONF} | awk '{print $2;}' | sed -e 's/[,"]//g')
-    URLBASE=$(grep RepoURL ${CONF} | awk '{print $2;}' | sed -e 's/[,"]//g')
+    REPOUSER="$(grep RepoUser "${CONF}" | awk '{print $2;}' | sed -e 's/[,"]//g')"
+    APIKEY="$(grep RepoPass "${CONF}" | awk '{print $2;}' | sed -e 's/[,"]//g')"
+    URLBASE="$(grep RepoURL "${CONF}" | awk '{print $2;}' | sed -e 's/[,"]//g')"
 
     # add a trailing / if it does not have one...
     if [ "${URLBASE: -1}" != "/" ]; then
@@ -80,24 +80,24 @@ configure() {
     # now make sure that we have jfrog...
     #---------------------------------------------------------
     if [ ! -f ~ec2-user/bin/jfrog ]; then
-        curl -s -u "${REPOUSER}:${APIKEY}" ${URLBASE}accord/tools/jfrog > ~ec2-user/bin/jfrog
+        curl -s -u "${REPOUSER}:${APIKEY}" "${URLBASE}"accord/tools/jfrog > ~ec2-user/bin/jfrog
         chown ec2-user:ec2-user ~ec2-user/bin/jfrog
         chmod +x ~ec2-user/bin/jfrog
     fi
     if [ ! -d ~ec2-user/.jfrog ]; then
-        curl -s -u "${REPOUSER}:${APIKEY}" ${URLBASE}accord/tools/jfrogconf.tar > ~ec2-user/jfrogconf.tar
-        pushd ~ec2-user
+        curl -s -u "${REPOUSER}:${APIKEY}" "${URLBASE}"accord/tools/jfrogconf.tar > ~ec2-user/jfrogconf.tar
+        pushd ~ec2-user || exit
         tar xvf jfrogconf.tar
         rm jfrogconf.tar
         chown ec2-user:ec2-user ~ec2-user/bin/jfrog
-        popd
+        popd || exit
     fi
     if [ ! -d ~root/.jfrog ]; then
-        curl -s -u "${REPOUSER}:${APIKEY}" ${URLBASE}accord/tools/jfrogconf.tar > ~root/jfrogconf.tar
-        pushd ~root
+        curl -s -u "${REPOUSER}:${APIKEY}" "${URLBASE}"accord/tools/jfrogconf.tar > ~root/jfrogconf.tar
+        pushd ~root || exit
         tar xvf jfrogconf.tar
         rm jfrogconf.tar
-        popd
+        popd || exit
     fi
 }
 
@@ -116,28 +116,28 @@ configure() {
 #
 #############################################################################
 GetLatestRepoRelease() {
-    f=$(~ec2-user/bin/jfrog rt s "accord/air/release/*" | grep ${1} | awk '{print $2}' | sed 's/"//g')
+    f=$(~ec2-user/bin/jfrog rt s "accord/air/release/*" | grep "${1}" | awk '{print $2}' | sed 's/"//g')
     if [ "x${f}" = "x" ]; then
         echo "There are no product releases for ${f}"
         exit 1
     fi
-    cd ${RELDIR}/..
-    d=$(pwd)
-    t=$(basename ${f})
-    curl -s -u "${REPOUSER}:${APIKEY}" ${URLBASE}${f} > ${t}
+    cd "${RELDIR}"/.. || exit
+    # d=$(pwd)
+    t=$(basename "${f}")
+    curl -s -u "${REPOUSER}:${APIKEY}" "${URLBASE}""${f}" > "${t}"
 }
 
 #----------------------------------------------
 #  ensure that we're in the wreis directory...
 #----------------------------------------------
 dir=${PWD##*/}
-if [ ${dir} != "wreis" ]; then
+if [ "${dir}" != "wreis" ]; then
     echo "This script must execute in the wreis directory."
     exit 1
 fi
 
 user=$(whoami)
-if [ ${user} != "root" ]; then
+if [ "${user}" != "root" ]; then
     echo "This script must execute as root.  Try sudo !!"
     exit 1
 fi
@@ -146,31 +146,31 @@ readConfig
 configure
 
 echo -n "Shut down wreis server... ";
-$(./activate.sh stop) >/dev/null 2>&1
+./activate.sh stop >/dev/null 2>&1
 echo "done"
 
-cd ${RELDIR}/..
+cd "${RELDIR}"/.. || exit
 rm -f wreis*.tar*
 echo "Distribution download to...  ${PWD}"
 GetLatestRepoRelease "wreis"
 
 echo -n "Extracting... "
-cd ${RELDIR}/..
+cd "${RELDIR}"/.. || exit
 tar xzf wreis*.tar.gz
 chown -R ec2-user:ec2-user wreis
 rm -f wreis*.tar*
-cd ${RELDIR}
+cd "${RELDIR}" || exit
 echo "done"
 
 echo -n "Activating: "
 ./activate.sh start
-sleep 2
+sleep 1
 status=$(./activate.sh ready)
-./installman.sh >installman.log 2>&1  # a task to perform while activation is running
+# ./installman.sh >installman.log 2>&1  # a task to perform while activation is running
 if [ "${status}" = "OK" ]; then
     echo "Success!"
 else
-    echo "error: tatus = ${status}"
+    echo "error: status = ${status}"
     echo "output from ./activate.sh -b start "
-    echo "${stat}"
+    echo "${status}"
 fi
