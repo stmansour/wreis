@@ -224,7 +224,7 @@ for arg do
 		exit 0
 		;;
 	"ready")
-		R=$(curl -s http://localhost:${PORT}/v1/ping | grep "Accord Mojo" | wc -l)
+		R=$(curl -s http://localhost:${PORT}/v1/ping | grep "WREIS" | wc -l)
 		if [ 1 = ${R} ]; then
 			echo "OK"
 		else
