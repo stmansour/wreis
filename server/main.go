@@ -90,7 +90,6 @@ func main() {
 		os.Exit(1)
 	}
 	util.Ulog("successfully opened database %q as user %q on %s\n", db.Wdb.Config.WREISDbname, db.Wdb.Config.WREISDbuser, db.Wdb.Config.WREISDbhost)
-	fmt.Printf("db open string:  %s\n", s)
 	defer App.db.Close()
 
 	err = App.db.Ping()
