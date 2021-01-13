@@ -410,7 +410,7 @@ function buildPropertyUIElements() {
             {field: 'DownPayment',          type: 'money', required: false},
             {field: 'RentableArea',         type: 'int',   required: false},
             {field: 'RentableAreaUnits',    type: 'hidden', required: false},
-            {field: 'LotSize',              type: 'int',    required: false},
+            {field: 'LotSize',              type: 'float',    required: false},
             {field: 'LotSizeUnits',         type: 'hidden', required: false},
             {field: 'CapRate',              type: 'percent',  required: false},
             {field: 'AvgCap',               type: 'percent',  required: false},

@@ -33,7 +33,7 @@ type PropertyGrid struct {
 	DownPayment       float64
 	RentableArea      int64
 	RentableAreaUnits int64
-	LotSize           int64
+	LotSize           float64
 	LotSizeUnits      int64
 	CapRate           float64
 	AvgCap            float64

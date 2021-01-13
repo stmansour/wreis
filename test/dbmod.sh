@@ -73,6 +73,7 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
+ALTER TABLE Property CHANGE LotSize LotSize DECIMAL(19,4) NOT NULL DEFAULT 0;
 LEOF
 
 #=====================================================

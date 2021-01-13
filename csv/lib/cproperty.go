@@ -145,7 +145,7 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 		case PRRentableAreaUnits:
 			p.RentableAreaUnits, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRLotSize:
-			p.LotSize, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
+			p.LotSize, errlist = ParseFloat64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRLotSizeUnits:
 			p.LotSizeUnits, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRCapRate:
