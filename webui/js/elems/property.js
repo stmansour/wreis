@@ -471,14 +471,19 @@ function buildPropertyUIElements() {
         onLoad: function(event) {
             event.onComplete = function() {
                 var r = this.record;
-                var y = new Date(r.BuildDate);
-                r.BuildDate = dateFmtStr(y);
-                y = new Date(r.DeliveryDt);
-                r.DeliveryDt = dateFmtStr(y);
-                y = new Date(r.RentCommencementDt);
-                r.RentCommencementDt = dateFmtStr(y);
-                y = new Date(r.LeaseExpirationDt);
-                r.LeaseExpirationDt = dateFmtStr(y);
+                // var y = new Date(r.BuildDate);
+                // r.BuildDate = dateFmtStr(y);
+                // y = new Date(r.DeliveryDt);
+                // r.DeliveryDt = dateFmtStr(y);
+                // y = new Date(r.RentCommencementDt);
+                // r.RentCommencementDt = dateFmtStr(y);
+                // y = new Date(r.LeaseExpirationDt);
+                // r.LeaseExpirationDt = dateFmtStr(y);
+                r.BuildDate = displayDateString(r.BuildDate);
+                r.DeliveryDt = displayDateString(r.DeliveryDt);
+                r.RentCommencementDt = displayDateString(r.RentCommencementDt);
+                r.LeaseExpirationDt = displayDateString(r.LeaseExpirationDt);
+
                 r.CapRate *= 100;
                 r.AvgCap *= 100;
 
@@ -567,6 +572,17 @@ function setPropertyHeader() {
     } else {
         f.header = r.Name + "  (" + r.PRID + ")";
     }
+}
+
+// displayDateString returns a string that can be used to populate a form field.
+// If the date is prior to 1971 then it will use a blank string.
+function displayDateString(d) {
+    var y = new Date(d);
+    var s = "";
+    if (y.getFullYear() > 1970) {
+        s = dateFmtStr(y);
+    }
+    return s;
 }
 
 function loadPropertyForm(PRID) {

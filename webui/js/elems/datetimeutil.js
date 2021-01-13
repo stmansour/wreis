@@ -12,7 +12,12 @@
 //
 //-----------------------------------------------------------------------------
 function varToUTCString(r) {
-    var x = new Date(r);
+    var x;
+    if (typeof r === "string" && r.length === 0) {
+        x = new Date("1/1/1970");
+    } else {
+        x = new Date(r);
+    }
     return x.toUTCString();
 }
 
