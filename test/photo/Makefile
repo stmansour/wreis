@@ -4,7 +4,7 @@ all:
 	@echo "*** Completed in ${THISDIR} ***"
 
 clean:
-	rm -f loginrequest slog wsrv.log serverreply log llog *.g ./gold/*.g err.txt [a-z] [a-z][0-9] [a-z0-9][0-9][0-9] qq? fail request w.[a-z] con*.json
+	rm -f loginrequest slog wreis.log serverreply log llog *.g ./gold/*.g err.txt [a-z] [a-z][0-9] [a-z0-9][0-9][0-9] qq? fail request w.[a-z] con*.json
 	@echo "*** CLEAN completed in ${THISDIR} ***"
 
 test: config.json
