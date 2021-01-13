@@ -10,6 +10,10 @@ else
         MYSQL="mysql"
 fi
 
+function CreateNewDB() {
+	${MYSQL} -h "${HOST}" -P "${PORT}" <schema.sql
+}
+
 function MakeProdDB() {
         MYSQLOPTS=
 
@@ -19,6 +23,11 @@ function MakeProdDB() {
         # echo "HOST = ${HOST}, PORT = ${PORT}"
 
         MYSQLDUMP="${MYSQL}dump"
+		if [ -f "${DBBACKUP}" ]; then
+			echo "Production database exists, and backup file (${DBBACKUP}) also exists."
+			echo "Please rename backup file or remove it and run this script again if you want to empty the database."
+			exit 1
+		fi
         echo "execute: ${MYSQLDUMP} -h ${HOST} -P ${PORT} ${DBNAME} >${DBBACKUP}"
         ${MYSQLDUMP} -h "${HOST}" -P "${PORT}" "${DBNAME}" >${DBBACKUP}
         RC=$?
@@ -26,9 +35,9 @@ function MakeProdDB() {
                 echo "WREIS database existed. A backup was made to ${DBBACKUP}."
         else
                 # echo "execute: ${MYSQL} -h ${HOST} -P ${PORT} <schema.sql"
-                ${MYSQL} -h "${HOST}" -P "${PORT}" <schema.sql
                 echo "WREIS database was created."
         fi
+		CreateNewDB
 }
 
 SOURCE="${BASH_SOURCE[0]}"
@@ -44,6 +53,6 @@ PROD=$(grep '"Env"' config.json | grep -c 1)   # if this is production then PROD
 if [ "${PROD}" = "1" ]; then
         MakeProdDB
 else
-        mysql "${MYSQLOPTS}" <schema.sql
+        CreateNewDB
 fi
 popd || exit 2
