@@ -401,7 +401,7 @@ function buildPropertyUIElements() {
         fields: [
             {field: 'recid',                type: 'int',  required: false },
             {field: 'PRID',                 type: 'int',  required: false},
-            {field: 'Name',                 type: 'text', required: false},
+            {field: 'Name',                 type: 'text', required: true},
             {field: 'YearsInBusiness',      type: 'int',  required: false},
             {field: 'ParentCompany',        type: 'text', required: false},
             {field: 'URL',                  type: 'text', required: false},
@@ -505,6 +505,10 @@ function buildPropertyUIElements() {
 
         actions: {
             save: function () {
+                    var x=w2ui.propertyForm.validate(true);
+                    if (x.length > 0) {
+                        return;
+                    }
                     $.when(
                         savePropertyForm(),
                         saveRentSteps(),

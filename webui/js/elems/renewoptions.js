@@ -191,6 +191,12 @@ function RenewOptionSave() {
     var r = w2ui.propertyRenewOptionForm.record;
     var g = w2ui.propertyRenewOptionsGrid;
 
+    var x=w2ui.propertyRenewOptionForm.validate(true);
+    if (x.length > 0) {
+        return;
+    }
+
+
     if (r.ROID < 0) {
         w2ui.propertyRenewOptionsGrid.add(r);
         w2ui.propertyRenewOptionForm.record.ROID = 0;  // to make sure that this one won't be added again

@@ -167,6 +167,13 @@ function TrafficDelete() {
 function TrafficSave() {
     var r = w2ui.propertyTrafficForm.record;
     var g = w2ui.propertyTrafficGrid;
+
+    var x=w2ui.propertyTrafficForm.validate(true);
+    if (x.length > 0) {
+        return;
+    }
+
+
     g.set(r.recid,r);
 
     w2ui.propertyTrafficLayout.hide('right',true);

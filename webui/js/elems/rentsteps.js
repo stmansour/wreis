@@ -191,6 +191,11 @@ function RentStepSave() {
     var r = w2ui.propertyRentStepForm.record;
     var g = w2ui.propertyRentStepsGrid;
 
+    var x=w2ui.propertyRentStepForm.validate(true);
+    if (x.length > 0) {
+        return;
+    }
+
     if (r.RSID < 0) {
         w2ui.propertyRentStepsGrid.add(r);
         w2ui.propertyRentStepForm.record.RSID = 0;  // to make sure that this one won't be added again
