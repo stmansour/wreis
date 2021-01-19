@@ -511,25 +511,24 @@ function buildPropertyUIElements() {
                         propertySaveDoneCB();
                     });
             },
-            delete: function() {
-                var request={cmd:"delete",selected: [w2ui.propertyForm.record.PRID]};
-                $.post('/v1/person/'+w2ui.propertyForm.record.PRID, JSON.stringify(request))
-                .done(function(data) {
-                    if (typeof data == 'string') {  // it's weird, a successful data add gets parsed as an object, an error message does not
-                        var msg = JSON.parse(data);
-                        w2ui.propertyForm.error(msg.message);
-                        return;
-                    }
-                    if (data.status != 'success') {
-                        w2ui.propertyForm.error(data.message);
-                    }
-                });
-                w2ui.toplayout.hide('right',true);
-                w2ui.propertyGrid.reload();
-            },
-            reset: function() {
-                var f = w2ui.asmInstForm;
-                console.log('reset: ASMID = ' + f.record.ASMID );
+            // delete: function() {
+            //     var request={cmd:"delete",selected: [w2ui.propertyForm.record.PRID]};
+            //     $.post('/v1/person/'+w2ui.propertyForm.record.PRID, JSON.stringify(request))
+            //     .done(function(data) {
+            //         if (typeof data == 'string') {  // it's weird, a successful data add gets parsed as an object, an error message does not
+            //             var msg = JSON.parse(data);
+            //             w2ui.propertyForm.error(msg.message);
+            //             return;
+            //         }
+            //         if (data.status != 'success') {
+            //             w2ui.propertyForm.error(data.message);
+            //         }
+            //     });
+            //     w2ui.toplayout.hide('right',true);
+            //     w2ui.propertyGrid.reload();
+            // },
+            cancel: function() {
+                closePropertyForm();
             }
         },
    });
