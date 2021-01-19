@@ -4,6 +4,7 @@
   app, setDateControl, dateMonthBack, getDateFromDT, getTimeFromDT, dateFromString,
   dateFmtStr, zeroPad, yearFwd, dateYearFwd, yearBack, dateYearBack, applyLocaltimeDateOffset,
   UTCDateStringToW2UIValidDate,stringToDate,
+  window, $, document, w2uiDateControlString, EDIEnabledForBUD
 */
 
 //-----------------------------------------------------------------------------

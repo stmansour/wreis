@@ -611,6 +611,7 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			OwnerUID:    sess.UID,
 			ApproverUID: sess.UID,
 			OwnerDt:     now,
+			ApproverDt:  util.TIME0,
 			FlowState:   1,
 			FLAGS:       uint64(0),
 		}
