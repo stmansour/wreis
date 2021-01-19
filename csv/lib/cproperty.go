@@ -14,7 +14,7 @@ import (
 //------------------------------------------------------------------------------
 const (
 	PRName                      = 0
-	PRYearsInBusiness           = iota
+	PRYearFounded               = iota
 	PRParentCompany             = iota
 	PRURL                       = iota
 	PRSymbol                    = iota
@@ -45,12 +45,8 @@ const (
 	PRCountry                   = iota
 	PRLLResponsibilities        = iota
 	PRNOI                       = iota
-	PRHQAddress                 = iota
-	PRHQAddress2                = iota
 	PRHQCity                    = iota
 	PRHQState                   = iota
-	PRHQPostalCode              = iota
-	PRHQCountry                 = iota
 	PRDriveThrough              = iota
 	PRRoofStructResp            = iota
 	PRFirstRightofRefusal       = iota
@@ -63,7 +59,7 @@ const (
 //------------------------------------------------------------------------------
 var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"Name"}, Required: true, CaseSensitive: false, CanonicalIndex: PRName, Index: -1, FlagBit: 0},
-	{Name: []string{"YearsInBusiness"}, Required: false, CaseSensitive: false, CanonicalIndex: PRYearsInBusiness, Index: -1, FlagBit: 0},
+	{Name: []string{"YearFounded"}, Required: false, CaseSensitive: false, CanonicalIndex: PRYearFounded, Index: -1, FlagBit: 0},
 	{Name: []string{"ParentCompany"}, Required: false, CaseSensitive: false, CanonicalIndex: PRParentCompany, Index: -1, FlagBit: 0},
 	{Name: []string{"URL"}, Required: false, CaseSensitive: false, CanonicalIndex: PRURL, Index: -1, FlagBit: 0},
 	{Name: []string{"Symbol"}, Required: false, CaseSensitive: false, CanonicalIndex: PRSymbol, Index: -1, FlagBit: 0},
@@ -95,12 +91,8 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"Country"}, Required: false, CaseSensitive: false, CanonicalIndex: PRCountry, Index: -1, FlagBit: 0},
 	{Name: []string{"LLResponsibilities"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLLResponsibilities, Index: -1, FlagBit: 0},
 	{Name: []string{"NOI"}, Required: false, CaseSensitive: false, CanonicalIndex: PRNOI, Index: -1, FlagBit: 0},
-	{Name: []string{"HQAddress"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQAddress, Index: -1, FlagBit: 0},
-	{Name: []string{"HQAddress2"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQAddress2, Index: -1, FlagBit: 0},
 	{Name: []string{"HQCity"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQCity, Index: -1, FlagBit: 0},
 	{Name: []string{"HQState"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQState, Index: -1, FlagBit: 0},
-	{Name: []string{"HQPostalCode"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQPostalCode, Index: -1, FlagBit: 0},
-	{Name: []string{"HQCountry"}, Required: false, CaseSensitive: false, CanonicalIndex: PRHQCountry, Index: -1, FlagBit: 0},
 	{Name: []string{"DriveThrough"}, Required: false, CaseSensitive: false, CanonicalIndex: PRDriveThrough, Index: -1, FlagBit: uint64(1 << 0)},
 	{Name: []string{"RoofStructResp"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRoofStructResp, Index: -1, FlagBit: uint64(1 << 1)},
 	{Name: []string{"FirstRightofRefusal"}, Required: false, CaseSensitive: false, CanonicalIndex: PRFirstRightofRefusal, Index: -1, FlagBit: uint64(1 << 2)},
@@ -128,8 +120,8 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 		switch i {
 		case PRName:
 			p.Name = ss[csvctx.Order[PRName]]
-		case PRYearsInBusiness:
-			p.YearsInBusiness, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
+		case PRYearFounded:
+			p.YearFounded, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRParentCompany:
 			p.ParentCompany = ss[csvctx.Order[i]]
 		case PRURL:
@@ -190,18 +182,10 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			p.LLResponsibilities = ss[csvctx.Order[i]]
 		case PRNOI:
 			p.NOI, errlist = ParseFloat64(ss[csvctx.Order[i]], lineno, errlist)
-		case PRHQAddress:
-			p.HQAddress = ss[csvctx.Order[i]]
-		case PRHQAddress2:
-			p.HQAddress2 = ss[csvctx.Order[i]]
 		case PRHQCity:
 			p.HQCity = ss[csvctx.Order[i]]
 		case PRHQState:
 			p.HQState = ss[csvctx.Order[i]]
-		case PRHQPostalCode:
-			p.HQPostalCode = ss[csvctx.Order[i]]
-		case PRHQCountry:
-			p.HQCountry = ss[csvctx.Order[i]]
 		case PRDriveThrough:
 			u, errlist = GetBitFlagValue(ss[csvctx.Order[i]], 1<<0, errlist)
 			p.FLAGS |= u

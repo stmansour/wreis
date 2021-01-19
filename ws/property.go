@@ -25,7 +25,7 @@ type PropertyGrid struct {
 	Recid             int64  `json:"recid"`
 	PRID              int64  // unique id
 	Name              string // property name
-	YearsInBusiness   int64
+	YearFounded       int64
 	ParentCompany     string
 	URL               string
 	Symbol            string
@@ -66,12 +66,8 @@ type PropertyGrid struct {
 	Country                   string
 	LLResponsibilities        string
 	NOI                       float64
-	HQAddress                 string
-	HQAddress2                string
 	HQCity                    string
 	HQState                   string
-	HQPostalCode              string
-	HQCountry                 string
 	Img1                      string
 	Img2                      string
 	Img3                      string
@@ -93,7 +89,7 @@ type PropertyGrid struct {
 var propFieldsMap = map[string][]string{
 	"PRID":                      {"Property.PRID"},
 	"Name":                      {"Property.Name"},
-	"YearsInBusiness":           {"Property.YearsInBusiness"},
+	"YearFounded":               {"Property.YearFounded"},
 	"ParentCompany":             {"Property.ParentCompany"},
 	"URL":                       {"Property.URL"},
 	"Symbol":                    {"Property.Symbol"},
@@ -128,12 +124,8 @@ var propFieldsMap = map[string][]string{
 	"Country":                   {"Property.Country"},
 	"LLResponsibilities":        {"Property.LLResponsibilities"},
 	"NOI":                       {"Property.NOI"},
-	"HQAddress":                 {"Property.HQAddress"},
-	"HQAddress2":                {"Property.HQAddress2"},
 	"HQCity":                    {"Property.HQCity"},
 	"HQState":                   {"Property.HQState"},
-	"HQPostalCode":              {"Property.HQPostalCode"},
-	"HQCountry":                 {"Property.HQCountry"},
 	"Img1":                      {"Property.Img1"},
 	"Img2":                      {"Property.Img2"},
 	"Img3":                      {"Property.Img3"},
@@ -152,7 +144,7 @@ var propFieldsMap = map[string][]string{
 var propQuerySelectFields = []string{
 	"Property.PRID",
 	"Property.Name",
-	"Property.YearsInBusiness",
+	"Property.YearFounded",
 	"Property.ParentCompany",
 	"Property.URL",
 	"Property.Symbol",
@@ -187,12 +179,8 @@ var propQuerySelectFields = []string{
 	"Property.Country",
 	"Property.LLResponsibilities",
 	"Property.NOI",
-	"Property.HQAddress",
-	"Property.HQAddress2",
 	"Property.HQCity",
 	"Property.HQState",
-	"Property.HQPostalCode",
-	"Property.HQCountry",
 	"Property.Img1",
 	"Property.Img2",
 	"Property.Img3",
@@ -479,7 +467,7 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 	err := rows.Scan(
 		&q.PRID,
 		&q.Name,
-		&q.YearsInBusiness,
+		&q.YearFounded,
 		&q.ParentCompany,
 		&q.URL,
 		&q.Symbol,
@@ -514,12 +502,8 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.Country,
 		&q.LLResponsibilities,
 		&q.NOI,
-		&q.HQAddress,
-		&q.HQAddress2,
 		&q.HQCity,
 		&q.HQState,
-		&q.HQPostalCode,
-		&q.HQCountry,
 		&q.Img1,
 		&q.Img2,
 		&q.Img3,

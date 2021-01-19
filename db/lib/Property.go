@@ -16,7 +16,7 @@ type Property struct {
 	RSLID             int64
 	FlowState         int64
 	Name              string // property name
-	YearsInBusiness   int64
+	YearFounded       int64
 	ParentCompany     string
 	URL               string
 	Symbol            string
@@ -53,12 +53,8 @@ type Property struct {
 	Country                   string
 	LLResponsibilities        string
 	NOI                       float64
-	HQAddress                 string
-	HQAddress2                string
 	HQCity                    string
 	HQState                   string
-	HQPostalCode              string
-	HQCountry                 string
 	Img1                      string // url to image
 	Img2                      string
 	Img3                      string
@@ -132,7 +128,7 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.RSLID,
 		a.FlowState,
 		a.Name,
-		a.YearsInBusiness,
+		a.YearFounded,
 		a.ParentCompany,
 		a.URL,
 		a.Symbol,
@@ -164,12 +160,8 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.Country,
 		a.LLResponsibilities,
 		a.NOI,
-		a.HQAddress,
-		a.HQAddress2,
 		a.HQCity,
 		a.HQState,
-		a.HQPostalCode,
-		a.HQCountry,
 		a.Img1,
 		a.Img2,
 		a.Img3,
@@ -233,7 +225,7 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.RSLID,
 		&a.FlowState,
 		&a.Name,
-		&a.YearsInBusiness,
+		&a.YearFounded,
 		&a.ParentCompany,
 		&a.URL,
 		&a.Symbol,
@@ -265,12 +257,8 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.Country,
 		&a.LLResponsibilities,
 		&a.NOI,
-		&a.HQAddress,
-		&a.HQAddress2,
 		&a.HQCity,
 		&a.HQState,
-		&a.HQPostalCode,
-		&a.HQCountry,
 		&a.Img1,
 		&a.Img2,
 		&a.Img3,
@@ -307,7 +295,7 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.RSLID,
 		&a.FlowState,
 		&a.Name,
-		&a.YearsInBusiness,
+		&a.YearFounded,
 		&a.ParentCompany,
 		&a.URL,
 		&a.Symbol,
@@ -339,12 +327,8 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.Country,
 		&a.LLResponsibilities,
 		&a.NOI,
-		&a.HQAddress,
-		&a.HQAddress2,
 		&a.HQCity,
 		&a.HQState,
-		&a.HQPostalCode,
-		&a.HQCountry,
 		&a.Img1,
 		&a.Img2,
 		&a.Img3,
@@ -382,7 +366,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.RSLID,
 		a.FlowState,
 		a.Name,
-		a.YearsInBusiness,
+		a.YearFounded,
 		a.ParentCompany,
 		a.URL,
 		a.Symbol,
@@ -414,12 +398,8 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.Country,
 		a.LLResponsibilities,
 		a.NOI,
-		a.HQAddress,
-		a.HQAddress2,
 		a.HQCity,
 		a.HQState,
-		a.HQPostalCode,
-		a.HQCountry,
 		a.Img1,
 		a.Img2,
 		a.Img3,

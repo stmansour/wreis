@@ -27,7 +27,7 @@ CREATE TABLE Property (
     FlowState BIGINT NOT NULL DEFAULT 0,                    -- what state is this property in its lifecycle:
 
     Name VARCHAR(256) NOT NULL DEFAULT '',
-    YearsInBusiness SMALLINT NOT NULL DEFAULT 0,
+    YearFounded SMALLINT NOT NULL DEFAULT 0,
     ParentCompany VARCHAR(256) NOT NULL DEFAULT '',
     URL VARCHAR(1028) NOT NULL DEFAULT '',                  -- web address
     Symbol VARCHAR(128) NOT NULL DEFAULT '',                -- Stock Symbol and board
@@ -35,7 +35,7 @@ CREATE TABLE Property (
     DownPayment DECIMAL(19,4) NOT NULL DEFAULT 0,
     RentableArea BIGINT NOT NULL DEFAULT 0,
     RentableAreaUnits SMALLINT NOT NULL DEFAULT 0,          -- 0 = sqft, 1 = acres,
-    LotSize BIGINT NOT NULL DEFAULT 0,
+    LotSize DECIMAL(19,4) NOT NULL DEFAULT 0,
     LotSizeUnits SMALLINT NOT NULL DEFAULT 0,               -- 0 = sqft, 1 = acres,
     CapRate FLOAT NOT NULL DEFAULT 0,                       -- percentage
     AvgCap FLOAT NOT NULL DEFAULT 0,                        -- percentage
@@ -68,12 +68,8 @@ CREATE TABLE Property (
     LLResponsibilities VARCHAR(2048) NOT NULL DEFAULT '',   -- Is this enough characters
     NOI DECIMAL(19,4) NOT NULL DEFAULT 0,                   -- Net Operating Income
 
-    HQAddress VARCHAR(100) NOT NULL DEFAULT '',             -- address of headquarters only City/State are required
-    HQAddress2 VARCHAR(100) NOT NULL DEFAULT '',
     HQCity VARCHAR(100) NOT NULL DEFAULT '',
     HQState CHAR(25) NOT NULL DEFAULT '',
-    HQPostalCode VARCHAR(100) NOT NULL DEFAULT '',
-    HQCountry VARCHAR(100) NOT NULL DEFAULT '',
 
     Img1 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
     Img2 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
