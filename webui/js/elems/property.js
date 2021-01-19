@@ -242,7 +242,7 @@ function buildPropertyUIElements() {
                 for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
                     w2ui.propertyGrid.records[i].recid = w2ui.propertyGrid.records[i].PRID;
                 }
-                setPropertyHeader();
+                // setPropertyHeader();
             //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
         // onSearch: function(event) {
@@ -299,7 +299,7 @@ function buildPropertyUIElements() {
     //--------------------------------------------------------------------------
     $().w2layout({
         name: 'propertyFormLayout',
-        header: 'Property Detail',
+        // header: 'Property Detail',
         panels: [
             {
                 type: 'top',
@@ -385,7 +385,7 @@ function buildPropertyUIElements() {
     $().w2form({
         name: 'propertyForm',
         style: 'border: 0px; background-color: transparent;',
-        header: 'Property Detail',
+        // header: 'Property Detail',
         formURL: '/static/html/formproperty.html',
         url: '/v1/property',
         fields: [
@@ -544,16 +544,16 @@ function setPropertyNotLoaded() {
     propData.states = [];
 }
 
-function setPropertyHeader() {
-    var f = w2ui.propertyForm;
-    var r = f.record;
-
-    if (r.PRID < 1) {
-        f.header = "New Record";
-    } else {
-        f.header = r.Name + "  (" + r.PRID + ")";
-    }
-}
+// function setPropertyHeader() {
+//     var f = w2ui.propertyForm;
+//     var r = f.record;
+//
+//     if (r.PRID < 1) {
+//         f.header = "New Record";
+//     } else {
+//         f.header = r.Name + "  (" + r.PRID + ")";
+//     }
+// }
 
 // displayDateString returns a string that can be used to populate a form field.
 // If the date is prior to 1971 then it will use a blank string.
@@ -585,7 +585,7 @@ function loadPropertyForm(PRID) {
     propData.PRID = rec.PRID;
     closeStateChangeDialog();
 
-    setPropertyHeader();
+    // setPropertyHeader();
     f.url = "/v1/property/"+rec.PRID;
     f.reload();  // get this going as quickly as possible
 
