@@ -1,5 +1,6 @@
 /*global
-    w2ui, app, $, console, dateFmtStr, propData, Promise,
+    w2ui, app, $, console, dateFmtStr, propData, Promise, w2utils, setInnerHTML,
+    number_format,
 */
 
 "use strict";
@@ -53,17 +54,24 @@ function buildRentStepsUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
         columns: [
-            {field: 'recid',       caption: 'recid',      size: '60px', sortable: true, hidden: true},
-            {field: 'RSID',        caption: 'RSID',       size: '60px', sortable: true, hidden: true},
-            {field: 'RSLID',       caption: 'RSLID',      size: '60px', sortable: true, hidden: true},
-            {field: 'FLAGS',       caption: 'FLAGS',      size: '60px', sortable: true, hidden: true},
-            {field: 'Opt',         caption: 'Period',     size: '250px', sortable: true, hidden: false},
-            {field: 'Dt',          caption: 'Date',       size: '80px', sotrable: true, hidden: false},
-            {field: 'Rent',        caption: 'Rent',       size: '80px', sortable: true, hidden: false, render: 'money'},
-            {field: 'CreateTime',  caption: 'CreateTime', size: '60px', sortable: true, hidden: true},
-            {field: 'CreateBy',   caption: 'CreateBy',  size: '60px', sortable: true, hidden: true},
-            {field: 'LastModTime', caption: 'LastModTime',size: '60px', sortable: true, hidden: true},
-            {field: 'LastModBy',   caption: 'LastModBy',  size: '60px', sortable: true, hidden: true},
+            {field: 'recid',  caption: 'recid',        size: '60px',  sortable: true, hidden: true},
+            {field: 'RSID',   caption: 'RSID',         size: '60px',  sortable: true, hidden: true},
+            {field: 'RSLID',  caption: 'RSLID',        size: '60px',  sortable: true, hidden: true},
+            {field: 'FLAGS',  caption: 'FLAGS',        size: '60px',  sortable: true, hidden: true},
+            {field: 'Opt',    caption: 'Period',       size: '250px', sortable: true, hidden: false},
+            {field: 'Dt',     caption: 'Date',         size: '80px',  sotrable: true, hidden: false},
+            {field: 'Rent',   caption: 'Annual Rent',  size: '110px', sortable: true, hidden: false, render: 'money'},
+            {field: 'mrent',  caption: 'Monthly Rent', size: '110px', sortable: false, style: 'text-align: right', hidden: false,
+                render: function (record, index, col_index) {
+                    var y = record.Rent/12;
+                    var s = "$" + number_format(y,2,'.',',');
+                    return s;
+                }
+            },
+            {field: 'CreateTime',  caption: 'CreateTime',   size: '60px',  sortable: true, hidden: true},
+            {field: 'CreateBy',    caption: 'CreateBy',     size: '60px',  sortable: true, hidden: true},
+            {field: 'LastModTime', caption: 'LastModTime',  size: '60px',  sortable: true, hidden: true},
+            {field: 'LastModBy',   caption: 'LastModBy',    size: '60px',  sortable: true, hidden: true},
         ],
         onLoad: function(event) {
             event.onComplete = function() {
@@ -136,6 +144,12 @@ function buildRentStepsUIElements() {
         onRefresh: function(event) {
             event.onComplete = function(event) {
                 EnableRentStepFormFields();
+                SetMonthlyRentString();
+            };
+        },
+        onChange: function(event) {
+            event.onComplete = function(event) {
+                SetMonthlyRentString();
             };
         },
     });
@@ -204,6 +218,12 @@ function RentStepSave() {
 
     w2ui.rentStepsLayout.hide('right',true);
     g.render();
+}
+
+function SetMonthlyRentString() {
+    var y = w2ui.propertyRentStepForm.record.Rent/12;
+    var s = "$" + number_format(y,2,'.',',');
+    setInnerHTML("PRmonthly",s);
 }
 
 function RentStepTypeChange(event) {
