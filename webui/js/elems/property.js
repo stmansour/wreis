@@ -232,9 +232,6 @@ function buildPropertyUIElements() {
             }
         },
         onRequest: function(/*event*/) {
-            // propData.statefilter = [1,2,3,4,5,6];
-            // propData.showTerminated = 0;
-            // propData.myQueue = 0;
             propertySetPostData();
         },
         onLoad: function(event) {
@@ -242,12 +239,7 @@ function buildPropertyUIElements() {
                 for (var i = 0; i < w2ui.propertyGrid.records.length; i++) {
                     w2ui.propertyGrid.records[i].recid = w2ui.propertyGrid.records[i].PRID;
                 }
-                // setPropertyHeader();
-            //document.getElementById('mojoGroupFilter').value = app.groupFilter;
         },
-        // onSearch: function(event) {
-        //     console.log('onSearch event fired. event = ' + event);
-        // }
     });
 
     w2ui.propertyGrid.toolbar.add([
@@ -341,7 +333,6 @@ function buildPropertyUIElements() {
                     //  HANDLE THE TAB CLICKS...
                     //---------------------------------
                     onClick: function (event) {
-                        // console.log('event.target = ' + event.target);
                         switch (event.target) {
                             case "proptabState":
                             setPropertyLayout(event.target);
@@ -385,7 +376,6 @@ function buildPropertyUIElements() {
     $().w2form({
         name: 'propertyForm',
         style: 'border: 0px; background-color: transparent;',
-        // header: 'Property Detail',
         formURL: '/static/html/formproperty.html',
         url: '/v1/property',
         fields: [
@@ -440,35 +430,14 @@ function buildPropertyUIElements() {
             {field: 'LastModTime',          type: 'text', required: false},
             {field: 'LastModBy',            type: 'text', required: false},
         ],
-        // toolbar: {
-        //     items: [
-        //         { id: 'btnNotes', type: 'button', icon: 'fa fa-sticky-note-o' },
-        //         { id: 'bt3', type: 'spacer' },
-        //         { id: 'btnClose', type: 'button', icon: 'fa fa-times' },
-        //     ],
-        //     onClick: function (event) {
-        //         if (event.target == 'btnClose') {
-        //                     w2ui.toplayout.hide('right',true);
-        //                     w2ui.propertyGrid.render();
-        //         }
-        //     },
-        // },
         onLoad: function(event) {
             event.onComplete = function() {
                 var r = this.record;
-                // var y = new Date(r.BuildDate);
-                // r.BuildDate = dateFmtStr(y);
-                // y = new Date(r.RentCommencementDt);
-                // r.RentCommencementDt = dateFmtStr(y);
-                // y = new Date(r.LeaseExpirationDt);
-                // r.LeaseExpirationDt = dateFmtStr(y);
                 r.BuildDate = displayDateString(r.BuildDate);
                 r.RentCommencementDt = displayDateString(r.RentCommencementDt);
                 r.LeaseExpirationDt = displayDateString(r.LeaseExpirationDt);
-
                 r.CapRate *= 100;
                 r.AvgCap *= 100;
-
                 propData.bPropLoaded = true;
                 propertyStateOnLoad(); // need to call this now that we know the state
             };
@@ -513,28 +482,11 @@ function buildPropertyUIElements() {
                         propertySaveDoneCB();
                     });
             },
-            // delete: function() {
-            //     var request={cmd:"delete",selected: [w2ui.propertyForm.record.PRID]};
-            //     $.post('/v1/person/'+w2ui.propertyForm.record.PRID, JSON.stringify(request))
-            //     .done(function(data) {
-            //         if (typeof data == 'string') {  // it's weird, a successful data add gets parsed as an object, an error message does not
-            //             var msg = JSON.parse(data);
-            //             w2ui.propertyForm.error(msg.message);
-            //             return;
-            //         }
-            //         if (data.status != 'success') {
-            //             w2ui.propertyForm.error(data.message);
-            //         }
-            //     });
-            //     w2ui.toplayout.hide('right',true);
-            //     w2ui.propertyGrid.reload();
-            // },
             cancel: function() {
                 closePropertyForm();
             }
         },
    });
-
 }
 
 function setPropertyNotLoaded() {
@@ -552,19 +504,9 @@ function setPropertyNotLoaded() {
     propData.tabStaDispCount = 0;
 }
 
-// function setPropertyHeader() {
-//     var f = w2ui.propertyForm;
-//     var r = f.record;
-//
-//     if (r.PRID < 1) {
-//         f.header = "New Record";
-//     } else {
-//         f.header = r.Name + "  (" + r.PRID + ")";
-//     }
-// }
-
 // displayDateString returns a string that can be used to populate a form field.
 // If the date is prior to 1971 then it will use a blank string.
+//------------------------------------------------------------------------------
 function displayDateString(d) {
     var y = new Date(d);
     var s = "";
@@ -598,7 +540,6 @@ function loadPropertyForm(PRID) {
     f.reload();  // get this going as quickly as possible
 
     setPropertyNotLoaded();
-    // w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
     var l = w2ui.propertyFormLayout.get('main');
     if (typeof l.tabs != "undefined"){
         if (typeof l.tabs.name == "string") {
@@ -668,6 +609,7 @@ function propertySaveDoneCB() {
 // INPUTS
 //      PRID - int64, property id
 //      tab  - string, name of the tab that was pressed
+//------------------------------------------------------------------------------
 function setPropertyLayout(tab) {
     w2ui.propertyFormLayout.content("bottom", w2ui.propertyFormBtns);
 
