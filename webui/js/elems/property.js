@@ -492,9 +492,11 @@ function buildPropertyUIElements() {
 
         actions: {
             save: function () {
-                    var x=w2ui.propertyForm.validate(true);
-                    if (x.length > 0) {
-                        return;
+                    if (propData.tabGenDispCount > 0) {
+                        var x=w2ui.propertyForm.validate(true);
+                        if (x.length > 0) {
+                            return;
+                        }
                     }
                     $.when(
                         savePropertyForm(),
@@ -542,6 +544,12 @@ function setPropertyNotLoaded() {
     propData.bTrafficLoaded = false;
     propData.bStateLoaded = false;
     propData.states = [];
+    propData.tabGenDispCount = 0;
+    propData.tabRStDispCount = 0;
+    propData.tabROpDispCount = 0;
+    propData.tabTraDispCount = 0;
+    propData.tabPhoDispCount = 0;
+    propData.tabStaDispCount = 0;
 }
 
 // function setPropertyHeader() {
@@ -590,7 +598,7 @@ function loadPropertyForm(PRID) {
     f.reload();  // get this going as quickly as possible
 
     setPropertyNotLoaded();
-    w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
+    // w2ui.propertyFormLayout_main_tabs.click('proptabGeneral'); // click the general tab
     var l = w2ui.propertyFormLayout.get('main');
     if (typeof l.tabs != "undefined"){
         if (typeof l.tabs.name == "string") {
@@ -667,6 +675,7 @@ function setPropertyLayout(tab) {
     switch (tab) {
 
     case "proptabState":
+        propData.tabStaDispCount++;
         // w2ui.propertyFormLayout.load('main', '/static/html/formState.html', null,propertyStateOnLoad);
         w2ui.propertyStateLayout.load('main','/static/html/formState.html', null, propertyStateOnLoad);
         w2ui.propertyFormLayout.content('main', w2ui.propertyStateLayout);
@@ -674,6 +683,7 @@ function setPropertyLayout(tab) {
         break;
 
     case "proptabGeneral":
+        propData.tabGenDispCount++;
         if (propData.bPropLoaded) {
             w2ui.propertyForm.url = '';
         } else {
@@ -684,6 +694,7 @@ function setPropertyLayout(tab) {
         break;
 
     case "proptabRentSteps":
+        propData.tabRStDispCount++;
         if (propData.bRentStepsLoaded) {
             w2ui.propertyRentStepsGrid.url = '';
         } else {
@@ -696,6 +707,7 @@ function setPropertyLayout(tab) {
         break;
 
     case "proptabRenewOptions":
+        propData.tabROpDispCount++;
         if (propData.bRenewOptionsLoaded) {
             w2ui.propertyRenewOptionsGrid.url = '';
         } else {
@@ -708,6 +720,7 @@ function setPropertyLayout(tab) {
         break;
 
     case "proptabTraffic":
+        propData.tabTraDispCount++;
         if (propData.bTrafficLoaded) {
             w2ui.propertyTrafficGrid.url = '';
         } else {
@@ -719,6 +732,7 @@ function setPropertyLayout(tab) {
         setPropertyStatusButtons(true);
         break;
     case "proptabPhotos":
+        propData.tabPhoDispCount++;
         w2ui.propertyPhotosLayout.load('main','/static/html/formPhotos.html');
         w2ui.propertyFormLayout.content('main',w2ui.propertyPhotosLayout);
         setTimeout(function() {
