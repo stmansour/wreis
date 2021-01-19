@@ -31,7 +31,6 @@ const (
 	PRTenantTradeName           = iota
 	PRLeaseGuarantor            = iota
 	PRLeaseType                 = iota
-	PRDeliveryDt                = iota
 	PROriginalLeaseTerm         = iota
 	PRRentCommencementDt        = iota
 	PRLeaseExpirationDt         = iota
@@ -76,7 +75,6 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"TenantTradeName"}, Required: false, CaseSensitive: false, CanonicalIndex: PRTenantTradeName, Index: -1, FlagBit: 0},
 	{Name: []string{"LeaseGuarantor"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseGuarantor, Index: -1, FlagBit: 0},
 	{Name: []string{"LeaseType"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseType, Index: -1, FlagBit: 0},
-	{Name: []string{"DeliveryDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRDeliveryDt, Index: -1, FlagBit: 0},
 	{Name: []string{"OriginalLeaseTerm"}, Required: false, CaseSensitive: false, CanonicalIndex: PROriginalLeaseTerm, Index: -1, FlagBit: 0},
 	{Name: []string{"RentCommencementDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRentCommencementDt, Index: -1, FlagBit: 0},
 	{Name: []string{"LeaseExpirationDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseExpirationDt, Index: -1, FlagBit: 0},
@@ -154,8 +152,6 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			p.LeaseGuarantor, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRLeaseType:
 			p.LeaseType, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
-		case PRDeliveryDt:
-			p.DeliveryDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
 		case PROriginalLeaseTerm:
 			p.OriginalLeaseTerm, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRRentCommencementDt:

@@ -39,7 +39,6 @@ type Property struct {
 	TenantTradeName           string
 	LeaseGuarantor            int64
 	LeaseType                 int64
-	DeliveryDt                time.Time
 	OriginalLeaseTerm         int64
 	RentCommencementDt        time.Time
 	LeaseExpirationDt         time.Time
@@ -146,7 +145,6 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.TenantTradeName,
 		a.LeaseGuarantor,
 		a.LeaseType,
-		a.DeliveryDt,
 		a.OriginalLeaseTerm,
 		a.RentCommencementDt,
 		a.LeaseExpirationDt,
@@ -243,7 +241,6 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.TenantTradeName,
 		&a.LeaseGuarantor,
 		&a.LeaseType,
-		&a.DeliveryDt,
 		&a.OriginalLeaseTerm,
 		&a.RentCommencementDt,
 		&a.LeaseExpirationDt,
@@ -313,7 +310,6 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.TenantTradeName,
 		&a.LeaseGuarantor,
 		&a.LeaseType,
-		&a.DeliveryDt,
 		&a.OriginalLeaseTerm,
 		&a.RentCommencementDt,
 		&a.LeaseExpirationDt,
@@ -384,7 +380,6 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.TenantTradeName,
 		a.LeaseGuarantor,
 		a.LeaseType,
-		a.DeliveryDt,
 		a.OriginalLeaseTerm,
 		a.RentCommencementDt,
 		a.LeaseExpirationDt,

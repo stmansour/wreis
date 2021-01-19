@@ -77,6 +77,7 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
+ALTER TABLE Property DROP COLUMN DeliveryDt;
 LEOF
 
 #=====================================================

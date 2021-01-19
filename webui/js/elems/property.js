@@ -109,7 +109,6 @@ function initializePropertyRecord() {
             LastModBy: 0,
 
             BuildDate: time0,
-            DeliveryDt: time0,
             RentCommencementDt: time0,
             LeaseExpirationDt: time0,
             CreateTime: now,
@@ -175,7 +174,6 @@ function buildPropertyUIElements() {
             {field: 'TenantTradeName',      size: '60px', caption: 'TenantTradeName', sortable: true, hidden: true},
             {field: 'LeaseGuarantor',       size: '60px', caption: 'LeaseGuarantor', sortable: true, hidden: true},
             {field: 'LeaseType',            size: '60px', caption: 'LeaseType', sortable: true, hidden: true},
-            {field: 'DeliveryDt',           size: '60px', caption: 'DeliveryDt', sortable: true, hidden: true},
             {field: 'OriginalLeaseTerm',    size: '60px', caption: 'OriginalLeaseTerm', sortable: true, hidden: true},
             {field: 'RentCommencementDt',   size: '60px', caption: 'RentCommencementDt', sortable: true, hidden: true},
             {field: 'LeaseExpirationDt',    size: '60px', caption: 'LeaseExpirationDt', sortable: true, hidden: true},
@@ -413,7 +411,6 @@ function buildPropertyUIElements() {
             {field: 'TenantTradeName',      type: 'text', required: false},
             {field: 'LeaseGuarantor',       type: 'text', required: false},
             {field: 'LeaseType',            type: 'hidden', required: false},
-            {field: 'DeliveryDt',           type: 'date', required: false},
             {field: 'OriginalLeaseTerm',    type: 'int', required: false},
             {field: 'RentCommencementDt',   type: 'date', required: false},
             {field: 'LeaseExpirationDt',    type: 'date', required: false},
@@ -461,14 +458,11 @@ function buildPropertyUIElements() {
                 var r = this.record;
                 // var y = new Date(r.BuildDate);
                 // r.BuildDate = dateFmtStr(y);
-                // y = new Date(r.DeliveryDt);
-                // r.DeliveryDt = dateFmtStr(y);
                 // y = new Date(r.RentCommencementDt);
                 // r.RentCommencementDt = dateFmtStr(y);
                 // y = new Date(r.LeaseExpirationDt);
                 // r.LeaseExpirationDt = dateFmtStr(y);
                 r.BuildDate = displayDateString(r.BuildDate);
-                r.DeliveryDt = displayDateString(r.DeliveryDt);
                 r.RentCommencementDt = displayDateString(r.RentCommencementDt);
                 r.LeaseExpirationDt = displayDateString(r.LeaseExpirationDt);
 
@@ -619,7 +613,6 @@ function savePropertyForm() {
     rec.AvgCap /= 100;  // convert back to decimal number
     rec.CapRate /= 100; // convert back to decimal number
     rec.BuildDate = varToUTCString(rec.BuildDate);
-    rec.DeliveryDt = varToUTCString(rec.DeliveryDt);
     rec.RentCommencementDt = varToUTCString(rec.RentCommencementDt);
     rec.LeaseExpirationDt = varToUTCString(rec.LeaseExpirationDt);
     rec.CreateTime = varToUTCString(rec.CreateTime);

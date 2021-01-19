@@ -35,7 +35,6 @@ func TestProperty(ctx context.Context) {
 		TenantTradeName:           "Bill's Boar Emporium",
 		LeaseGuarantor:            0,
 		LeaseType:                 0,
-		DeliveryDt:                dt,
 		OriginalLeaseTerm:         int64(dur),
 		RentCommencementDt:        dt,
 		LeaseExpirationDt:         dt,

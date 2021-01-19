@@ -50,7 +50,6 @@ type PropertyGrid struct {
 	TenantTradeName           string
 	LeaseGuarantor            int64
 	LeaseType                 int64
-	DeliveryDt                util.JSONDateTime
 	OriginalLeaseTerm         int64
 	RentCommencementDt        util.JSONDateTime
 	LeaseExpirationDt         util.JSONDateTime
@@ -108,7 +107,6 @@ var propFieldsMap = map[string][]string{
 	"TenantTradeName":           {"Property.TenantTradeName"},
 	"LeaseGuarantor":            {"Property.LeaseGuarantor"},
 	"LeaseType":                 {"Property.LeaseType"},
-	"DeliveryDt":                {"Property.DeliveryDt"},
 	"OriginalLeaseTerm":         {"Property.OriginalLeaseTerm"},
 	"RentCommencementDt":        {"Property.RentCommencementDt"},
 	"LeaseExpirationDt":         {"Property.LeaseExpirationDt"},
@@ -163,7 +161,6 @@ var propQuerySelectFields = []string{
 	"Property.TenantTradeName",
 	"Property.LeaseGuarantor",
 	"Property.LeaseType",
-	"Property.DeliveryDt",
 	"Property.OriginalLeaseTerm",
 	"Property.RentCommencementDt",
 	"Property.LeaseExpirationDt",
@@ -486,7 +483,6 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.TenantTradeName,
 		&q.LeaseGuarantor,
 		&q.LeaseType,
-		&q.DeliveryDt,
 		&q.OriginalLeaseTerm,
 		&q.RentCommencementDt,
 		&q.LeaseExpirationDt,
