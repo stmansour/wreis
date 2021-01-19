@@ -322,8 +322,6 @@ function saveRentSteps() {
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
-        // if (data.status === "success") {
-        // }
         if (data.status === "error") {
             w2ui.propertyGrid.error('ERROR: '+ data.message);
         }

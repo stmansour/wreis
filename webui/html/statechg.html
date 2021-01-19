@@ -21,7 +21,7 @@
                 </div>
             </td>
             <td>
-                <button onclick="stateReadyForApproval();" id="stateReadyButton" >
+                <button class="w2ui-btn w2ui-btn-green" onclick="stateReadyForApproval();" id="stateReadyButton" >
                     <span id="stateReadyButtonLbl"></span>
                 </button>
                 </div>
@@ -36,7 +36,7 @@
                 ---------------------->
                 </div>
             </td>
-            <td><button id="approveStateButton" onclick="stateApproved();">Approve</button></td>
+            <td><button class="w2ui-btn w2ui-btn-green" id="approveStateButton" onclick="stateApproved();">Approve</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -44,7 +44,7 @@
         <tr>
             <td align="right">Reject because:</td>
             <td valign="bottom" id="smReject"> <textarea id="smRejectReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea> </td>
-            <td valign="bottom"><button id="rejectStateButton" onclick="stateRejected();">Reject</button></td>
+            <td valign="bottom"><button class="w2ui-btn w2ui-btn-green" id="rejectStateButton" onclick="stateRejected();">Reject</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -52,7 +52,7 @@
         <tr>
             <td align="right">Revert because:</td>
             <td align="left" valign="bottom" id="smRevert"><textarea id="smRevertReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea></td>
-            <td valign="bottom"><button id="revertStateButton" onclick="stateReverted();">Revert</button></td>
+            <td valign="bottom"><button class="w2ui-btn w2ui-btn-green" id="revertStateButton" onclick="stateReverted();">Revert</button></td>
         </tr>
 
         <tr><td colspan="3" height="10"></td></tr>
@@ -69,7 +69,7 @@
             <td align="right">Reason:</td>
             <td align="right" valign="bottom">
                 <textarea id="smApproverReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea></td>
-            <td valign="bottom"><button id="btnSetNewApprover" onclick="stateSetApprover();">Set New Approver</button></td>
+            <td valign="bottom"><button class="w2ui-btn w2ui-btn-green" id="btnSetNewApprover" onclick="stateSetApprover();">Set New Approver</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
@@ -87,7 +87,7 @@
         <tr>
             <td align="right">Reason:</td>
             <td><textarea id="smOwnerReason" rows="3" cols="40" maxlength="256" style="width:100%;"> </textarea></td>
-            <td valign="bottom"><button id="btnSetNewOwner" onclick="stateSetOwner();">Set New Owner</button></td>
+            <td valign="bottom"><button class="w2ui-btn w2ui-btn-green" id="btnSetNewOwner" onclick="stateSetOwner();">Set New Owner</button></td>
         </tr>
 
         <tr><td colspan="3" height="10"></td></tr>
@@ -95,13 +95,13 @@
         <tr>
             <td align="right">Terminate because:</td>
             <td align="left" valign="bottom" id="smTerminate"><textarea id="smTerminateReason" rows="3" cols="40" maxlength="256" style="width:100%;"></textarea></td>
-            <td valign="bottom"><button id="terminateStateButton" onclick="stateTerminated();">Terminate</button></td>
+            <td valign="bottom"><button class="w2ui-btn w2ui-btn-green" id="terminateStateButton" onclick="stateTerminated();">Terminate</button></td>
         </tr>
 
         <tr><td colspan="3" height="20"></td></tr>
 
         <tr>
-            <td align="center" colspan="3"><button onclick="closeStateChangeDialog();" id="btnDone">Done</button></td>
+            <td align="center" colspan="3"><button class="w2ui-btn" onclick="closeStateChangeDialog();" id="btnDone">Done</button></td>
         </tr>
 
 
