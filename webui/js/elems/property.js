@@ -1,7 +1,7 @@
 /*global
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
-    propertyStateOnLoad,setTimeout,closeStateChangeDialog,setPropertyStatusButtons,
+    propertyStateOnLoad,setTimeout,closeStateChangeDialog,setPropertyFormActionButtons,
     closePropertyForm, saveTraffic,
 */
 
@@ -215,6 +215,16 @@ function buildPropertyUIElements() {
             f.recid = 0;
             f.url = "";
             f.refresh();
+            setPropertyNotLoaded();
+            if (w2ui.propertyRentStepsGrid.records === "object") {
+                w2ui.propertyRentStepsGrid.records = [];
+            }
+            if (w2ui.propertyRenewOptionsGrid.records === "object") {
+                w2ui.propertyRenewOptionsGrid.records = [];
+            }
+            if (w2ui.propertyTrafficGrid.records === "object") {
+                w2ui.propertyTrafficGrid.records = [];
+            }
             propData.PRID = 0;  // new entry
             var s = initializeStateRecord();
             propData.states = [s];
@@ -489,6 +499,16 @@ function buildPropertyUIElements() {
    });
 }
 
+function resetTabDispCounts() {
+    propData.tabGenDispCount = 0;
+    propData.tabRStDispCount = 0;
+    propData.tabROpDispCount = 0;
+    propData.tabTraDispCount = 0;
+    propData.tabPhoDispCount = 0;
+    propData.tabStaDispCount = 0;
+
+}
+
 function setPropertyNotLoaded() {
     propData.bPropLoaded = false;
     propData.bRentStepsLoaded = false;
@@ -496,12 +516,7 @@ function setPropertyNotLoaded() {
     propData.bTrafficLoaded = false;
     propData.bStateLoaded = false;
     propData.states = [];
-    propData.tabGenDispCount = 0;
-    propData.tabRStDispCount = 0;
-    propData.tabROpDispCount = 0;
-    propData.tabTraDispCount = 0;
-    propData.tabPhoDispCount = 0;
-    propData.tabStaDispCount = 0;
+    resetTabDispCounts();
 }
 
 // displayDateString returns a string that can be used to populate a form field.
@@ -632,7 +647,7 @@ function setPropertyLayout(tab) {
             w2ui.propertyForm.url = '/v1/property/' + propData.PRID;
         }
         w2ui.propertyFormLayout.content('main', w2ui.propertyForm);
-        setPropertyStatusButtons(true);
+        setPropertyFormActionButtons(true);
         break;
 
     case "proptabRentSteps":
@@ -645,7 +660,7 @@ function setPropertyLayout(tab) {
         }
         w2ui.rentStepsLayout.content('main',w2ui.propertyRentStepsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.rentStepsLayout);
-        setPropertyStatusButtons(true);
+        setPropertyFormActionButtons(true);
         break;
 
     case "proptabRenewOptions":
@@ -658,7 +673,7 @@ function setPropertyLayout(tab) {
         }
         w2ui.renewOptionsLayout.content('main',w2ui.propertyRenewOptionsGrid);
         w2ui.propertyFormLayout.content('main',w2ui.renewOptionsLayout);
-        setPropertyStatusButtons(true);
+        setPropertyFormActionButtons(true);
         break;
 
     case "proptabTraffic":
@@ -671,14 +686,14 @@ function setPropertyLayout(tab) {
         }
         w2ui.propertyTrafficLayout.content('main',w2ui.propertyTrafficGrid);
         w2ui.propertyFormLayout.content('main',w2ui.propertyTrafficLayout);
-        setPropertyStatusButtons(true);
+        setPropertyFormActionButtons(true);
         break;
     case "proptabPhotos":
         propData.tabPhoDispCount++;
         w2ui.propertyPhotosLayout.load('main','/static/html/formPhotos.html');
         w2ui.propertyFormLayout.content('main',w2ui.propertyPhotosLayout);
         setTimeout(function() {
-                    setPropertyStatusButtons(false);
+                    setPropertyFormActionButtons(false);
                 }, 100 );
         break;
     }
@@ -693,18 +708,17 @@ function showForm() {
     w2ui.toplayout.show('right', true);
 }
 
-// setPropertyStatusButtons is used to turn off and on the Save, Save And Add, and
+// setPropertyFormActionButtons is used to turn off and on the Save, Save And Add, and
 // Delete buttons at the bottom of the form.
 //
 // INPUTS:
 //  t = true -> turn buttons on,  false -> turn buttons off
 //--------------------------------------------------------------------------------
-function setPropertyStatusButtons(t) {
+function setPropertyFormActionButtons(t) {
     var f=w2ui.propertyFormBtns;
     var x = !t;
     $(f.box).find("button[name=save]").prop( "disabled", x );
-    $(f.box).find("button[name=saveadd]").prop( "disabled", x );
-    $(f.box).find("button[name=delete]").prop( "disabled", x );
+    $(f.box).find("button[name=cancel]").prop( "disabled", x );
 }
 
 

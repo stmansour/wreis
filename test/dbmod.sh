@@ -69,15 +69,17 @@ DBNAME="wreis"
 # ALTER TABLE StateInfo CHANGE InitiatorDt OwnerDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00';
 
 # ALTER TABLE Property CHANGE LotSize LotSize DECIMAL(19,4) NOT NULL DEFAULT 0;
+
 # ALTER TABLE Property CHANGE YearsInBusiness YearBuilt SMALLINT NOT NULL DEFAULT 0;
+# ALTER TABLE Property CHANGE YearBuilt YearFounded SMALLINT NOT NULL DEFAULT 0;
 # ALTER TABLE Property DROP COLUMN HQAddress, DROP COLUMN HQAddress2, DROP COLUMN HQPostalCode, DROP COLUMN HQCountry;
+# ALTER TABLE Property DROP COLUMN DeliveryDt;
 
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-ALTER TABLE Property DROP COLUMN DeliveryDt;
 LEOF
 
 #=====================================================

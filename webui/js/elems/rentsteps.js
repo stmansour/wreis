@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, w2utils, setInnerHTML,
-    number_format,
+    number_format, setPropertyFormActionButtons,
 */
 
 "use strict";
@@ -136,8 +136,7 @@ function buildRentStepsUIElements() {
             ],
             onClick: function (event) {
                 if (event.target == 'btnClose') {
-                    w2ui.rentStepsLayout.hide('right',true);
-                    w2ui.propertyRentStepsGrid.render();
+                    closeRentStepForm();
                 }
             },
         },
@@ -197,7 +196,7 @@ function RentStepDelete() {
         var removed = g.records.splice(i,1);
         // console.log('removed = ' + removed);
     }
-    w2ui.rentStepsLayout.hide('right',true);
+    closeRentStepForm();
     g.render();
 }
 
@@ -211,12 +210,13 @@ function RentStepSave() {
     }
 
     if (r.RSID < 0) {
+        r.RSLID = w2ui.propertyForm.record.RSLID;
         w2ui.propertyRentStepsGrid.add(r);
         w2ui.propertyRentStepForm.record.RSID = 0;  // to make sure that this one won't be added again
     }
     g.set(r.recid,r);
 
-    w2ui.rentStepsLayout.hide('right',true);
+    closeRentStepForm();
     g.render();
 }
 
@@ -285,8 +285,14 @@ function showRentStepForm() {
     w2ui.rentStepsLayout.content('right',w2ui.propertyRentStepForm);
     w2ui.rentStepsLayout.sizeTo('right',400);
     w2ui.rentStepsLayout.show('right',true);
+    setPropertyFormActionButtons(false); // turn off the property form buttons when this form is on
 }
 
+function closeRentStepForm() {
+    w2ui.rentStepsLayout.hide('right',true);
+    w2ui.propertyRentStepsGrid.render();
+    setPropertyFormActionButtons(true); // turn on the property form buttons now
+}
 
 function saveRentSteps() {
     //-----------------------------------------------------------------------
