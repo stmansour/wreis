@@ -170,9 +170,11 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//------------------------------------------------------------------------
 	// Make sure we have a list for this set of RenewOptions
 	//------------------------------------------------------------------------
+	// util.Console("foo.Records contains %d elements\n", len(foo.Records))
 	if len(foo.Records) > 0 {
 
 		if foo.Records[0].RSLID < 1 {
+			// util.Console("New RSLID being created\n")
 			var RSLID int64
 			var list db.RentSteps
 			if RSLID, err = db.InsertRentSteps(ctx, &list); err != nil {
@@ -181,6 +183,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				return
 			}
 
+			// util.Console("Created.  Now updating property with RSLID = %d\n", RSLID)
 			//---------------------------------------------------
 			// now update this property to point to the list...
 			//---------------------------------------------------
@@ -197,6 +200,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
+			// util.Console("Properyt Successfully updated.  Now saving RentSteps: %d\n", len(foo.Records))
 
 			//---------------------------------------------------
 			// now update each renew option...
@@ -205,12 +209,13 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				foo.Records[i].RSLID = RSLID
 				var x db.RentStep
 				util.MigrateStructVals(&foo.Records[i], &x)
+				// util.Console("foo.Records[%d] = %#v\n", i, foo.Records[i])
+				// util.Console("x = %#v\n", x)
 				if _, err = db.InsertRentStep(ctx, &x); err != nil {
 					tx.Rollback()
 					SvcErrorReturn(w, err)
 					return
 				}
-
 			}
 			//---------------------------------------
 			// commit
@@ -234,16 +239,18 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	if d.ID > 0 {
 		a, err = db.GetRentStepsItems(ctx, d.ID)
 		if err != nil {
-			util.Console("%s: B\n", funcname)
+			// util.Console("%s: B\n", funcname)
 			tx.Rollback()
 			SvcErrorReturn(w, err)
 			return
 		}
 	}
 
-	// util.Console("%s: RSLID = %d  num items = %d\n", funcname, d.ID, len(a))
+	// util.Console("%s: RSLID = %d, len(a) = %d, len(foo) = %d\n", funcname, d.ID, len(a), len(foo.Records))
 	for i := 0; i < len(foo.Records); i++ {
-		if foo.Records[i].RSID < 0 {
+		// util.Console("i = %d, foo.Records[i].RSID = %d\n", i, foo.Records[i].RSID)
+		if foo.Records[i].RSID < 1 {
+			// util.Console("IN PATH A")
 			var x db.RentStep
 			// util.Console("ADD: foo.Records[i].RSID = %d\n", foo.Records[i].RSID)
 			util.MigrateStructVals(&foo.Records[i], &x)
@@ -255,6 +262,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				return
 			}
 		} else {
+			// util.Console("IN PATH B")
 			for j := 0; j < len(a); j++ {
 				if foo.Records[i].RSID == a[j].RSID {
 					t := foo.Records[i].Rent != a[j].Rent       // check for rent change

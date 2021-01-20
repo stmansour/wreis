@@ -1,5 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise,
+    setPropertyFormActionButtons,
 */
 
 "use strict";
@@ -57,9 +58,9 @@ function buildTrafficUIElements() {
             {field: 'PRID',        caption: 'PRID',       size: '60px',  sortable: true, hidden: true},
             {field: 'FLAGS',       caption: 'FLAGS',      size: '60px',  sortable: true, hidden: true},
             {field: 'Count',       caption: 'Count',      size: '80px',  sortable: true, hidden: false},
-            {field: 'Description', caption: 'Description',size: '350px', sortable: true, hidden: false},
+            {field: 'Description', caption: 'Street Name',size: '350px', sortable: true, hidden: false},
             {field: 'CreateTime',  caption: 'CreateTime', size: '60px',  sortable: true, hidden: true},
-            {field: 'CreateBy',   caption: 'CreateBy',  size: '60px',  sortable: true, hidden: true},
+            {field: 'CreateBy',    caption: 'CreateBy',   size: '60px',  sortable: true, hidden: true},
             {field: 'LastModTime', caption: 'LastModTime',size: '60px',  sortable: true, hidden: true},
             {field: 'LastModBy',   caption: 'LastModBy',  size: '60px',  sortable: true, hidden: true},
         ],
@@ -120,7 +121,7 @@ function buildTrafficUIElements() {
             ],
             onClick: function (event) {
                 if (event.target == 'btnClose') {
-                    w2ui.propertyTrafficLayout.hide('right',true);
+                    closeTrafficForm();
                     w2ui.propertyTrafficGrid.render();
                 }
             },
@@ -157,7 +158,7 @@ function TrafficDelete() {
         var removed = g.records.splice(i,1);
         // console.log('removed = ' + removed);
     }
-    w2ui.propertyTrafficLayout.hide('right',true);
+    closeTrafficForm();
     g.render();
 }
 
@@ -172,11 +173,8 @@ function TrafficSave() {
     if (x.length > 0) {
         return;
     }
-
-
     g.set(r.recid,r);
-
-    w2ui.propertyTrafficLayout.hide('right',true);
+    closeTrafficForm();
     g.render();
 }
 
@@ -184,6 +182,12 @@ function showTrafficForm() {
     w2ui.propertyTrafficLayout.content('right',w2ui.propertyTrafficForm);
     w2ui.propertyTrafficLayout.sizeTo('right',400);
     w2ui.propertyTrafficLayout.show('right',true);
+    setPropertyFormActionButtons(false);
+}
+
+function closeTrafficForm() {
+    w2ui.propertyTrafficLayout.hide('right',true);
+    setPropertyFormActionButtons(true);
 }
 
 function saveTraffic() {

@@ -216,13 +216,13 @@ function buildPropertyUIElements() {
             f.url = "";
             f.refresh();
             setPropertyNotLoaded();
-            if (w2ui.propertyRentStepsGrid.records === "object") {
+            if (typeof w2ui.propertyRentStepsGrid.records === "object") {
                 w2ui.propertyRentStepsGrid.records = [];
             }
-            if (w2ui.propertyRenewOptionsGrid.records === "object") {
+            if (typeof w2ui.propertyRenewOptionsGrid.records === "object") {
                 w2ui.propertyRenewOptionsGrid.records = [];
             }
-            if (w2ui.propertyTrafficGrid.records === "object") {
+            if (typeof w2ui.propertyTrafficGrid.records === "object") {
                 w2ui.propertyTrafficGrid.records = [];
             }
             propData.PRID = 0;  // new entry
@@ -477,26 +477,90 @@ function buildPropertyUIElements() {
                             return;
                         }
                     }
-                    $.when(
-                        savePropertyForm(),
-                        saveRentSteps(),
-                        saveRenewOptions(),
-                        saveTraffic()
-                    )
-                    .done( function() {
-                        propertySaveDoneCB();
-                    })
-                    .fail( function() {
-                        var s = 'Save Property encountered an error';
-                        w2ui.propertyGrid.error(s);
-                        propertySaveDoneCB();
-                    });
-            },
+                    savePropertyParts();
+
+        },
             cancel: function() {
                 closePropertyForm();
             }
         },
    });
+}
+
+// savePropertyParts will save the property in an efficient way to handle new
+// properties or updates.  If the property is new, it must first save the Property
+// structure in order to get back the PRID.  The PRID is needed for saving all
+// the other structures.  If propertyForm.record.PRID < 1 it means we're saving
+// a new property.  Save it first, then set the PRID so that the remaining calls
+// can reference it.
+//-------------------------------------------------------------------------------
+function savePropertyParts() {
+    var PRID = w2ui.propertyForm.record.PRID;
+    if (PRID > 0) {
+        savePropertyPartsPhase2(true);
+        return;
+    }
+    //-------------------------------------------
+    // need to save property first to get PRID
+    //-------------------------------------------
+    $.when(
+        savePropertyForm()
+    )
+    .done( function() {
+        var PRID = w2ui.propertyForm.record.PRID;
+        if (0 == PRID) {
+            // an error must have occurred.  don't proceed.
+            return;
+        }
+        savePropertyPartsPhase2(false);  // proceed with saving everything else
+    })
+    .fail( function() {
+        var s = 'Save Property encountered an error';
+        w2ui.propertyGrid.error(s);
+        propertySaveDoneCB();
+    });
+}
+// savePropertyPartsPhase2
+// If x is false, then we don't need to call savePropertyForm because it was
+// a new property and had to be saved before everything else so that we could
+// establish the PRID.
+//
+// INPUTS
+//    x  -  true means save everything including the propertyForm.
+//          false means save everything but exclude the propertyForm.
+//-------------------------------------------------------------------------------
+function savePropertyPartsPhase2(x) {
+    if (x) {
+        $.when(
+            savePropertyForm(),
+            saveRentSteps(),
+            saveRenewOptions(),
+            saveTraffic()
+        )
+        .done( function() {
+            propertySaveDoneCB();
+        })
+        .fail( function() {
+            var s = 'Save Property encountered an error';
+            w2ui.propertyGrid.error(s);
+            propertySaveDoneCB();
+        });
+        return;
+    }
+
+    $.when(
+        saveRentSteps(),
+        saveRenewOptions(),
+        saveTraffic()
+    )
+    .done( function() {
+        propertySaveDoneCB();
+    })
+    .fail( function() {
+        var s = 'Save Property encountered an error';
+        w2ui.propertyGrid.error(s);
+        propertySaveDoneCB();
+    });
 }
 
 function resetTabDispCounts() {
@@ -606,6 +670,7 @@ function savePropertyForm() {
         if (data.status === "error") {
             w2ui.propertyGrid.error('ERROR: '+ data.message);
         }
+        w2ui.propertyForm.record.PRID = data.recid;  // this ensures that if a new property was saved we have a valid PRID in the struct
     })
     .fail(function(data){
             w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);

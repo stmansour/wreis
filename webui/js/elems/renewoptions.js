@@ -1,5 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise,
+    setPropertyFormActionButtons,
 */
 
 "use strict";
@@ -128,7 +129,7 @@ function buildRenewOptionsUIElements() {
             ],
             onClick: function (event) {
                 if (event.target == 'btnClose') {
-                    w2ui.renewOptionsLayout.hide('right',true);
+                    closeRenewOptionForm();
                     w2ui.propertyRenewOptionsGrid.render();
                 }
             },
@@ -183,7 +184,7 @@ function RenewOptionDelete() {
         var removed = g.records.splice(i,1);
         // console.log('removed = ' + removed);
     }
-    w2ui.renewOptionsLayout.hide('right',true);
+    closeRenewOptionForm();
     g.render();
 }
 
@@ -203,7 +204,7 @@ function RenewOptionSave() {
     }
     g.set(r.recid,r);
 
-    w2ui.renewOptionsLayout.hide('right',true);
+    closeRenewOptionForm();
     g.render();
 }
 
@@ -266,6 +267,12 @@ function showRenewOptionForm() {
     w2ui.renewOptionsLayout.content('right',w2ui.propertyRenewOptionForm);
     w2ui.renewOptionsLayout.sizeTo('right',400);
     w2ui.renewOptionsLayout.show('right',true);
+    setPropertyFormActionButtons(false);
+}
+
+function closeRenewOptionForm() {
+    w2ui.renewOptionsLayout.hide('right',true);
+    setPropertyFormActionButtons(true);
 }
 
 

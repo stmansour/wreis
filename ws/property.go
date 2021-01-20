@@ -607,7 +607,7 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		}
 	}
 	// util.Console("UpdateProperty completed successfully\n")
-	SvcWriteSuccessResponse(w)
+	SvcWriteSuccessResponseWithID(w, p.PRID)
 }
 
 // PropertyUpdate updates the supplied Property in the database with the supplied
