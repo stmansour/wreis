@@ -805,9 +805,20 @@ function closePropertyForm() {
 }
 
 function setTermRemaining() {
-    var d1=new Date(w2ui.propertyForm.record.RentCommencementDt);
-    var d2=new Date(w2ui.propertyForm.record.LeaseExpirationDt);
+    var s = "n/a";
+    var s1=w2ui.propertyForm.record.RentCommencementDt;
+    if (s1 == null || typeof s1 != "string") {
+        setInnerHTML("PRTermRemaining",s);
+        return;
+    }
+    var d1=new Date(s1);
+    var s2=w2ui.propertyForm.record.LeaseExpirationDt;
+    if (s2 == null || typeof s2 != "string") {
+        setInnerHTML("PRTermRemaining",s);
+        return;
+    }
+    var d2=new Date(s2);
     var m=monthDiff(d1,d2);
-    var s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
+    s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
     setInnerHTML("PRTermRemaining",s);
 }
