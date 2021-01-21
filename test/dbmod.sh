@@ -83,6 +83,7 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
+ALTER TABLE Property ADD RenovationYear SMALLINT NOT NULL DEFAULT 0 AFTER BuildYear;
 LEOF
 
 #=====================================================

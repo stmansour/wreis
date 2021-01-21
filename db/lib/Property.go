@@ -29,6 +29,7 @@ type Property struct {
 	CapRate           float64
 	AvgCap            float64
 	BuildYear         int64
+	RenovationYear    int64
 	// FLAGS
 	//     1<<0  Drive Through?  0 = no, 1 = yes
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
@@ -140,6 +141,7 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.CapRate,
 		a.AvgCap,
 		a.BuildYear,
+		a.RenovationYear,
 		a.FLAGS,
 		a.Ownership,
 		a.TenantTradeName,
@@ -236,6 +238,7 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.CapRate,
 		&a.AvgCap,
 		&a.BuildYear,
+		&a.RenovationYear,
 		&a.FLAGS,
 		&a.Ownership,
 		&a.TenantTradeName,
@@ -305,6 +308,7 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.CapRate,
 		&a.AvgCap,
 		&a.BuildYear,
+		&a.RenovationYear,
 		&a.FLAGS,
 		&a.Ownership,
 		&a.TenantTradeName,
@@ -358,7 +362,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		return ErrSessionRequired
 	}
 	fields := []interface{}{
-		a.ROLID,
+		a.ROLID, // 1
 		a.RSLID,
 		a.FlowState,
 		a.Name,
@@ -367,7 +371,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.URL,
 		a.Symbol,
 		a.Price,
-		a.DownPayment,
+		a.DownPayment, // 10
 		a.RentableArea,
 		a.RentableAreaUnits,
 		a.LotSize,
@@ -375,7 +379,8 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.CapRate,
 		a.AvgCap,
 		a.BuildYear,
-		a.FLAGS,
+		a.RenovationYear,
+		a.FLAGS, // 20
 		a.Ownership,
 		a.TenantTradeName,
 		a.LeaseGuarantor,
@@ -385,7 +390,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LeaseExpirationDt,
 		a.TermRemainingOnLease,
 		a.TermRemainingOnLeaseUnits,
-		a.Address,
+		a.Address, // 30
 		a.Address2,
 		a.City,
 		a.State,
@@ -395,7 +400,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.NOI,
 		a.HQCity,
 		a.HQState,
-		a.Img1,
+		a.Img1, // 40
 		a.Img2,
 		a.Img3,
 		a.Img4,
@@ -404,7 +409,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.Img7,
 		a.Img8,
 		sess.UID,
-		a.PRID,
+		a.PRID, // 49
 	}
 	var err error
 	a.LastModBy, err = genericUpdate(ctx, Wdb.Prepstmt.UpdateProperty, fields)

@@ -30,6 +30,7 @@ func TestProperty(ctx context.Context) {
 		CapRate:                   float64(.7),
 		AvgCap:                    float64(.6),
 		BuildYear:                 2010,
+		RenovationYear:            0,
 		FLAGS:                     0,
 		Ownership:                 0,
 		TenantTradeName:           "Bill's Boar Emporium",

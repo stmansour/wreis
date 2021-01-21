@@ -40,6 +40,7 @@ CREATE TABLE Property (
     CapRate FLOAT NOT NULL DEFAULT 0,                       -- percentage
     AvgCap FLOAT NOT NULL DEFAULT 0,                        -- percentage
     BuildYear SMALLINT NOT NULL DEFAULT 0,                  -- Year the property was built, Kristin said it would always be a year
+    RenovationYear SMALLINT NOT NULL DEFAULT 0,             -- Year the property was renovated.
     FLAGS BIGINT NOT NULL DEFAULT 0,                        /* 1<<0  Drive Through?  0 = no, 1 = yes
                                                                1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes
