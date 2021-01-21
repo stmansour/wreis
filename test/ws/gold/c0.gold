@@ -48,8 +48,6 @@
             "State": "AK",
             "Symbol": "BBE",
             "TenantTradeName": "Bill's Boar Emporium",
-            "TermRemainingOnLease": 25,
-            "TermRemainingOnLeaseUnits": 0,
             "URL": "http://bbb.com/",
             "YearFounded": 8,
             "recid": 0
@@ -102,8 +100,6 @@
             "State": "MI",
             "Symbol": "",
             "TenantTradeName": "Bill's Bungalo Emporium",
-            "TermRemainingOnLease": 7,
-            "TermRemainingOnLeaseUnits": 1,
             "URL": "https://bbe.com/",
             "YearFounded": 5,
             "recid": 1
@@ -156,8 +152,6 @@
             "State": "GA",
             "Symbol": "",
             "TenantTradeName": "Jimbo's Junk Yard",
-            "TermRemainingOnLease": 73,
-            "TermRemainingOnLeaseUnits": 0,
             "URL": "https://bbe.com/",
             "YearFounded": 5,
             "recid": 2
@@ -210,8 +204,6 @@
             "State": "KY",
             "Symbol": "",
             "TenantTradeName": "Mungo's Mud",
-            "TermRemainingOnLease": 5,
-            "TermRemainingOnLeaseUnits": 1,
             "URL": "https://bbe.com/",
             "YearFounded": 5,
             "recid": 3
@@ -264,8 +256,6 @@
             "State": "AL",
             "Symbol": "",
             "TenantTradeName": "Rosita's Taco Town",
-            "TermRemainingOnLease": 15,
-            "TermRemainingOnLeaseUnits": 1,
             "URL": "https://bbe.com/",
             "YearFounded": 5,
             "recid": 4
@@ -318,8 +308,6 @@
             "State": "TN",
             "Symbol": "",
             "TenantTradeName": "Sally's Sludge Salon",
-            "TermRemainingOnLease": 71,
-            "TermRemainingOnLeaseUnits": 0,
             "URL": "https://bbe.com/",
             "YearFounded": 5,
             "recid": 5
@@ -372,8 +360,6 @@
             "State": "MN",
             "Symbol": "",
             "TenantTradeName": "Wings 'n Such",
-            "TermRemainingOnLease": 75,
-            "TermRemainingOnLeaseUnits": 0,
             "URL": "https://bbe.com/",
             "YearFounded": 5,
             "recid": 6

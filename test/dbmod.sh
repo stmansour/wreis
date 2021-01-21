@@ -84,6 +84,7 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
+ALTER TABLE Property DROP COLUMN TermRemainingOnLease, DROP COLUMN TermRemainingOnLeaseUnits;
 LEOF
 
 #=====================================================

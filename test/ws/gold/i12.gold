@@ -8,7 +8,7 @@
         "City": "Rabbit Hash",
         "Country": "USA",
         "CreateBy": 269,
-        "CreateTime": "2021-01-21 09:34:33 UTC",
+        "CreateTime": "2021-01-21 10:36:56 UTC",
         "DownPayment": 0,
         "FLAGS": 5,
         "FlowState": 4,
@@ -47,8 +47,6 @@
         "State": "KY",
         "Symbol": "",
         "TenantTradeName": "Mungo's Mud",
-        "TermRemainingOnLease": 5,
-        "TermRemainingOnLeaseUnits": 1,
         "URL": "https://bbe.com/",
         "YearFounded": 5,
         "recid": 4

@@ -35,40 +35,38 @@ type Property struct {
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
 	//     1<<3  0 = processing/processed. 1 = Terminated
-	FLAGS                     uint64
-	Ownership                 int
-	TenantTradeName           string
-	LeaseGuarantor            int64
-	LeaseType                 int64
-	OriginalLeaseTerm         int64
-	RentCommencementDt        time.Time
-	LeaseExpirationDt         time.Time
-	TermRemainingOnLease      int64
-	TermRemainingOnLeaseUnits int64
-	Address                   string
-	Address2                  string
-	City                      string
-	State                     string
-	PostalCode                string
-	Country                   string
-	LLResponsibilities        string
-	NOI                       float64
-	HQCity                    string
-	HQState                   string
-	Img1                      string // url to image
-	Img2                      string
-	Img3                      string
-	Img4                      string
-	Img5                      string
-	Img6                      string
-	Img7                      string
-	Img8                      string
-	LastModTime               time.Time    // when was the record last written
-	LastModBy                 int64        // id of user that did the modify
-	CreateTime                time.Time    // when was this record created
-	CreateBy                  int64        // id of user that created it
-	RO                        RenewOptions // contains the list of RenewOptions and context
-	RS                        RentSteps    // contains the list of RentSteps and context
+	FLAGS              uint64
+	Ownership          int
+	TenantTradeName    string
+	LeaseGuarantor     int64
+	LeaseType          int64
+	OriginalLeaseTerm  int64
+	RentCommencementDt time.Time
+	LeaseExpirationDt  time.Time
+	Address            string
+	Address2           string
+	City               string
+	State              string
+	PostalCode         string
+	Country            string
+	LLResponsibilities string
+	NOI                float64
+	HQCity             string
+	HQState            string
+	Img1               string // url to image
+	Img2               string
+	Img3               string
+	Img4               string
+	Img5               string
+	Img6               string
+	Img7               string
+	Img8               string
+	LastModTime        time.Time    // when was the record last written
+	LastModBy          int64        // id of user that did the modify
+	CreateTime         time.Time    // when was this record created
+	CreateBy           int64        // id of user that created it
+	RO                 RenewOptions // contains the list of RenewOptions and context
+	RS                 RentSteps    // contains the list of RentSteps and context
 }
 
 // DeleteProperty deletes the Property with the specified id from the database
@@ -150,8 +148,6 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.OriginalLeaseTerm,
 		a.RentCommencementDt,
 		a.LeaseExpirationDt,
-		a.TermRemainingOnLease,
-		a.TermRemainingOnLeaseUnits,
 		a.Address,
 		a.Address2,
 		a.City,
@@ -247,8 +243,6 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.OriginalLeaseTerm,
 		&a.RentCommencementDt,
 		&a.LeaseExpirationDt,
-		&a.TermRemainingOnLease,
-		&a.TermRemainingOnLeaseUnits,
 		&a.Address,
 		&a.Address2,
 		&a.City,
@@ -317,8 +311,6 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.OriginalLeaseTerm,
 		&a.RentCommencementDt,
 		&a.LeaseExpirationDt,
-		&a.TermRemainingOnLease,
-		&a.TermRemainingOnLeaseUnits,
 		&a.Address,
 		&a.Address2,
 		&a.City,
@@ -388,8 +380,6 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.OriginalLeaseTerm,
 		a.RentCommencementDt,
 		a.LeaseExpirationDt,
-		a.TermRemainingOnLease,
-		a.TermRemainingOnLeaseUnits,
 		a.Address, // 30
 		a.Address2,
 		a.City,

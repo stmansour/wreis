@@ -8,7 +8,7 @@
         "City": "Goober",
         "Country": "USA",
         "CreateBy": 269,
-        "CreateTime": "2021-01-20 18:36:01 UTC",
+        "CreateTime": "2021-01-21 10:36:44 UTC",
         "DownPayment": 510000,
         "FLAGS": 2,
         "FlowState": 1,
@@ -47,8 +47,6 @@
         "State": "AK",
         "Symbol": "",
         "TenantTradeName": "Sallys Sludge Salon",
-        "TermRemainingOnLease": 71,
-        "TermRemainingOnLeaseUnits": 0,
         "URL": "https://bbe.com/",
         "YearFounded": 5,
         "recid": 4

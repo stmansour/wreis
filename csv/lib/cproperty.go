@@ -13,45 +13,43 @@ import (
 // PRName, et al, are indeces into the canonical PropertyList
 //------------------------------------------------------------------------------
 const (
-	PRName                      = 0
-	PRYearFounded               = iota
-	PRParentCompany             = iota
-	PRURL                       = iota
-	PRSymbol                    = iota
-	PRPrice                     = iota
-	PRDownPayment               = iota
-	PRRentableArea              = iota
-	PRRentableAreaUnits         = iota
-	PRLotSize                   = iota
-	PRLotSizeUnits              = iota
-	PRCapRate                   = iota
-	PRAvgCap                    = iota
-	PRBuildYear                 = iota
-	PRRenovationYear            = iota
-	PROwnership                 = iota
-	PRTenantTradeName           = iota
-	PRLeaseGuarantor            = iota
-	PRLeaseType                 = iota
-	PROriginalLeaseTerm         = iota
-	PRRentCommencementDt        = iota
-	PRLeaseExpirationDt         = iota
-	PRTermRemainingOnLease      = iota
-	PRTermRemainingOnLeaseUnits = iota
-	PRAddress                   = iota
-	PRAddress2                  = iota
-	PRCity                      = iota
-	PRState                     = iota
-	PRPostalCode                = iota
-	PRCountry                   = iota
-	PRLLResponsibilities        = iota
-	PRNOI                       = iota
-	PRHQCity                    = iota
-	PRHQState                   = iota
-	PRDriveThrough              = iota
-	PRRoofStructResp            = iota
-	PRFirstRightofRefusal       = iota
-	PRRenewOptions              = iota
-	PRRentSteps                 = iota
+	PRName                = 0
+	PRYearFounded         = iota
+	PRParentCompany       = iota
+	PRURL                 = iota
+	PRSymbol              = iota
+	PRPrice               = iota
+	PRDownPayment         = iota
+	PRRentableArea        = iota
+	PRRentableAreaUnits   = iota
+	PRLotSize             = iota
+	PRLotSizeUnits        = iota
+	PRCapRate             = iota
+	PRAvgCap              = iota
+	PRBuildYear           = iota
+	PRRenovationYear      = iota
+	PROwnership           = iota
+	PRTenantTradeName     = iota
+	PRLeaseGuarantor      = iota
+	PRLeaseType           = iota
+	PROriginalLeaseTerm   = iota
+	PRRentCommencementDt  = iota
+	PRLeaseExpirationDt   = iota
+	PRAddress             = iota
+	PRAddress2            = iota
+	PRCity                = iota
+	PRState               = iota
+	PRPostalCode          = iota
+	PRCountry             = iota
+	PRLLResponsibilities  = iota
+	PRNOI                 = iota
+	PRHQCity              = iota
+	PRHQState             = iota
+	PRDriveThrough        = iota
+	PRRoofStructResp      = iota
+	PRFirstRightofRefusal = iota
+	PRRenewOptions        = iota
+	PRRentSteps           = iota
 )
 
 // CanonicalPropertyList defines the canonical array of ColumnDefs for the CSV
@@ -80,9 +78,6 @@ var CanonicalPropertyList = []ColumnDef{
 	{Name: []string{"OriginalLeaseTerm"}, Required: false, CaseSensitive: false, CanonicalIndex: PROriginalLeaseTerm, Index: -1, FlagBit: 0},
 	{Name: []string{"RentCommencementDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRRentCommencementDt, Index: -1, FlagBit: 0},
 	{Name: []string{"LeaseExpirationDt"}, Required: false, CaseSensitive: false, CanonicalIndex: PRLeaseExpirationDt, Index: -1, FlagBit: 0},
-	{Name: []string{"TermRemainingOnLease"}, Required: false, CaseSensitive: false, CanonicalIndex: PRTermRemainingOnLease, Index: -1, FlagBit: 0},
-	{Name: []string{"TermRemainingOnLeaseUnits"}, Required: false, CaseSensitive: false, CanonicalIndex: PRTermRemainingOnLease, Index: -1, FlagBit: 0},
-	// {Name: []string{"ROLID"}, Required: false, CaseSensitive: false, CanonicalIndex: PRROLID, Index: -1, FlagBit: 0},
 	{Name: []string{"Address"}, Required: false, CaseSensitive: false, CanonicalIndex: PRAddress, Index: -1, FlagBit: 0},
 	{Name: []string{"Address2"}, Required: false, CaseSensitive: false, CanonicalIndex: PRAddress2, Index: -1, FlagBit: 0},
 	{Name: []string{"City"}, Required: false, CaseSensitive: false, CanonicalIndex: PRCity, Index: -1, FlagBit: 0},
@@ -162,10 +157,6 @@ func PropertyHandler(csvctx Context, ss []string, lineno int) []error {
 			p.RentCommencementDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
 		case PRLeaseExpirationDt:
 			p.LeaseExpirationDt, errlist = ParseDate(ss[csvctx.Order[i]], lineno, errlist)
-		case PRTermRemainingOnLease:
-			p.TermRemainingOnLease, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
-		case PRTermRemainingOnLeaseUnits:
-			p.TermRemainingOnLeaseUnits, errlist = ParseInt64(ss[csvctx.Order[i]], lineno, errlist)
 		case PRAddress:
 			p.Address = ss[csvctx.Order[i]]
 		case PRAddress2:

@@ -84,7 +84,6 @@ function initializePropertyRecord() {
             LeaseGuarantor: 0,
             LeaseType: 0,
             OriginalLeaseTerm: 0,
-            TermRemainingOnLease: 0,
             ROLID: 0,
             RSLID: 0,
             Address: "",
@@ -180,7 +179,6 @@ function buildPropertyUIElements() {
             {field: 'OriginalLeaseTerm',    size: '60px', caption: 'OriginalLeaseTerm', sortable: true, hidden: true},
             {field: 'RentCommencementDt',   size: '60px', caption: 'RentCommencementDt', sortable: true, hidden: true},
             {field: 'LeaseExpirationDt',    size: '60px', caption: 'LeaseExpirationDt', sortable: true, hidden: true},
-            {field: 'TermRemainingOnLease', size: '60px', caption: 'TermRemainingOnLease', sortable: true, hidden: true},
             {field: 'ROLID',                size: '60px', caption: 'ROLID', sortable: true, hidden: true},
             {field: 'RSLID',                size: '60px', caption: 'RSLID', sortable: true, hidden: true},
             {field: 'Address',              size: '60px', caption: 'Address', sortable: true, hidden: true},
@@ -418,7 +416,6 @@ function buildPropertyUIElements() {
             {field: 'OriginalLeaseTerm',    type: 'int', required: false},
             {field: 'RentCommencementDt',   type: 'date', required: false},
             {field: 'LeaseExpirationDt',    type: 'date', required: false},
-            {field: 'TermRemainingOnLease', type: 'int', required: false},
             {field: 'ROLID',                type: 'hidden', required: false},
             {field: 'RSLID',                type: 'hidden', required: false},
             {field: 'Address',              type: 'text', required: false},
@@ -445,7 +442,7 @@ function buildPropertyUIElements() {
             {field: 'LastModBy',            type: 'text', required: false},
         ],
         onLoad: function(event) {
-            event.onComplete = function() {
+            event.onComplete = function(event) {
                 var r = this.record;
                 r.RentCommencementDt = displayDateString(r.RentCommencementDt);
                 r.LeaseExpirationDt = displayDateString(r.LeaseExpirationDt);
@@ -460,10 +457,19 @@ function buildPropertyUIElements() {
                 var r = w2ui.propertyForm.record;
                 setDropDownSelectedIndex("LotSizeUnitsDD",r.LotSizeUnits);
                 setDropDownSelectedIndex("OwnershipDD",r.Ownership);
-                setDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD",r.TermRemainingOnLeaseUnits);
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
                 setTermRemaining();
+            };
+        },
+        onChange: function(event) {
+            event.onComplete = function(event) {
+                switch( event.target ) {
+                    case "RentCommencementDt":
+                    case "LeaseExpirationDt":
+                        setTermRemaining();
+                        break;
+                }
             };
         },
     });
@@ -650,7 +656,6 @@ function savePropertyForm() {
 
     rec.LotSizeUnits = getDropDownSelectedIndex("LotSizeUnitsDD");
     rec.Ownership = getDropDownSelectedIndex("OwnershipDD");
-    rec.TermRemainingOnLeaseUnits = getDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD");
     rec.LeaseType = getDropDownSelectedIndex("LeaseTypeDD");
     rec.LeaseGuarantor = getDropDownSelectedIndex("LeaseGuarantorDD");
 
@@ -807,13 +812,21 @@ function closePropertyForm() {
 function setTermRemaining() {
     var s = "n/a";
     var s1=w2ui.propertyForm.record.RentCommencementDt;
-    if (s1 == null || typeof s1 != "string") {
+    if (s1 == null || typeof s1 != "string" ) {
+        setInnerHTML("PRTermRemaining",s);
+        return;
+    }
+    if (s1.length == 0) {
         setInnerHTML("PRTermRemaining",s);
         return;
     }
     var d1=new Date(s1);
     var s2=w2ui.propertyForm.record.LeaseExpirationDt;
     if (s2 == null || typeof s2 != "string") {
+        setInnerHTML("PRTermRemaining",s);
+        return;
+    }
+    if (s2.length == 0) {
         setInnerHTML("PRTermRemaining",s);
         return;
     }

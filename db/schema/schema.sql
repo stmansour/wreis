@@ -56,8 +56,6 @@ CREATE TABLE Property (
     OriginalLeaseTerm BIGINT NOT NULL DEFAULT 0,            -- Duration
     RentCommencementDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',    -- GMT datetime
     LeaseExpirationDt DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00',      -- GMT datetime
-    TermRemainingOnLease BIGINT NOT NULL DEFAULT 0,         -- Duration
-    TermRemainingOnLeaseUnits SMALLINT NOT NULL DEFAULT 0,  -- 0 = months, 1 = Years
     Address VARCHAR(100) NOT NULL DEFAULT '',               -- property address
     Address2 VARCHAR(100) NOT NULL DEFAULT '',
     City VARCHAR(100) NOT NULL DEFAULT '',

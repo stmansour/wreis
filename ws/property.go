@@ -46,40 +46,38 @@ type PropertyGrid struct {
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
 	//======================================================================
-	FLAGS                     uint64
-	Ownership                 int
-	TenantTradeName           string
-	LeaseGuarantor            int64
-	LeaseType                 int64
-	OriginalLeaseTerm         int64
-	RentCommencementDt        util.JSONDateTime
-	LeaseExpirationDt         util.JSONDateTime
-	TermRemainingOnLease      int64
-	TermRemainingOnLeaseUnits int64
-	ROLID                     int64
-	RSLID                     int64
-	Address                   string
-	Address2                  string
-	City                      string
-	State                     string
-	PostalCode                string
-	Country                   string
-	LLResponsibilities        string
-	NOI                       float64
-	HQCity                    string
-	HQState                   string
-	Img1                      string
-	Img2                      string
-	Img3                      string
-	Img4                      string
-	Img5                      string
-	Img6                      string
-	Img7                      string
-	Img8                      string
-	CreateTime                util.JSONDateTime
-	CreateBy                  int64
-	LastModTime               util.JSONDateTime
-	LastModBy                 int64
+	FLAGS              uint64
+	Ownership          int
+	TenantTradeName    string
+	LeaseGuarantor     int64
+	LeaseType          int64
+	OriginalLeaseTerm  int64
+	RentCommencementDt util.JSONDateTime
+	LeaseExpirationDt  util.JSONDateTime
+	ROLID              int64
+	RSLID              int64
+	Address            string
+	Address2           string
+	City               string
+	State              string
+	PostalCode         string
+	Country            string
+	LLResponsibilities string
+	NOI                float64
+	HQCity             string
+	HQState            string
+	Img1               string
+	Img2               string
+	Img3               string
+	Img4               string
+	Img5               string
+	Img6               string
+	Img7               string
+	Img8               string
+	CreateTime         util.JSONDateTime
+	CreateBy           int64
+	LastModTime        util.JSONDateTime
+	LastModBy          int64
 	//
 	// RO db.RenewOptions // contains the list of RenewOptions and context
 	// RS db.RentSteps    // contains the list of RentSteps and context
@@ -87,57 +85,55 @@ type PropertyGrid struct {
 
 // which fields needs to be fetched for SQL query for property grid
 var propFieldsMap = map[string][]string{
-	"PRID":                      {"Property.PRID"},
-	"Name":                      {"Property.Name"},
-	"YearFounded":               {"Property.YearFounded"},
-	"ParentCompany":             {"Property.ParentCompany"},
-	"URL":                       {"Property.URL"},
-	"Symbol":                    {"Property.Symbol"},
-	"Price":                     {"Property.Price"},
-	"DownPayment":               {"Property.DownPayment"},
-	"RentableArea":              {"Property.RentableArea"},
-	"RentableAreaUnits":         {"Property.RentableAreaUnits"},
-	"LotSize":                   {"Property.LotSize"},
-	"LotSizeUnits":              {"Property.LotSizeUnits"},
-	"CapRate":                   {"Property.CapRate"},
-	"AvgCap":                    {"Property.AvgCap"},
-	"BuildYear":                 {"Property.BuildYear"},
-	"RenovationYear":            {"Property.RenovationYear"},
-	"FlowState":                 {"Property.FlowState"},
-	"FLAGS":                     {"Property.FLAGS"},
-	"Ownership":                 {"Property.Ownership"},
-	"TenantTradeName":           {"Property.TenantTradeName"},
-	"LeaseGuarantor":            {"Property.LeaseGuarantor"},
-	"LeaseType":                 {"Property.LeaseType"},
-	"OriginalLeaseTerm":         {"Property.OriginalLeaseTerm"},
-	"RentCommencementDt":        {"Property.RentCommencementDt"},
-	"LeaseExpirationDt":         {"Property.LeaseExpirationDt"},
-	"TermRemainingOnLease":      {"Property.TermRemainingOnLease"},
-	"TermRemainingOnLeaseUnits": {"Property.TermRemainingOnLeaseUnits"},
-	"ROLID":                     {"Property.ROLID"},
-	"RSLID":                     {"Property.RSLID"},
-	"Address":                   {"Property.Address"},
-	"Address2":                  {"Property.Address2"},
-	"City":                      {"Property.City"},
-	"State":                     {"Property.State"},
-	"PostalCode":                {"Property.PostalCode"},
-	"Country":                   {"Property.Country"},
-	"LLResponsibilities":        {"Property.LLResponsibilities"},
-	"NOI":                       {"Property.NOI"},
-	"HQCity":                    {"Property.HQCity"},
-	"HQState":                   {"Property.HQState"},
-	"Img1":                      {"Property.Img1"},
-	"Img2":                      {"Property.Img2"},
-	"Img3":                      {"Property.Img3"},
-	"Img4":                      {"Property.Img4"},
-	"Img5":                      {"Property.Img5"},
-	"Img6":                      {"Property.Img6"},
-	"Img7":                      {"Property.Img7"},
-	"Img8":                      {"Property.Img8"},
-	"CreateTime":                {"Property.CreateTime"},
-	"CreateBy":                  {"Property.CreateBy"},
-	"LastModTime":               {"Property.LastModTime"},
-	"LastModBy":                 {"Property.LastModBy"},
+	"PRID":               {"Property.PRID"},
+	"Name":               {"Property.Name"},
+	"YearFounded":        {"Property.YearFounded"},
+	"ParentCompany":      {"Property.ParentCompany"},
+	"URL":                {"Property.URL"},
+	"Symbol":             {"Property.Symbol"},
+	"Price":              {"Property.Price"},
+	"DownPayment":        {"Property.DownPayment"},
+	"RentableArea":       {"Property.RentableArea"},
+	"RentableAreaUnits":  {"Property.RentableAreaUnits"},
+	"LotSize":            {"Property.LotSize"},
+	"LotSizeUnits":       {"Property.LotSizeUnits"},
+	"CapRate":            {"Property.CapRate"},
+	"AvgCap":             {"Property.AvgCap"},
+	"BuildYear":          {"Property.BuildYear"},
+	"RenovationYear":     {"Property.RenovationYear"},
+	"FlowState":          {"Property.FlowState"},
+	"FLAGS":              {"Property.FLAGS"},
+	"Ownership":          {"Property.Ownership"},
+	"TenantTradeName":    {"Property.TenantTradeName"},
+	"LeaseGuarantor":     {"Property.LeaseGuarantor"},
+	"LeaseType":          {"Property.LeaseType"},
+	"OriginalLeaseTerm":  {"Property.OriginalLeaseTerm"},
+	"RentCommencementDt": {"Property.RentCommencementDt"},
+	"LeaseExpirationDt":  {"Property.LeaseExpirationDt"},
+	"ROLID":              {"Property.ROLID"},
+	"RSLID":              {"Property.RSLID"},
+	"Address":            {"Property.Address"},
+	"Address2":           {"Property.Address2"},
+	"City":               {"Property.City"},
+	"State":              {"Property.State"},
+	"PostalCode":         {"Property.PostalCode"},
+	"Country":            {"Property.Country"},
+	"LLResponsibilities": {"Property.LLResponsibilities"},
+	"NOI":                {"Property.NOI"},
+	"HQCity":             {"Property.HQCity"},
+	"HQState":            {"Property.HQState"},
+	"Img1":               {"Property.Img1"},
+	"Img2":               {"Property.Img2"},
+	"Img3":               {"Property.Img3"},
+	"Img4":               {"Property.Img4"},
+	"Img5":               {"Property.Img5"},
+	"Img6":               {"Property.Img6"},
+	"Img7":               {"Property.Img7"},
+	"Img8":               {"Property.Img8"},
+	"CreateTime":         {"Property.CreateTime"},
+	"CreateBy":           {"Property.CreateBy"},
+	"LastModTime":        {"Property.LastModTime"},
+	"LastModBy":          {"Property.LastModBy"},
 }
 
 // which fields needs to be fetched for SQL query for property grid
@@ -167,8 +163,6 @@ var propQuerySelectFields = []string{
 	"Property.OriginalLeaseTerm",
 	"Property.RentCommencementDt",
 	"Property.LeaseExpirationDt",
-	"Property.TermRemainingOnLease",
-	"Property.TermRemainingOnLeaseUnits",
 	"Property.ROLID",
 	"Property.RSLID",
 	"Property.Address",
@@ -490,8 +484,6 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.OriginalLeaseTerm,
 		&q.RentCommencementDt,
 		&q.LeaseExpirationDt,
-		&q.TermRemainingOnLease,
-		&q.TermRemainingOnLeaseUnits,
 		&q.ROLID,
 		&q.RSLID,
 		&q.Address,
