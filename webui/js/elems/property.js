@@ -108,7 +108,7 @@ function initializePropertyRecord() {
             CreateBy: 0,
             LastModBy: 0,
 
-            BuildDate: time0,
+            BuildYear: 0,
             RentCommencementDt: time0,
             LeaseExpirationDt: time0,
             CreateTime: now,
@@ -167,7 +167,7 @@ function buildPropertyUIElements() {
             {field: 'LotSizeUnits',         size: '60px', caption: 'LotSizeUnits', sortable: true, hidden: true},
             {field: 'CapRate',              size: '60px', caption: 'CapRate', sortable: true, hidden: true},
             {field: 'AvgCap',               size: '60px', caption: 'AvgCap', sortable: true, hidden: true},
-            {field: 'BuildDate',            size: '60px', caption: 'BuildDate', sortable: true, hidden: true},
+            {field: 'BuildYear',            size: '60px', caption: 'BuildYear', sortable: true, hidden: true},
             {field: 'FlowState',            size: '60px', caption: 'FlowState', sortable: true, hidden: true},
             {field: 'FLAGS',                size: '60px', caption: 'FLAGS', sortable: true, hidden: true},
             {field: 'Ownership',            size: '60px', caption: 'Ownership', sortable: true, hidden: true},
@@ -392,7 +392,7 @@ function buildPropertyUIElements() {
             {field: 'recid',                type: 'int',  required: false },
             {field: 'PRID',                 type: 'int',  required: false},
             {field: 'Name',                 type: 'text', required: true},
-            {field: 'YearFounded',      type: 'int',  required: false},
+            {field: 'YearFounded',          type: 'int',  required: false},
             {field: 'ParentCompany',        type: 'text', required: false},
             {field: 'URL',                  type: 'text', required: false},
             {field: 'Symbol',               type: 'text',  required: false},
@@ -404,7 +404,7 @@ function buildPropertyUIElements() {
             {field: 'LotSizeUnits',         type: 'hidden', required: false},
             {field: 'CapRate',              type: 'percent',  required: false},
             {field: 'AvgCap',               type: 'percent',  required: false},
-            {field: 'BuildDate',            type: 'date', required: false},
+            {field: 'BuildYear',            type: 'number',    required: false},
             {field: 'FlowState',            type: 'hidden†', required: false},
             {field: 'FLAGS',                type: 'text', required: false},
             {field: 'Ownership',            type: 'hidden', required: false},
@@ -436,14 +436,14 @@ function buildPropertyUIElements() {
             {field: 'Img7',                 type: 'hidden', required: false},
             {field: 'Img8',                 type: 'hidden', required: false},
             {field: 'CreateTime',           type: 'text', required: false},
-            {field: 'CreateBy',            type: 'text', required: false},
+            {field: 'CreateBy',             type: 'text', required: false},
             {field: 'LastModTime',          type: 'text', required: false},
             {field: 'LastModBy',            type: 'text', required: false},
         ],
         onLoad: function(event) {
             event.onComplete = function() {
                 var r = this.record;
-                r.BuildDate = displayDateString(r.BuildDate);
+                // r.BuildYear = displayDateString(r.BuildYear);
                 r.RentCommencementDt = displayDateString(r.RentCommencementDt);
                 r.LeaseExpirationDt = displayDateString(r.LeaseExpirationDt);
                 r.CapRate *= 100;
@@ -639,7 +639,7 @@ function savePropertyForm() {
     //-----------------------------------------
     rec.AvgCap /= 100;  // convert back to decimal number
     rec.CapRate /= 100; // convert back to decimal number
-    rec.BuildDate = varToUTCString(rec.BuildDate);
+    // rec.BuildYear = varToUTCString(rec.BuildYear);
     rec.RentCommencementDt = varToUTCString(rec.RentCommencementDt);
     rec.LeaseExpirationDt = varToUTCString(rec.LeaseExpirationDt);
     rec.CreateTime = varToUTCString(rec.CreateTime);
@@ -650,6 +650,11 @@ function savePropertyForm() {
     rec.TermRemainingOnLeaseUnits = getDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD");
     rec.LeaseType = getDropDownSelectedIndex("LeaseTypeDD");
     rec.LeaseGuarantor = getDropDownSelectedIndex("LeaseGuarantorDD");
+
+    var x = rec.BuildYear;
+    if (typeof x == "string") {
+        rec.BuildYear = parseInt(x);
+    }
 
     //-----------------------------------------
     // Now send it to the server

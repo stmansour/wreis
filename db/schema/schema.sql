@@ -39,7 +39,7 @@ CREATE TABLE Property (
     LotSizeUnits SMALLINT NOT NULL DEFAULT 0,               -- 0 = sqft, 1 = acres,
     CapRate FLOAT NOT NULL DEFAULT 0,                       -- percentage
     AvgCap FLOAT NOT NULL DEFAULT 0,                        -- percentage
-    BuildDate DATETIME NOT NULL DEFAULT '1970-01-01 00:00:00', -- Date the property was built, if applicable
+    BuildYear SMALLINT NOT NULL DEFAULT 0,                  -- Year the property was built, Kristin said it would always be a year
     FLAGS BIGINT NOT NULL DEFAULT 0,                        /* 1<<0  Drive Through?  0 = no, 1 = yes
                                                                1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes

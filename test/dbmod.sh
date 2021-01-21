@@ -75,6 +75,9 @@ DBNAME="wreis"
 # ALTER TABLE Property DROP COLUMN HQAddress, DROP COLUMN HQAddress2, DROP COLUMN HQPostalCode, DROP COLUMN HQCountry;
 # ALTER TABLE Property DROP COLUMN DeliveryDt;
 
+# ALTER TABLE Property CHANGE BuildDate BuildYear SMALLINT NOT NULL DEFAULT 0;
+
+
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================

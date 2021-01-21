@@ -28,7 +28,7 @@ type Property struct {
 	LotSizeUnits      int64
 	CapRate           float64
 	AvgCap            float64
-	BuildDate         time.Time
+	BuildYear         int64
 	// FLAGS
 	//     1<<0  Drive Through?  0 = no, 1 = yes
 	//	   1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
@@ -139,7 +139,7 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.LotSizeUnits,
 		a.CapRate,
 		a.AvgCap,
-		a.BuildDate,
+		a.BuildYear,
 		a.FLAGS,
 		a.Ownership,
 		a.TenantTradeName,
@@ -235,7 +235,7 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.LotSizeUnits,
 		&a.CapRate,
 		&a.AvgCap,
-		&a.BuildDate,
+		&a.BuildYear,
 		&a.FLAGS,
 		&a.Ownership,
 		&a.TenantTradeName,
@@ -304,7 +304,7 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.LotSizeUnits,
 		&a.CapRate,
 		&a.AvgCap,
-		&a.BuildDate,
+		&a.BuildYear,
 		&a.FLAGS,
 		&a.Ownership,
 		&a.TenantTradeName,
@@ -374,7 +374,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.LotSizeUnits,
 		a.CapRate,
 		a.AvgCap,
-		a.BuildDate,
+		a.BuildYear,
 		a.FLAGS,
 		a.Ownership,
 		a.TenantTradeName,

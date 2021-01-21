@@ -37,7 +37,7 @@ type PropertyGrid struct {
 	LotSizeUnits      int64
 	CapRate           float64
 	AvgCap            float64
-	BuildDate         util.JSONDateTime
+	BuildYear         int64
 	FlowState         int64
 	//======================================================================
 	// FLAGS
@@ -100,7 +100,7 @@ var propFieldsMap = map[string][]string{
 	"LotSizeUnits":              {"Property.LotSizeUnits"},
 	"CapRate":                   {"Property.CapRate"},
 	"AvgCap":                    {"Property.AvgCap"},
-	"BuildDate":                 {"Property.BuildDate"},
+	"BuildYear":                 {"Property.BuildYear"},
 	"FlowState":                 {"Property.FlowState"},
 	"FLAGS":                     {"Property.FLAGS"},
 	"Ownership":                 {"Property.Ownership"},
@@ -154,7 +154,7 @@ var propQuerySelectFields = []string{
 	"Property.LotSizeUnits",
 	"Property.CapRate",
 	"Property.AvgCap",
-	"Property.BuildDate",
+	"Property.BuildYear",
 	"Property.FlowState",
 	"Property.FLAGS",
 	"Property.Ownership",
@@ -476,7 +476,7 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.LotSizeUnits,
 		&q.CapRate,
 		&q.AvgCap,
-		&q.BuildDate,
+		&q.BuildYear,
 		&q.FlowState,
 		&q.FLAGS,
 		&q.Ownership,
@@ -549,10 +549,11 @@ func deleteProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveProperty"
 	util.Console("Entered %s\n", funcname)
-	// util.Console("record data = %s\n", d.data)
-	// util.Console("PRID = %d\n", d.ID)
+	util.Console("record data = %s\n", d.data)
+	util.Console("PRID = %d\n", d.ID)
 
 	var foo SaveProperty
+
 	data := []byte(d.data)
 	err := json.Unmarshal(data, &foo)
 
