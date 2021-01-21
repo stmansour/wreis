@@ -76,6 +76,7 @@ DBNAME="wreis"
 # ALTER TABLE Property DROP COLUMN DeliveryDt;
 
 # ALTER TABLE Property CHANGE BuildDate BuildYear SMALLINT NOT NULL DEFAULT 0;
+# ALTER TABLE Property ADD RenovationYear SMALLINT NOT NULL DEFAULT 0 AFTER BuildYear;
 
 
 #=====================================================
@@ -83,7 +84,6 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-ALTER TABLE Property ADD RenovationYear SMALLINT NOT NULL DEFAULT 0 AFTER BuildYear;
 LEOF
 
 #=====================================================

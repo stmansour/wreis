@@ -2,7 +2,8 @@
     w2ui, app, $, console, dateFmtStr, getDropDownSelectedIndex,
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
     propertyStateOnLoad,setTimeout,closeStateChangeDialog,setPropertyFormActionButtons,
-    closePropertyForm, saveTraffic,
+    closePropertyForm, saveTraffic, setTermRemaining, monthDiff,
+    setInnerHTML,
 */
 
 "use strict";
@@ -462,6 +463,7 @@ function buildPropertyUIElements() {
                 setDropDownSelectedIndex("TermRemainingOnLeaseUnitsDD",r.TermRemainingOnLeaseUnits);
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
+                setTermRemaining();
             };
         },
     });
@@ -800,4 +802,12 @@ function setPropertyFormActionButtons(t) {
 function closePropertyForm() {
     w2ui.toplayout.hide('right', true);
     w2ui.propertyGrid.render();
+}
+
+function setTermRemaining() {
+    var d1=new Date(w2ui.propertyForm.record.RentCommencementDt);
+    var d2=new Date(w2ui.propertyForm.record.LeaseExpirationDt);
+    var m=monthDiff(d1,d2);
+    var s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
+    setInnerHTML("PRTermRemaining",s);
 }

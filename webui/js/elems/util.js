@@ -6,6 +6,17 @@
   UTCDateStringToW2UIValidDate,stringToDate,
 */
 
+// monthDiff returns the number of months between 2 dates
+//
+//------------------------------------------------------------------------------
+function monthDiff(d1, d2) {
+    var months;
+    months = (d2.getFullYear() - d1.getFullYear()) * 12;
+    months -= d1.getMonth();
+    months += d2.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
 // getDropDownSelectedIndex returns the selected index of a dropdown menu with
 // with the supplied id.
 //
