@@ -273,7 +273,7 @@ func CreateSession(ctx context.Context, a *ValidateCookieResponse) (*Session, er
 	var c DirectoryPerson
 	// err := sessDB.PBsql.GetDirectoryPerson.QueryRow(a.UID).Scan(&c.UID, &c.UserName, &c.LastName, &c.MiddleName, &c.FirstName, &c.PreferredName, &c.PreferredName, &c.OfficePhone, &c.CellPhone)
 
-	if c, err = getUserInfo(a.UID); err != nil {
+	if c, err = getUserInfo(a); err != nil {
 		return nil, err
 	}
 
@@ -304,7 +304,7 @@ type UserInfoRequest struct {
 // RETURNS
 //  session - pointer to the new session
 //-----------------------------------------------------------------------------
-func getUserInfo(uid int64) (DirectoryPerson, error) {
+func getUserInfo(a *ValidateCookieResponse) (DirectoryPerson, error) {
 	funcname := "session.getUserInfo"
 	var p DirectoryPerson
 	var r = UserInfoRequest{Cmd: "get"}
@@ -318,10 +318,12 @@ func getUserInfo(uid int64) (DirectoryPerson, error) {
 	//----------------------------------------------------------------------
 	// the business portion of the URL is ignored.  We snap it to 0
 	//----------------------------------------------------------------------
-	url := fmt.Sprintf("%sv1/people/0/%d", appConfig.AuthNHost, uid)
+	url := fmt.Sprintf("%sv1/people/0/%d", appConfig.AuthNHost, a.UID)
+	cookies := fmt.Sprintf("%s=%s", SessionCookieName, a.Token) // we need the cookie so that Phonebook gives us back the info
 	// util.Console("userInfo request: %s\n", url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("cookie", cookies)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -466,7 +468,7 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *
 
 	// util.Console("GetSession 1\n")
 	// util.Console("\nSession Table:\n")
-	DumpSessions()
+	// DumpSessions()
 	// util.Console("\n")
 	cookie, err := r.Cookie(SessionCookieName)
 	if err != nil {

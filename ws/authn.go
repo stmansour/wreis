@@ -119,7 +119,9 @@ func SvcAuthenticate(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcFuncErrorReturn(w, err, funcname)
 		return
 	}
+	util.Console("Session Created.  b = %#v\n", b)
 	cookie := http.Cookie{Name: session.SessionCookieName, Value: b.Token, Expires: s.Expire, Path: "/"}
+
 	http.SetCookie(w, &cookie) // a cookie cannot be set after writing anything to a response writer
 	b.ImageURL = s.ImageURL
 	b.Name = s.Name

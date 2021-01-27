@@ -1103,7 +1103,7 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	for k := range mm {
 		uids = append(uids, k)
 	}
-	if p, err = GetUserListInfo(uids); err != nil {
+	if p, err = GetUserListInfo(uids, d.sess); err != nil {
 		SvcErrorReturn(w, err)
 		return
 	}

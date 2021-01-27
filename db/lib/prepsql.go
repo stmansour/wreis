@@ -12,9 +12,6 @@ import (
 var mySQLRpl = string("?")
 var myRpl = mySQLRpl
 
-// TRNSfields defined fields for Transactant, used in at least one other function
-var TRNSfields = string("TCID,BID,NLID,FirstName,MiddleName,LastName,PreferredName,CompanyName,IsCompany,PrimaryEmail,SecondaryEmail,WorkPhone,CellPhone,Address,Address2,City,State,PostalCode,Country,Website,Comment,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy")
-
 // GenSQLInsertAndUpdateStrings generates a string suitable for SQL INSERT and UPDATE statements given the fields as used in SELECT statements.
 //
 //  example:
