@@ -201,16 +201,16 @@ pause() {
 	x=$(echo "${x}" | tr "[:upper:]" "[:lower:]")
 	if [ "${x}" == "q" -o "${x}" == "x" ]; then
 		if [ ${MANAGESERVER} -eq 1 ]; then
-			echo "STOPPING RENTROLL SERVER"
-			pkill rentroll
+			echo "STOPPING WREIS SERVER"
+			pkill wreis
 		fi
 		exit 0
 	elif [[ ${x} == "m" ]]; then
 		echo "********************************************"
 		echo "********************************************"
 		echo "********************************************"
-		echo "mv ${1} gold/${1}.gold"
-		mv ${1} gold/${1}.gold
+		echo "cp ${1} gold/${1}.gold"
+		cp ${1} gold/${1}.gold
 	fi
 
 }
@@ -996,8 +996,8 @@ doCheckOnly() {
 			pause ${1}
 		else
 			if [ ${MANAGESERVER} -eq 1 ]; then
-				echo "STOPPING RENTROLL SERVER"
-				pkill rentroll
+				echo "STOPPING WREIS SERVER"
+				pkill wreis
 			fi
 			exit 1
 		fi
@@ -1088,8 +1088,8 @@ dojsonPOST () {
 				pause ${3}
 			else
 				if [ ${MANAGESERVER} -eq 1 ]; then
-					echo "STOPPING RENTROLL SERVER"
-					pkill rentroll
+					echo "STOPPING WREIS SERVER"
+					pkill wreis
 				fi
 				exit 1
 			fi
@@ -1193,8 +1193,8 @@ dobinPOST () {
 				pause ${3}
 			else
 				if [ ${MANAGESERVER} -eq 1 ]; then
-					echo "STOPPING RENTROLL SERVER"
-					pkill rentroll
+					echo "STOPPING WREIS SERVER"
+					pkill wreis
 				fi
 				exit 1
 			fi
@@ -1275,8 +1275,8 @@ dojsonGET () {
 				pause ${2}
 			else
 				if [ ${MANAGESERVER} -eq 1 ]; then
-					echo "STOPPING RENTROLL SERVER"
-					pkill rentroll
+					echo "STOPPING WREIS SERVER"
+					pkill wreis
 				fi
 				exit 1
 			fi
@@ -1348,8 +1348,8 @@ doValidateFile () {
 				pause ${1}
 			else
 				if [ ${MANAGESERVER} -eq 1 ]; then
-					echo "STOPPING RENTROLL SERVER"
-					pkill rentroll
+					echo "STOPPING WREIS SERVER"
+					pkill wreis
 				fi
 				exit 1
 			fi
@@ -1424,8 +1424,8 @@ doPlainGET () {
 				pause "${2}"
 			else
 				if [ ${MANAGESERVER} -eq 1 ]; then
-					echo "STOPPING RENTROLL SERVER"
-					pkill rentroll
+					echo "STOPPING WREIS SERVER"
+					pkill wreis
 				fi
 				exit 1
 			fi
@@ -1555,7 +1555,7 @@ doCypressUITest () {
 		echo
 	fi
 
-	echo "STOPPING RENTROLL SERVER in cypress UI automated testing" # finally
+	echo "STOPPING WREIS SERVER in cypress UI automated testing" # finally
 	stopRentRollServer
 	echo "STOPPING PHONEBOOK SERVER in cypress UI automated testing" # finally
 	pushd ../../../phonebook/

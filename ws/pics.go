@@ -48,6 +48,17 @@ type imgSuccess struct {
 	URL    string `json:"url"`
 }
 
+// The contractors set up extres to not include S3Region.  This turned out to be
+// needed as WREIS was set to a different region.
+//------------------------------------------------------------------------------
+func getS3Region() string {
+	rg := S3Region // default
+	if len(db.Wdb.Config.S3Region) > 0 {
+		rg = db.Wdb.Config.S3Region
+	}
+	return rg
+}
+
 // SvcHandlerPropertyPhoto uploads a single file belonging to a property. The
 // URL is of the form:
 //-----------------------------------------------------------------------------
@@ -442,7 +453,7 @@ func UploadImageToS3(filename string, buffer []byte, PRID, idx int64) (string, s
 	//-----------------------------------------
 	// Set up configuration
 	//-----------------------------------------
-	cfg := aws.NewConfig().WithRegion(S3Region).WithCredentials(creds)
+	cfg := aws.NewConfig().WithRegion(getS3Region()).WithCredentials(creds)
 
 	//-----------------------------------------
 	// Set up session
@@ -519,7 +530,7 @@ func DeleteS3ImageFile(filename string, PRID, idx int64) error {
 	//-----------------------------------------
 	// Set up configuration
 	//-----------------------------------------
-	cfg := aws.NewConfig().WithRegion(S3Region).WithCredentials(creds)
+	cfg := aws.NewConfig().WithRegion(getS3Region()).WithCredentials(creds)
 
 	//-----------------------------------------
 	// Set up session
