@@ -20,7 +20,7 @@ config.json:
 	/usr/local/accord/bin/getfile.sh accord/db/configwreisdev.json
 	cp configwreisdev.json config.json
 
-pushconf: configwreisdev.json
+pushconf:
 	jfrog rt u configwreisdev.json accord/misc/
 	/usr/local/accord/bin/deployfile.sh configwreisdev.json accord/db/
 
