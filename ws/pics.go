@@ -341,7 +341,7 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // GeneratePRImageFileName generate file name with PRID
 //------------------------------------------------------------------------------
 func GeneratePRImageFileName(filename string, PRID, idx int64) string {
-	return fmt.Sprintf("img-%d-%d-%s", PRID, idx, filename)
+	return fmt.Sprintf("WR-img-%d-%d-%s", PRID, idx, filename)
 }
 
 // GetImageFilenameFromURL returns the image filename from a URL of the form:
