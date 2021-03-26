@@ -13,21 +13,21 @@ server: *.go config.json
 	@echo "*** ${THISDIR}: completed ${THISDIR} ***"
 
 # you can update the config files as follows:
-# $ jfrog rt u[pload] confdev.json accord/misc/
-# $ deployfile.sh confdev.json accord/db/
+# $ jfrog rt u[pload] configwreisdev.json accord/misc/
+# $ deployfile.sh configwreisdev.json accord/db/
 
 config.json:
-	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
-	cp confdev.json config.json
+	/usr/local/accord/bin/getfile.sh accord/db/configwreisdev.json
+	cp configwreisdev.json config.json
 
-pushconf: confdev.json
-	jfrog rt u confdev.json accord/misc/
-	/usr/local/accord/bin/deployfile.sh confdev.json accord/db/
+pushconf: configwreisdev.json
+	jfrog rt u configwreisdev.json accord/misc/
+	/usr/local/accord/bin/deployfile.sh configwreisdev.json accord/db/
 
 package: server
 	mkdir -p ${BINDIR}
 	cp server ${BINDIR}/wreis
-	cp confdev.json ${BINDIR}/config.json
+	cp configwreisdev.json ${BINDIR}/config.json
 
 build: server package
 
@@ -44,8 +44,5 @@ test:
 
 all: clean server package
 
-mkprod:
-	/usr/local/accord/bin/getfile.sh accord/db/confprod.json
-	cp confprod.json config.json
 secure:
-	@rm -f config.json confdev.json confprod.json
+	@rm -f config.json configwreisdev.json confprod.json

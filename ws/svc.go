@@ -376,8 +376,8 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	}
 
 	if d.Service == "propertyphoto" {
-		util.Console("data may contain binary info.\n\n")
-		hexdump(d.b)
+		// util.Console("data may contain binary info.\n\n")
+		// hexdump(d.b)
 		d.MimeMultipartOnly = true
 		return nil
 	}

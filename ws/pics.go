@@ -476,17 +476,26 @@ func UploadImageToS3(filename string, buffer []byte, PRID, idx int64) (string, s
 	imagePath := filepath.Join(ImageUploadPath, fname)
 	contentType := http.DetectContentType(buffer)
 
+	util.Console(`
+Bucket:               %s
+Key:                  %s
+ServerSideEncryption: %s
+ContentType:          %s
+CacheControl:         %s
+ACL:                  %s
+`, db.Wdb.Config.S3BucketName, imagePath, "AES256", contentType, "max-age=86400", "public-read")
+
 	//-----------------------------------------
 	// define parameters to upload image to S3
 	//-----------------------------------------
 	params := &s3.PutObjectInput{
-		Bucket:               aws.String(db.Wdb.Config.S3BucketName),
-		Key:                  aws.String(imagePath),   // it include filename
-		Body:                 bytes.NewReader(buffer), // data of file
-		ServerSideEncryption: aws.String("AES256"),
-		ContentType:          aws.String(contentType),
-		CacheControl:         aws.String("max-age=86400"),
-		ACL:                  aws.String("public-read"),
+		Bucket: aws.String(db.Wdb.Config.S3BucketName),
+		Key:    aws.String(imagePath),
+		Body:   bytes.NewReader(buffer),
+		//ServerSideEncryption: aws.String("AES256"),
+		ContentType:  aws.String(contentType),
+		CacheControl: aws.String("max-age=86400"),
+		ACL:          aws.String("public-read"),
 	}
 
 	//-----------------------------------------
@@ -546,7 +555,7 @@ func DeleteS3ImageFile(filename string, PRID, idx int64) error {
 	//-----------------------------------------
 	svc := s3.New(sess)
 	params := &s3.DeleteObjectInput{
-		Bucket: aws.String("directory-pics"),
+		Bucket: aws.String(db.Wdb.Config.S3BucketName),
 		Key:    aws.String(GeneratePRImageFileName(filename, PRID, idx)),
 	}
 	if _, err := svc.DeleteObject(params); err != nil {
