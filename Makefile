@@ -11,6 +11,7 @@ clean:
 
 test:
 	for dir in $(DIRS); do make -C $$dir test;done
+	mysql wreis < test/ws/xh.sql
 
 package:
 	for dir in $(DIRS); do make -C $$dir package;done
