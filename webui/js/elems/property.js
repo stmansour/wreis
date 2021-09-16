@@ -17,7 +17,7 @@ var propData = {
     bRenewOptionsLoaded: false, // "  same as above for RenewOptions
     bTrafficLoaded: false,      // " for Traffic
     bStateLoaded: false,        // " for state info
-    statefilter: [1,2,3,4,5,6], // how to filter properties  (1-6) = open, (7) = closed
+    statefilter: [1,2,3,4,5,6,7], // how to filter properties  (1-7) = open, (8) = closed
     showTerminated: 0,          // 0 = don't show terminated properties, 1 = show terminated properties
     myQueue: 0,                 // 0 = don't show my queue, 1 = show my queue
     formWidth: 575,             // how wide is the entry / edit form
@@ -268,9 +268,9 @@ function buildPropertyUIElements() {
         event.onComplete = function (event) {
             var found = false;
             switch (event.item.id) {
-            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6];                   break;
-            case "closedProperties": found=true; propData.statefilter    = [7];                             break;
-            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7];                 break;
+            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6,7];                 break;
+            case "closedProperties": found=true; propData.statefilter    = [8];                             break;
+            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7,8];               break;
             case "showTerminated":   found=true; propData.showTerminated = propData.showTerminated ? 0 : 1; break;
             case "myQueue":          found=true; propData.myQueue        = (propData.myQueue == 1) ? 0 : 1; break;
             }

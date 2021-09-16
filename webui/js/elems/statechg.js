@@ -103,6 +103,7 @@ function setStateChangeDialogValues() {
     }
     if (typeof si === "number") {
         console.log('Could not determine the current stateInfo object');
+        stateChangeFormRedrawInProgress = false;
         return;
     }
 

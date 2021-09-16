@@ -10,9 +10,11 @@ import (
 	util "wreis/util/lib"
 )
 
+// places where we should avoid hardcoding inline
 const (
-	fn = "?? unknown"
-	ln = "user ??"
+	fn          = "?? unknown"
+	ln          = "user ??"
+	FINALSTATE  = 8  // this should be the highest state number
 )
 
 // StateInfo deals with state changes to the StateInfo structs. The states are:
@@ -22,8 +24,9 @@ const (
 //		3. Marketing Package
 //		4. Ready To List
 //		5. Listed
-//		6. Under Contract
-//		7. Closed
+//      6. Contract Pending
+//		7. Under Contract
+//		8. Closed
 //
 // The following actions apply to states:
 //
@@ -631,7 +634,7 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	}
 
 	// now create the new next StateInfo
-	if a.FlowState < 7 {
+	if a.FlowState <= FINALSTATE  {
 		a.FlowState++
 		a.SIID = 0
 		a.FLAGS = 0
