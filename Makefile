@@ -1,4 +1,4 @@
-DIRS=util session db csv ws server admin webui test
+DIRS=util session db csv ws server admin webui test mktpkg
 DIST=dist
 .PHONY: test
 
