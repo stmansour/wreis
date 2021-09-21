@@ -5,7 +5,6 @@ LOGFILE="log"
 REQCOUNT=0
 COOKIES=
 USER="smansour"
-PASS="Dai5F0pp"
 PRID=1
 OUTFILE="jbx.js"
 PROPJSON="property.json"
