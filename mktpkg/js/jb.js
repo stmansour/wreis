@@ -108,7 +108,7 @@ function generateMarketPackage() {
     jb.ab = jb.doc.artboards[0];
 
     //---------------------------------------------------------------------------
-    //  FIRST PAGE
+    //  PAGE 1 - Cover Page
     //---------------------------------------------------------------------------
     var t = jb.doc.textFrames.getByName("propertyName");
     t.contents = property.Name;
@@ -116,6 +116,41 @@ function generateMarketPackage() {
     t.contents = property.Address;
     t = jb.doc.textFrames.getByName("cityStateZip");
     t.contents = property.City + ", " + property.State + "  " + property.PostalCode;
+
+    //---------------------------------------------------------------------------
+    //  PAGE 3 - Financial Overview
+    //---------------------------------------------------------------------------
+    t = jb.doc.textFrames.getByName("FO-Price");
+    t.contents = fmtCurrency(property.Price);
+    t = jb.doc.textFrames.getByName("FO-DownPayment");
+    t.contents = fmtCurrency(property.DownPayment);
+    t = jb.doc.textFrames.getByName("FO-RentableSF");
+    t.contents = fmtWithCommas(property.RentableArea);
+    t = jb.doc.textFrames.getByName("FO-RentableSF");
+    t.contents = fmtWithCommas(property.RentableArea);
+    t = jb.doc.textFrames.getByName("FO-CapRate");
+    t.contents = fmtAsPercent(property.CapRate);
+    t = jb.doc.textFrames.getByName("FO-BuildRenovationYear");
+    if (property.RenovationYear > 0) {
+        t.contents = '' + property.RenovationYear;
+    } else {
+        t.contents = 'n/a';
+    }
+    t = jb.doc.textFrames.getByName("FO-LotSize");
+    if (property.LotSizeUnits + 1 > jb.lotSizeLabels.length) {
+        t.contents = "(unknown units)";
+    } else {
+        t.contents = fmtWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits];
+    }
+    fmtIndexedName(property.Ownership,"FO-TypeOwnership",jb.ownershipLabels,"ownership type");
+
+    //---------------------------------------------------------------------------
+    //  PAGE 4 - Financial Overview
+    //---------------------------------------------------------------------------
+    t = jb.doc.textFrames.getByName("FO-TenantTradeName");
+    t.contents = property.TenantTradeName;
+    fmtIndexedName(property.LeaseGuarantor,"FO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
+
 
     placeImage1();
 }

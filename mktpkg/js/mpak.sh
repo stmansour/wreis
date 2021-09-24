@@ -72,10 +72,10 @@ Clean() {
 #-----------------------------------------------------------------------------
 LIReq() {
 
-    if [ "${PASS}x" = "x" ]; then
-        read -sp 'Password: ' PASS
+    if [ "${PASSWD}x" = "x" ]; then
+        read -sp 'Password: ' PASSWD
     fi
-    encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASS}\"}"   # puts encoded request in file named "request"
+    encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
     dojsonPOST "${HOST}/v1/authn/" "request" "response"  # URL, JSONfname, serverresponse
 
     #-----------------------------------------------------------------------------
@@ -115,11 +115,22 @@ BuildJS () {
 var jb = {
     portfolio: null,        // the portfolio.ai we are auto-generating
     ab: null,               // active artboard
+    doc: null,              // the working document
     cwd: "${CWD}",          // the current working directory
+    lotSizeLabels: [        // what units for LotSize
+        "sqft", "acres"
+        ],
+    ownershipLabels: [      // ownership type
+        "Fee Simple", "Leasehold"
+        ],
+    guarantorLabels: [      // who is guarantor
+        "Corporate",
+        "Franchise",
+        "Individual"],
 };
 
 FEOF
-    cat "${PROPJSON}" jb.js >> "${OUTFILE}"
+    cat "${PROPJSON}" utils.js jb.js >> "${OUTFILE}"
 }
 
 #-----------------------------------------------------------------------------
