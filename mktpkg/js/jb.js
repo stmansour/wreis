@@ -126,10 +126,27 @@ function generateMarketPackage() {
     t.contents = fmtCurrency(property.DownPayment);
     t = jb.doc.textFrames.getByName("FO-RentableSF");
     t.contents = fmtWithCommas(property.RentableArea);
-    t = jb.doc.textFrames.getByName("FO-RentableSF");
-    t.contents = fmtWithCommas(property.RentableArea);
+    t = jb.doc.textFrames.getByName("FO-Roof");
+    if (property.FLAGS & 0x1 > 0) {
+        t.contents = "Landlord Responsible";
+    } else {
+        t.contents = "Tenant Responsible";
+    }
+    t = jb.doc.textFrames.getByName("FO-RightOfFirstRefusal");
+    if (property.FLAGS & 0x4 > 0) {
+        t.contents = "Yes";
+    } else {
+        t.contents = "No";
+    }
+
     t = jb.doc.textFrames.getByName("FO-CapRate");
     t.contents = fmtAsPercent(property.CapRate);
+
+    t = jb.doc.textFrames.getByName("FO-LeaseTermRemaining");
+    var dt = new Date();
+    t.contents = fmtDateDiffInYears(dt, property.LeaseExpirationDt);
+
+
     t = jb.doc.textFrames.getByName("FO-BuildRenovationYear");
     if (property.RenovationYear > 0) {
         t.contents = '' + property.RenovationYear;
@@ -150,6 +167,10 @@ function generateMarketPackage() {
     t = jb.doc.textFrames.getByName("FO-TenantTradeName");
     t.contents = property.TenantTradeName;
     fmtIndexedName(property.LeaseGuarantor,"FO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
+    fmtIndexedName(property.LeaseType,"FO-LeaseType",jb.leaseTypeLabels,"lease type");
+    t = jb.doc.textFrames.getByName("FO-OriginalLeaseTerm");
+    t.contents = property.OriginalLeaseTerm + " years";
+    fmtDate(property.LeaseExpirationDt, "FO-LeaseExpirationDate");
 
 
     placeImage1();

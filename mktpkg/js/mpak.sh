@@ -126,7 +126,14 @@ var jb = {
     guarantorLabels: [      // who is guarantor
         "Corporate",
         "Franchise",
-        "Individual"],
+        "Individual"
+        ],
+    leaseTypeLabels: [
+        "Absolute NNN",
+        "Double Net",
+        "Triple Net",
+        "Gross"
+    ],
 };
 
 FEOF
