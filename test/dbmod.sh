@@ -78,13 +78,15 @@ DBNAME="wreis"
 # ALTER TABLE Property CHANGE BuildDate BuildYear SMALLINT NOT NULL DEFAULT 0;
 # ALTER TABLE Property ADD RenovationYear SMALLINT NOT NULL DEFAULT 0 AFTER BuildYear;
 
+# ALTER TABLE Property DROP COLUMN TermRemainingOnLease, DROP COLUMN TermRemainingOnLeaseUnits;
+
+# ALTER TABLE Property CHANGE Ownership OwnershipType SMALLINT NOT NULL DEFAULT 0;
 
 #=====================================================
 #  Put modifications to schema in the lines below
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
-ALTER TABLE Property DROP COLUMN TermRemainingOnLease, DROP COLUMN TermRemainingOnLeaseUnits;
 LEOF
 
 #=====================================================
