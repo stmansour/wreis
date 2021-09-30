@@ -159,7 +159,7 @@ function generateMarketPackage() {
     } else {
         t.contents = fmtWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits];
     }
-    fmtIndexedName(property.Ownership,"FO-TypeOwnership",jb.ownershipLabels,"ownership type");
+    fmtIndexedName(property.OwnershipType,"FO-TypeOwnership",jb.ownershipTypeLabels,"ownership type");
 
     //---------------------------------------------------------------------------
     //  PAGE 4 - Financial Overview
@@ -171,6 +171,8 @@ function generateMarketPackage() {
     t = jb.doc.textFrames.getByName("FO-OriginalLeaseTerm");
     t.contents = property.OriginalLeaseTerm + " years";
     fmtDate(property.LeaseExpirationDt, "FO-LeaseExpirationDate");
+    var own = ((property.FLAGS & (1<<3)) == 0) ? 0 : 1;
+    fmtIndexedName(own,"FO-Ownership",jb.ownershipLabels,"ownership type");
 
 
     placeImage1();

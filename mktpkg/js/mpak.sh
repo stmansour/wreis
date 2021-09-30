@@ -109,39 +109,8 @@ ReadProperty () {
 # BuildJS
 #-----------------------------------------------------------------------------
 BuildJS () {
-    cat >"${OUTFILE}" <<FEOF
-//
-//  jbx.js - the portfolio writer :-)
-//
-//  File -> Scripts -> Other Script...
-//     or press Cmd + F12
-//  then select this file.
-
-var jb = {
-    portfolio: null,        // the portfolio.ai we are auto-generating
-    ab: null,               // active artboard
-    doc: null,              // the working document
-    cwd: "${CWD}",          // the current working directory
-    lotSizeLabels: [        // what units for LotSize
-        "sqft", "acres"
-        ],
-    OwnershipTypeabels: [      // OwnershipTypetype
-        "Fee Simple", "Leasehold"
-        ],
-    guarantorLabels: [      // who is guarantor
-        "Corporate",
-        "Franchise",
-        "Individual"
-        ],
-    leaseTypeLabels: [
-        "Absolute NNN",
-        "Double Net",
-        "Triple Net",
-        "Gross"
-    ],
-};
-
-FEOF
+    cat header.js > "${OUTFILE}"
+    echo "jb.cwd = \"${CWD}\";" >> "${OUTFILE}"
     cat "${PROPJSON}" utils.js jb.js >> "${OUTFILE}"
 }
 
