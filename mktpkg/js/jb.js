@@ -22,10 +22,15 @@ function getArtboardBounds(artboard) {
     return b;
 }
 
-// item = the image
-// p = the size and location of the artboard (the page)
-function fitItem(item, p) {
-    var bar = jb.doc.pathItems.getByName("headerBar");
+// fitItem  center an image on the page, resize to maintain aspect ratio
+//
+// item - the image
+// p    - the size and location of the artboard (the page)
+// hdr  - the name of the path defining the header of the page.  It is assumed
+//        to be a rectangle located at the top of the artboard.
+//------------------------------------------------------------------------------
+function fitItem(item, p, hdr) {
+    var bar = jb.doc.pathItems.getByName(hdr);
     var bt = bar.visibleBounds;
     var b = {
         left: bt[0],
@@ -66,12 +71,40 @@ function fitItem(item, p) {
     item.selected = false;
 }
 
-function placeImage1() {
+function placeCoverImage() {
+    var fname = jb.cwd + "/Img1.png";
     var placedItem = jb.doc.placedItems.add();
-    placedItem.file = new File(jb.cwd + "/Img1.png");
+    try {
+        placedItem.file = new File(fname);
+    } catch (error) {
+        alert(fname + ': ' + error);
+        return;
+    }
+
     placedItem.name = "coverPicture";
     var b = getArtboardBounds(jb.ab);
-    fitItem(placedItem,b);
+    fitItem(placedItem,b,"coverPageHeaderBar");
+}
+
+function placeAerialImage() {
+    var placedItem = jb.doc.placedItems.add();
+    var fname = jb.cwd + "/Img2.png";
+    try {
+        placedItem.file = new File(fname);
+    } catch (error) {
+        alert(fname + ': ' + error);
+        return;
+    }
+    placedItem.name = "aerialPhoto";
+
+    var aab = jb.doc.artboards.getByName("Aerial Photo");
+    if (aab == null) {
+        alert("artboard not found:  Aerial Photo");
+        return;
+    }
+
+    var b = getArtboardBounds(aab);
+    fitItem(placedItem,b,"aerialPhotoHeaderBar");
 }
 
 function generateMarketPackage() {
@@ -116,6 +149,7 @@ function generateMarketPackage() {
     t.contents = property.Address;
     t = jb.doc.textFrames.getByName("cityStateZip");
     t.contents = property.City + ", " + property.State + "  " + property.PostalCode;
+    placeCoverImage();
 
     //---------------------------------------------------------------------------
     //  PAGE 3 - Financial Overview
@@ -174,8 +208,18 @@ function generateMarketPackage() {
     var own = ((property.FLAGS & (1<<3)) == 0) ? 0 : 1;
     fmtIndexedName(own,"FO-Ownership",jb.ownershipLabels,"ownership type");
 
+    //---------------------------------------------------------------------------
+    //  PAGE 4 - Financial Overview
+    //---------------------------------------------------------------------------
 
-    placeImage1();
+    //---------------------------------------------------------------------------
+    //  PAGE 5 - Executive Summary
+    //---------------------------------------------------------------------------
+
+    //---------------------------------------------------------------------------
+    //  PAGE 6 - Aerial Photo
+    //---------------------------------------------------------------------------
+    placeAerialImage();
 }
 
 generateMarketPackage();
