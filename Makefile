@@ -9,6 +9,9 @@ clean:
 	for dir in $(DIRS); do make -C $$dir clean;done
 	rm -rf dist
 
+db1:
+	cd test/ws; mysql wreis < xh.sql ; cd ../..
+
 test:
 	for dir in $(DIRS); do make -C $$dir test;done
 	cd test/ws; mysql wreis < xh.sql ; cd ../..
