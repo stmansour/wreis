@@ -165,7 +165,7 @@ CREATE TABLE `Property` (
   `BuildYear` smallint(6) NOT NULL DEFAULT '0',
   `RenovationYear` smallint(6) NOT NULL DEFAULT '0',
   `FLAGS` bigint(20) NOT NULL DEFAULT '0',
-  `Ownership` smallint(6) NOT NULL DEFAULT '0',
+  `OwnershipType` smallint(6) NOT NULL DEFAULT '0',
   `TenantTradeName` varchar(256) NOT NULL DEFAULT '',
   `LeaseGuarantor` smallint(6) NOT NULL DEFAULT '0',
   `LeaseType` smallint(6) NOT NULL DEFAULT '0',

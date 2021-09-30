@@ -79,7 +79,7 @@ function initializePropertyRecord() {
             AvgCap: 0,
             FlowState: 1,  // initialize to State = 1
             FLAGS: 0,
-            Ownership: 0,
+            OwnershipType: 0,
             TenantTradeName: "",
             LeaseGuarantor: 0,
             LeaseType: 0,
@@ -172,7 +172,7 @@ function buildPropertyUIElements() {
             {field: 'RenovationYear',       size: '60px', caption: 'RenovationYear', sortable: true, hidden: true},
             {field: 'FlowState',            size: '60px', caption: 'FlowState', sortable: true, hidden: true},
             {field: 'FLAGS',                size: '60px', caption: 'FLAGS', sortable: true, hidden: true},
-            {field: 'Ownership',            size: '60px', caption: 'Ownership', sortable: true, hidden: true},
+            {field: 'OwnershipType',            size: '60px', caption: 'OwnershipType', sortable: true, hidden: true},
             {field: 'TenantTradeName',      size: '60px', caption: 'TenantTradeName', sortable: true, hidden: true},
             {field: 'LeaseGuarantor',       size: '60px', caption: 'LeaseGuarantor', sortable: true, hidden: true},
             {field: 'LeaseType',            size: '60px', caption: 'LeaseType', sortable: true, hidden: true},
@@ -409,7 +409,7 @@ function buildPropertyUIElements() {
             {field: 'RenovationYear',       type: 'number',    required: false},
             {field: 'FlowState',            type: 'hidden†', required: false},
             {field: 'FLAGS',                type: 'text', required: false},
-            {field: 'Ownership',            type: 'hidden', required: false},
+            {field: 'OwnershipType',            type: 'hidden', required: false},
             {field: 'TenantTradeName',      type: 'text', required: false},
             {field: 'LeaseGuarantor',       type: 'text', required: false},
             {field: 'LeaseType',            type: 'hidden', required: false},
@@ -456,7 +456,7 @@ function buildPropertyUIElements() {
             event.onComplete = function() {
                 var r = w2ui.propertyForm.record;
                 setDropDownSelectedIndex("LotSizeUnitsDD",r.LotSizeUnits);
-                setDropDownSelectedIndex("OwnershipDD",r.Ownership);
+                setDropDownSelectedIndex("OwnershipTypeDD",r.OwnershipType);
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
                 setTermRemaining();
@@ -655,7 +655,7 @@ function savePropertyForm() {
     rec.LastModTime = varToUTCString(rec.LastModTime);
 
     rec.LotSizeUnits = getDropDownSelectedIndex("LotSizeUnitsDD");
-    rec.Ownership = getDropDownSelectedIndex("OwnershipDD");
+    rec.OwnershipType = getDropDownSelectedIndex("OwnershipTypeDD");
     rec.LeaseType = getDropDownSelectedIndex("LeaseTypeDD");
     rec.LeaseGuarantor = getDropDownSelectedIndex("LeaseGuarantorDD");
 

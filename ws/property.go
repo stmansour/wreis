@@ -47,7 +47,7 @@ type PropertyGrid struct {
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
 	//======================================================================
 	FLAGS              uint64
-	Ownership          int
+	OwnershipType      int
 	TenantTradeName    string
 	LeaseGuarantor     int64
 	LeaseType          int64
@@ -103,7 +103,7 @@ var propFieldsMap = map[string][]string{
 	"RenovationYear":     {"Property.RenovationYear"},
 	"FlowState":          {"Property.FlowState"},
 	"FLAGS":              {"Property.FLAGS"},
-	"Ownership":          {"Property.Ownership"},
+	"OwnershipType":      {"Property.OwnershipType"},
 	"TenantTradeName":    {"Property.TenantTradeName"},
 	"LeaseGuarantor":     {"Property.LeaseGuarantor"},
 	"LeaseType":          {"Property.LeaseType"},
@@ -156,7 +156,7 @@ var propQuerySelectFields = []string{
 	"Property.RenovationYear",
 	"Property.FlowState",
 	"Property.FLAGS",
-	"Property.Ownership",
+	"Property.OwnershipType",
 	"Property.TenantTradeName",
 	"Property.LeaseGuarantor",
 	"Property.LeaseType",
@@ -477,7 +477,7 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.RenovationYear,
 		&q.FlowState,
 		&q.FLAGS,
-		&q.Ownership,
+		&q.OwnershipType,
 		&q.TenantTradeName,
 		&q.LeaseGuarantor,
 		&q.LeaseType,

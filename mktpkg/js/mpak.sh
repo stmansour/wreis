@@ -73,6 +73,11 @@ Clean() {
 LIReq() {
 
     if [ "${PASSWD}x" = "x" ]; then
+        echo "Your password is required to access the WREIS server."
+        echo "You can enter it at the prompt, or to avoid having to enter it"
+        echo "you can export it in an environment variable as follows:"
+        echo "    PASSWD=\"your password\""
+        echo "    export PASSWD"
         read -sp 'Password: ' PASSWD
     fi
     encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
@@ -120,7 +125,7 @@ var jb = {
     lotSizeLabels: [        // what units for LotSize
         "sqft", "acres"
         ],
-    ownershipLabels: [      // ownership type
+    OwnershipTypeabels: [      // OwnershipTypetype
         "Fee Simple", "Leasehold"
         ],
     guarantorLabels: [      // who is guarantor
@@ -177,8 +182,12 @@ shift $((OPTIND-1))
 
 Clean
 LIReq
+echo -n "Pulling information for Property (PRID): ${PRID}... "
 ReadProperty
 GetImages
+echo "Done"
+echo "Generating script to create Adobe Illustrator marketing package... "
 BuildJS
+echo "Done"
 
 exit 0

@@ -36,7 +36,7 @@ type Property struct {
 	//	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
 	//     1<<3  0 = processing/processed. 1 = Terminated
 	FLAGS              uint64
-	Ownership          int
+	OwnershipType      int
 	TenantTradeName    string
 	LeaseGuarantor     int64
 	LeaseType          int64
@@ -141,7 +141,7 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.BuildYear,
 		a.RenovationYear,
 		a.FLAGS,
-		a.Ownership,
+		a.OwnershipType,
 		a.TenantTradeName,
 		a.LeaseGuarantor,
 		a.LeaseType,
@@ -236,7 +236,7 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.BuildYear,
 		&a.RenovationYear,
 		&a.FLAGS,
-		&a.Ownership,
+		&a.OwnershipType,
 		&a.TenantTradeName,
 		&a.LeaseGuarantor,
 		&a.LeaseType,
@@ -304,7 +304,7 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.BuildYear,
 		&a.RenovationYear,
 		&a.FLAGS,
-		&a.Ownership,
+		&a.OwnershipType,
 		&a.TenantTradeName,
 		&a.LeaseGuarantor,
 		&a.LeaseType,
@@ -373,7 +373,7 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.BuildYear,
 		a.RenovationYear,
 		a.FLAGS, // 20
-		a.Ownership,
+		a.OwnershipType,
 		a.TenantTradeName,
 		a.LeaseGuarantor,
 		a.LeaseType,

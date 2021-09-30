@@ -33,7 +33,7 @@
         "NOI": 25000,
         "Name": "Sallys Sludge Salon",
         "OriginalLeaseTerm": 31,
-        "Ownership": 1,
+        "OwnershipType": 1,
         "PRID": 4,
         "ParentCompany": "",
         "PostalCode": "12345",

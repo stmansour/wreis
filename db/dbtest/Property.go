@@ -32,7 +32,7 @@ func TestProperty(ctx context.Context) {
 		BuildYear:          2010,
 		RenovationYear:     0,
 		FLAGS:              0,
-		Ownership:          0,
+		OwnershipType:      0,
 		TenantTradeName:    "Bill's Boar Emporium",
 		LeaseGuarantor:     0,
 		LeaseType:          0,

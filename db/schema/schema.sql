@@ -44,12 +44,12 @@ CREATE TABLE Property (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        /* 1<<0  Drive Through?  0 = no, 1 = yes
                                                                1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes
-                                                               1<<3  (unused at this time)
+                                                               1<<3  OwnershipType 0 = private, 1 = public
                                                                1<<4  (unused at this time)
                                                                1<<5  (unused at this time)
                                                                1<<6  (TERMINATED - consistent with StateInfo)
                                                             */
-    Ownership SMALLINT NOT NULL DEFAULT 0,                  -- 0 = fee simple, 1 = leasehold
+    OwnershipType SMALLINT NOT NULL DEFAULT 0,              -- 0 = fee simple, 1 = leasehold
     TenantTradeName VARCHAR(256) NOT NULL DEFAULT '',       -- trade name of business
     LeaseGuarantor SMALLINT NOT NULL DEFAULT 0,             -- 0 = corporate, 1 = franchise, 2 = individual
     LeaseType SMALLINT NOT NULL DEFAULT 0,                  -- 0 = Absolute NNN, 1 = Double Net, 2 = Triple Net, 3 = Gross

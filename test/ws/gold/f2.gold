@@ -29,7 +29,7 @@
         "NOI": 25000,
         "Name": "Sallys Sludge Salon",
         "OriginalLeaseTerm": 31,
-        "Ownership": 1,
+        "OwnershipType": 1,
         "PID": 0,
         "PRID": 4,
         "ParentCompany": "",
