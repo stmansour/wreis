@@ -43,8 +43,14 @@ function tableText(x,y,s) {
     layer = jb.doc.layers.getByName("Financial Overview");
     var t = layer.textFrames.add();
 
+
     t.contents = s;
     t.textRange.characterAttributes = jb.chattr;
+
+    var font = app.textFonts.getByName("Arial Narrow");
+    if (font != null) {
+        t.textRange.characterAttributes.textFont = font;
+    }
 
     // alert("x,y = " + x + ', ' + y);
     t.textRange.justification = Justification.LEFT;
@@ -84,7 +90,7 @@ function genTable() {
     var y = top - height;
     var x = left;
     var offsetx = 10;  // from the left
-    var offsety = 2; // from the top
+    var offsety = 3;   // from the top
 
     //---------------------------------
     // Do the Rent Steps first...
