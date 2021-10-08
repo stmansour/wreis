@@ -3,16 +3,17 @@
 //
 //    x,y = top left corner of rectangle
 //    w,h = width and height of the rectangle
+//    f   = boolean for filled or not
+//    l   = layer
 //-----------------------------------------------------------------------------
-function genRect(x,y,w,h) {
-    var rgb = colorComponents(0x173e35);
-    var c = new RGBColor();
-    c.red = rgb.r;
-    c.green = rgb.g;
-    c.blue = rgb.b;
-
-    var r = jb.doc.pathItems.add();
-    r.filled = false;
+function genRect(x,y,w,h,f,l) {
+    var c = aiFillColor(0x173e35);
+    var fc = aiFillColor(0xcdd1ce);
+    var r = l.pathItems.add();
+    r.filled = f;
+    if (f) {
+        r.fillColor = fc;
+    }
     r.stroked = true;
     r.strokeWidth = 1.0; // in points
     r.strokeColor = c;
@@ -35,19 +36,19 @@ function genRect(x,y,w,h) {
     r.setEntirePath([[x1,y1],[x2,y1],[x2,y2],[x1,y2],[x1,y1]]);
 }
 
-function tableText(x,y,s) {
+function tableText(x,y,s,layer) {
     if (jb.chattr == null) {
         alert('jb.chattr is being used before it has been set!');
         return;
     }
-    layer = jb.doc.layers.getByName("Financial Overview");
     var t = layer.textFrames.add();
 
 
     t.contents = s;
     t.textRange.characterAttributes = jb.chattr;
+    t.textRange.characterAttributes.size = 11;
 
-    var font = app.textFonts.getByName("Arial Narrow");
+    var font = app.textFonts.getByName("ArialNarrow");
     if (font != null) {
         t.textRange.characterAttributes.textFont = font;
     }
@@ -62,7 +63,8 @@ function tableText(x,y,s) {
 //
 //-----------------------------------------------------------------------------
 function genTable() {
-    hbn = "AnnOpDt-Hdr";
+    var layer = jb.doc.layers.getByName("Financial Overview");
+    var hbn = "AnnOpDt-Hdr";
 
     //------------------------------------------------------
     // First, select the header bar and get its location
@@ -89,23 +91,35 @@ function genTable() {
     }
     var y = top - height;
     var x = left;
-    var offsetx = 10;  // from the left
-    var offsety = 3;   // from the top
+    var offsetx = 10;   // from the left
+    var offsety = 3;    // from the top
+    var col2 = 135;     // 150 from left edge
+    var col3 = 275;     // from left edge
+    var monthly = 0.0;  // monthly amount
+    var fill = false;   // every other rect should be filled
 
     //---------------------------------
     // Do the Rent Steps first...
     //---------------------------------
     for (var i = 0; i < property.rentSteps.length; i++) {
-        genRect(x,y,width,height);
-        tableText(x+offsetx, y-offsety, property.rentSteps[i].Opt);
+        genRect(x,y,width,height,fill,layer);
+        tableText(x+offsetx, y-offsety, property.rentSteps[i].Opt,layer);
+        tableText(x+offsetx+col2, y-offsety, fmtCurrency(property.rentSteps[i].Rent),layer);
+        monthly = property.rentSteps[i].Rent / 12.0;
+        tableText(x+offsetx+col3, y-offsety, fmtCurrency(monthly),layer);
         y -=height;
+        fill = !fill;
     }
     //---------------------------------
     // Now the Renewal Options
     //---------------------------------
     for (i = 0; i < property.renewOptions.length; i++) {
-        genRect(x,y,width,height);
-        tableText(x+offsetx, y-offsety, property.renewOptions[i].Opt);
+        genRect(x,y,width,height,fill,layer);
+        tableText(x+offsetx, y-offsety, property.renewOptions[i].Opt,layer);
+        tableText(x+offsetx+col2, y-offsety, fmtCurrency(property.renewOptions[i].Rent),layer);
+        monthly = property.renewOptions[i].Rent / 12.0;
+        tableText(x+offsetx+col3, y-offsety, fmtCurrency(monthly),layer);
         y -=height;
+        fill = !fill;
     }
 }

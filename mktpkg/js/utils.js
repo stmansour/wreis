@@ -138,3 +138,12 @@ function colorComponents(h) {
     };
     return x;
 }
+
+function aiFillColor(h) {
+    var rgb = colorComponents(h);
+    var c = new RGBColor();
+    c.red = rgb.r;
+    c.green = rgb.g;
+    c.blue = rgb.b;
+    return c;
+}
