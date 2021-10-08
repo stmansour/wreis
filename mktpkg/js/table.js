@@ -102,8 +102,8 @@ function genTable() {
     var x = left;
     var offsetx = 10;   // from the left
     var offsety = 3;    // from the top
-    var col2 = 135;     // 150 from left edge
-    var col3 = 275;     // from left edge
+    var col2 = 155;     // 150 from left edge
+    var col3 = 310;     // from left edge
     var monthly = 0.0;  // monthly amount
     var fill = false;   // every other rect should be filled
 
