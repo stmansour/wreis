@@ -15,7 +15,7 @@ function genRect(x,y,w,h,f,l) {
         r.fillColor = fc;
     }
     r.stroked = true;
-    r.strokeWidth = 1.0; // in points
+    r.strokeWidth = 0.75; // in points
     r.strokeColor = c;
 
     var t;
@@ -63,8 +63,17 @@ function tableText(x,y,s,layer) {
 //
 //-----------------------------------------------------------------------------
 function genTable() {
-    var layer = jb.doc.layers.getByName("Financial Overview");
     var hbn = "AnnOpDt-Hdr";
+    var l1 = jb.doc.layers.getByName("Financial Overview");
+    if (l1==null) {
+        alert("could not get layer Financial Overview" );
+        return;
+    }
+    var layer = l1.layers.getByName("Annualized Operating Data");
+    if (layer == null) {
+        alert("could not get sublayer Annualized Operating Data" );
+        return;
+    }
 
     //------------------------------------------------------
     // First, select the header bar and get its location
