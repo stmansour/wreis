@@ -32,10 +32,18 @@ function fmtAsPercent(x) {
 }
 
 function fmtIndexedName(i,aiName,arr,errLabel) {
+    if (arr.length < 1) {
+        alert("fmtIndexedName: arr.length < 1 for ainame = " + aiName);
+        return;
+    }
     t = jb.doc.textFrames.getByName(aiName);
     if (i + 1 > arr.length) {
         t.contents = "(unknown "+errLabel+")";
     } else {
+        if (arr[i] == null) {
+            alert("fmtIndexedName: arr.length = " + arr.length + ", i = " + i + "ainame = " + aiName);
+            return;
+        }
         t.contents = arr[i];
     }
 }
@@ -114,4 +122,19 @@ function fmtDateDiffInYears(d1,d2) {
         return '' + diff + " Years";
     }
     return 'Lease has expired';
+}
+
+//
+// Breaks up the supplied hex number into 3 parts: rgb
+//
+// x = colorComponents(0x2020ff);
+// when this is returns, x will be the object {r: 32, g: 32, b: 256}
+// ---------------------------------------------------------------------------
+function colorComponents(h) {
+    var x = {
+        r: (h >> 16) & 0xff,
+        g: (h >> 8) & 0xff,
+        b: h & 0xff,
+    };
+    return x;
 }

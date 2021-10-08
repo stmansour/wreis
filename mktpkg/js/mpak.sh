@@ -8,6 +8,8 @@ USER="smansour"
 PRID=1
 OUTFILE="jbx.js"
 PROPJSON="property.json"
+ROPTJSON="ropt.json"
+RENTJSON="rent.json"
 CWD=$(pwd)
 
 HOST="http://localhost:8276"
@@ -64,7 +66,7 @@ dojsonPOST () {
 # Clean - remove old files first...
 #-----------------------------------------------------------------------------
 Clean() {
-    rm -f request response loginrequest log serverreply "${OUTFILE}" property.json portfolio.ai "${PROPJSON}" Img*
+    rm -f request response loginrequest log serverreply "${OUTFILE}" property.json portfolio.ai "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" Img*
 }
 
 #-----------------------------------------------------------------------------
@@ -97,12 +99,51 @@ LIReq() {
 }
 
 #-----------------------------------------------------------------------------
-# Read propertu PRID
+# Read property PRID
 #-----------------------------------------------------------------------------
-ReadProperty () {
+GetProperty () {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "${HOST}/v1/property/${PRID}" "request" "response"  # URL, JSONfname, serverresponse
     cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/},/};/' > "${PROPJSON}"
+    GetImages
+
+    # we need RSLID and ROLID
+    RSLID=$(grep "RSLID" property.json | sed 's/^[^:][^:]*: //' | sed 's/,//')
+    ROLID=$(grep "ROLID" property.json | sed 's/^[^:][^:]*: //' | sed 's/,//')
+}
+
+#-----------------------------------------------------------------------------
+# GetImages
+#-----------------------------------------------------------------------------
+GetImages () {
+    for (( i = 1; i < 9; i++ )); do
+        iname=$(echo "Img${i}" | sed 's/ *//g')
+        iurl=$(grep "${iname}" ${PROPJSON} | awk '{print $2}' | sed 's/[",]//g')
+        if [ "${iurl}x" != "x" ]; then
+            echo -n " img${i}... "
+            fname=$(basename -- "${iurl}")
+            ext="${fname##*.}"
+            curl -s "${iurl}" -o "${iname}.${ext}"
+        fi
+    done
+}
+
+#-----------------------------------------------------------------------------
+# Read RenewOptions
+#-----------------------------------------------------------------------------
+GetRenewOptions () {
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "${HOST}/v1/renewoptions/${ROLID}" "request" "response"  # URL, JSONfname, serverresponse
+    cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"renewOptions\"] = /" > "${ROPTJSON}"
+}
+
+#-----------------------------------------------------------------------------
+# Read RentSteps
+#-----------------------------------------------------------------------------
+GetRentSteps () {
+    encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
+    dojsonPOST "${HOST}/v1/rentsteps/${RSLID}" "request" "response"  # URL, JSONfname, serverresponse
+    cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"rentSteps\"] = /" > "${RENTJSON}"
 }
 
 #-----------------------------------------------------------------------------
@@ -111,25 +152,7 @@ ReadProperty () {
 BuildJS () {
     cat header.js > "${OUTFILE}"
     echo "jb.cwd = \"${CWD}\";" >> "${OUTFILE}"
-    cat "${PROPJSON}" utils.js jb.js >> "${OUTFILE}"
-}
-
-#-----------------------------------------------------------------------------
-# GetImages
-#-----------------------------------------------------------------------------
-GetImages () {
-
-    for (( i = 1; i < 9; i++ )); do
-        iname=$(echo "Img${i}" | sed 's/ *//g')
-        iurl=$(grep "${iname}" ${PROPJSON} | awk '{print $2}' | sed 's/[",]//g')
-        if [ "${iurl}x" != "x" ]; then
-            echo -n "downloading image ${iurl}... "
-            fname=$(basename -- "${iurl}")
-            ext="${fname##*.}"
-            curl -s "${iurl}" -o "${iname}.${ext}"
-            echo "  ${iname}.${ext} completed"
-        fi
-    done
+    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" utils.js table.js jb.js >> "${OUTFILE}"
 }
 
 ###############################################################################
@@ -149,12 +172,18 @@ while getopts "c" o; do
 done
 shift $((OPTIND-1))
 
-Clean
-LIReq
+Clean       # Remove any old files
+LIReq       # Log in
+
 echo -n "Pulling information for Property (PRID): ${PRID}... "
-ReadProperty
-GetImages
+GetProperty
+
+echo -n "Getting RenewOptions... "
+GetRenewOptions
+echo -n "Getting RentSteps... "
+GetRentSteps
 echo "Done"
+
 echo "Generating script to create Adobe Illustrator marketing package... "
 BuildJS
 echo "Done"

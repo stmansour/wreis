@@ -156,6 +156,8 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     t = jb.doc.textFrames.getByName("FO-Price");
     t.contents = fmtCurrency(property.Price);
+    jb.chattr = t.textRange.characterAttributes;    // we save this for use later
+
     t = jb.doc.textFrames.getByName("FO-DownPayment");
     t.contents = fmtCurrency(property.DownPayment);
     t = jb.doc.textFrames.getByName("FO-RentableSF");
@@ -207,10 +209,7 @@ function generateMarketPackage() {
     fmtDate(property.LeaseExpirationDt, "FO-LeaseExpirationDate");
     var own = ((property.FLAGS & (1<<3)) == 0) ? 0 : 1;
     fmtIndexedName(own,"FO-Ownership",jb.ownershipLabels,"ownership type");
-
-    //---------------------------------------------------------------------------
-    //  PAGE 4 - Financial Overview
-    //---------------------------------------------------------------------------
+    genTable();
 
     //---------------------------------------------------------------------------
     //  PAGE 5 - Executive Summary

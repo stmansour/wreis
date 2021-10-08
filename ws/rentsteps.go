@@ -133,7 +133,7 @@ func deleteRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // SaveRentSteps returns the requested assessment
 // wsdoc {
 //  @Title  Save RentSteps
-//	@URL /v1/RentStepse/RSLID
+//	@URL /v1/RentSteps/RSLID
 //  @Method  GET
 //	@Synopsis Update the information on a RentSteps with the supplied data, create if necessary.
 //  @Description  Create or update a RentStep List
@@ -168,7 +168,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	}
 
 	//------------------------------------------------------------------------
-	// Make sure we have a list for this set of RenewOptions
+	// Make sure we have a list for this set of RentSteps
 	//------------------------------------------------------------------------
 	// util.Console("foo.Records contains %d elements\n", len(foo.Records))
 	if len(foo.Records) > 0 {
@@ -200,7 +200,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			// util.Console("Properyt Successfully updated.  Now saving RentSteps: %d\n", len(foo.Records))
+			// util.Console("Property successfully updated, prop.RSLID = %d.  Now saving RentSteps: %d\n", prop.RSLID, len(foo.Records))
 
 			//---------------------------------------------------
 			// now update each renew option...

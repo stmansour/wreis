@@ -9,6 +9,7 @@ var jb = {
     portfolio: null,        // the portfolio.ai we are auto-generating
     ab: null,               // active artboard
     doc: null,              // the working document
+    chattr: null,           // the default font and attributes
     cwd: "",                // the current working directory
     lotSizeLabels: [        // what units for LotSize
         "sqft", "acres"
