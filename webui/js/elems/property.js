@@ -3,7 +3,7 @@
     setDropDownSelectedIndex,saveRentSteps,saveRenewOptions, varToUTCString,
     propertyStateOnLoad,setTimeout,closeStateChangeDialog,setPropertyFormActionButtons,
     closePropertyForm, saveTraffic, setTermRemaining, monthDiff,
-    setInnerHTML,
+    setInnerHTML,getDropDownSafe
 */
 
 "use strict";
@@ -640,6 +640,21 @@ function loadPropertyForm(PRID) {
     }
 }
 
+// getDropDownIndexSafe - the UI may not have been loaded if the user did not
+//    goto the "General" tab.  When this is the case, just return the prev
+//    value -- it's like the default value.
+//
+// s = name of UI element to check
+// y = previous value
+//------------------------------------------------------------------------------
+function getDropDownSafe(s,y) {
+    var x = getDropDownSelectedIndex(s);
+    if (x > -1) {
+        return x;
+    }
+    return y;
+}
+
 // savePropertyForm grabs all the data that is associated with the propertForm,
 //      converts anything that needs attention and calls the server's save
 //      function.
@@ -657,12 +672,14 @@ function savePropertyForm() {
     rec.CreateTime = varToUTCString(rec.CreateTime);
     rec.LastModTime = varToUTCString(rec.LastModTime);
 
-    rec.LotSizeUnits = getDropDownSelectedIndex("LotSizeUnitsDD");
-    rec.OwnershipType = getDropDownSelectedIndex("OwnershipTypeDD");
-    rec.LeaseType = getDropDownSelectedIndex("LeaseTypeDD");
-    rec.LeaseGuarantor = getDropDownSelectedIndex("LeaseGuarantorDD");
 
-    var b = getDropDownSelectedIndex("OwnershipDD");
+    rec.LotSizeUnits = getDropDownSafe("LotSizeUnitsDD",rec.LotSizeUnits);
+    rec.OwnershipType = getDropDownSafe("OwnershipTypeDD",rec.OwnershipType);
+    rec.LeaseType = getDropDownSafe("LeaseTypeDD",rec.LeaseType);
+    rec.LeaseGuarantor = getDropDownSafe("LeaseGuarantorDD",rec.LeaseGuarantor);
+
+    var Own = ( (rec.FLAGS & (1<<3)) == 0) ? 0 : 1;
+    var b = getDropDownSafe("OwnershipDD",Own);
     var mask = 1<<3;
     if (b === 0) {
         rec.FLAGS &= ~mask;

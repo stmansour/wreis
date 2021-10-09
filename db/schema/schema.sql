@@ -44,7 +44,7 @@ CREATE TABLE Property (
     FLAGS BIGINT NOT NULL DEFAULT 0,                        /* 1<<0  Drive Through?  0 = no, 1 = yes
                                                                1<<1  Roof & Structure Responsibility: 0 = Tenant, 1 = Landlord
                                                                1<<2  Right Of First Refusal: 0 = no, 1 = yes
-                                                               1<<3  OwnershipType 0 = private, 1 = public
+                                                               1<<3  Ownership 0 = private, 1 = public
                                                                1<<4  (unused at this time)
                                                                1<<5  (unused at this time)
                                                                1<<6  (TERMINATED - consistent with StateInfo)

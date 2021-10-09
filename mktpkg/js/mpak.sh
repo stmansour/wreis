@@ -152,7 +152,7 @@ GetRentSteps () {
 BuildJS () {
     cat header.js > "${OUTFILE}"
     echo "jb.cwd = \"${CWD}\";" >> "${OUTFILE}"
-    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" utils.js table.js jb.js >> "${OUTFILE}"
+    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" utils.js image.js table.js jb.js >> "${OUTFILE}"
 }
 
 ###############################################################################

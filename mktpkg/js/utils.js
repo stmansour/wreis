@@ -128,7 +128,8 @@ function fmtDateDiffInYears(d1,d2) {
 // Breaks up the supplied hex number into 3 parts: rgb
 //
 // x = colorComponents(0x2020ff);
-// when this is returns, x will be the object {r: 32, g: 32, b: 256}
+//
+// returns: RGBColor object
 // ---------------------------------------------------------------------------
 function colorComponents(h) {
     var x = {
@@ -146,4 +147,22 @@ function aiGenColor(h) {
     c.green = rgb.g;
     c.blue = rgb.b;
     return c;
+}
+
+function getArtboardBounds(artboard) {
+    var bounds = artboard.artboardRect;
+    var left = bounds[0];
+    var top = bounds[1];
+    var right = bounds[2];
+    var bottom = bounds[3];
+    var width = right - left;
+    var height = top - bottom;
+    var b = {
+        left: left,
+        top: top,
+        width: width,
+        height: height
+    };
+    // alert('artboard bounds:  top=' + b.top + ' left=' + b.left + ' width=' + b.width + ' height=' + b.height );
+    return b;
 }

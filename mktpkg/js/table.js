@@ -198,6 +198,11 @@ function genTable() {
     var labels = ["BASE RENT", "NET OPERATING INCOME", "TOTAL RETURN YR-1"];
     var white = aiGenColor(0xffffff);
 
+    var rent = "";  // if there are no rentSteps, just show blank
+    if (property.rentSteps.length > 0) {
+        rent = fmtCurrency(property.rentSteps[0].Rent);
+    }
+
     for (i = 0; i < 3; i++) {
         c = (i == 2) ? bottomColor : fillColor;
         genRect(layer,skx,sky,w,height,strokeWidth,strokeColor,c);
@@ -205,9 +210,42 @@ function genTable() {
         genRect(layer,skx+w+w,sky,w,height,strokeWidth,strokeColor,c);
         c = (i == 2) ? white : bottomColor;
         tableText(layer,skx+offsetx, sky-offsety, labels[i], 13, "BebasNeue-Regular", 0, null,c);
+        if (rent != "") {
+            tableText(layer,skx+offsetx+col3, sky-offsety, rent, 11, "ArialNarrow", 0, null,c);
+        }
 
         sky -= height;
     }
     strokeWidth = 0.5; // points
     genRect(layer,upperLX,upperLY,width,3*height,strokeWidth,bottomColor,null); // encompassing rect
+
+    //-------------------------------------------------
+    // Now add a smaller version of the cover image...
+    //-------------------------------------------------
+    var ab = jb.doc.artboards.getByName("Financial Overview");
+    if (null == ab) {
+        alert('could not find Financial Overview artboard');
+        return;
+    }
+    var bounds = ab.artboardRect;
+    var b = {
+        left: bounds[0],
+        top: bounds[1],
+        right: bounds[2],
+        bottom: bounds[3],
+        width: bounds[2] - bounds[0],
+        height: bounds[1] - bounds[3],
+    };
+
+    y = sky - height;  // top - moves top y pos to one cell height below skeleton table
+    var lowerRY = b.bottom + 70;
+
+    var pb = {
+        left: x,
+        top: y,
+        width: width,
+        height: y - b.bottom,
+    };
+
+    placeImage(layer, "Img1.png", "coverShot", pb);
 }
