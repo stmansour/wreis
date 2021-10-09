@@ -237,7 +237,7 @@ function genTable() {
         height: bounds[1] - bounds[3],
     };
 
-    y = sky - height;  // top - moves top y pos to one cell height below skeleton table
+    y = sky;  // top - moves top y pos to one cell height below skeleton table
     var lowerRY = b.bottom + 70;
 
     var pb = {
