@@ -58,19 +58,36 @@ function genAODRect(l,x,y,w,h,f) {
     genRect(l,x,y,w,h,strokeWidth,strokeColor,fillColor);
 }
 
-function tableText(x,y,s,layer) {
+// tableext creates text
+//
+//    l     = layer
+//    x,y   = top left corner of text
+//    s     = string
+//    sz    = text size
+//    fname = fontname
+//    sw    = stroke weight. if 0, stroke color is ignored
+//    sc    = stroke color.  null if you don't want to set the color
+//    fc    = fill color
+//-----------------------------------------------------------------------------
+function tableText(l,x,y,s,sz,fname,sw,sc,fc) {
     if (jb.chattr == null) {
         alert('jb.chattr is being used before it has been set!');
         return;
     }
-    var t = layer.textFrames.add();
-
+    var t = l.textFrames.add();
 
     t.contents = s;
     t.textRange.characterAttributes = jb.chattr;
-    t.textRange.characterAttributes.size = 11;
+    t.textRange.characterAttributes.size = sz;
+    t.textRange.characterAttributes.strokeWeight = sw;
+    if (sw > 0 && sc != null) {
+        t.textRange.characterAttributes.strokeColor = sc;
+    }
+    if (fc != null) {
+        t.textRange.characterAttributes.fillColor = fc;
+    }
 
-    var font = app.textFonts.getByName("ArialNarrow");
+    var font = app.textFonts.getByName(fname);
     if (font != null) {
         t.textRange.characterAttributes.textFont = font;
     }
@@ -78,6 +95,16 @@ function tableText(x,y,s,layer) {
     // alert("x,y = " + x + ', ' + y);
     t.textRange.justification = Justification.LEFT;
     t.position = [x,y];
+}
+// tableAODText creates text
+//
+//    l   = layer
+//    x,y = top left corner of text
+//    s   = string
+//-----------------------------------------------------------------------------
+function tableAODText(l,x,y,s) {
+    var c = aiGenColor(0x000000);
+    tableText(l,x,y,s,11,"ArialNarrow",0,null,c);
 }
 
 
@@ -134,10 +161,10 @@ function genTable() {
     //---------------------------------
     for (var i = 0; i < property.rentSteps.length; i++) {
         genAODRect(layer,x,y,width,height,fill);
-        tableText(x+offsetx, y-offsety, property.rentSteps[i].Opt,layer);
-        tableText(x+offsetx+col2, y-offsety, fmtCurrency(property.rentSteps[i].Rent),layer);
+        tableAODText(layer,x+offsetx, y-offsety, property.rentSteps[i].Opt);
+        tableAODText(layer,x+offsetx+col2, y-offsety, fmtCurrency(property.rentSteps[i].Rent));
         monthly = property.rentSteps[i].Rent / 12.0;
-        tableText(x+offsetx+col3, y-offsety, fmtCurrency(monthly),layer);
+        tableAODText(layer,x+offsetx+col3, y-offsety, fmtCurrency(monthly));
         y -=height;
         fill = !fill;
     }
@@ -146,10 +173,10 @@ function genTable() {
     //---------------------------------
     for (i = 0; i < property.renewOptions.length; i++) {
         genAODRect(layer,x,y,width,height,fill);
-        tableText(x+offsetx, y-offsety, property.renewOptions[i].Opt,layer);
-        tableText(x+offsetx+col2, y-offsety, fmtCurrency(property.renewOptions[i].Rent),layer);
+        tableAODText(layer,x+offsetx, y-offsety, property.renewOptions[i].Opt);
+        tableAODText(layer,x+offsetx+col2, y-offsety, fmtCurrency(property.renewOptions[i].Rent));
         monthly = property.renewOptions[i].Rent / 12.0;
-        tableText(x+offsetx+col3, y-offsety, fmtCurrency(monthly),layer);
+        tableAODText(layer,x+offsetx+col3, y-offsety, fmtCurrency(monthly));
         y -=height;
         fill = !fill;
     }
@@ -168,12 +195,17 @@ function genTable() {
     var fillColor = aiGenColor(0xcdd1ce);
     var bottomColor = aiGenColor(0x173e35);
     var c = null;
+    var labels = ["BASE RENT", "NET OPERATING INCOME", "TOTAL RETURN YR-1"];
+    var white = aiGenColor(0xffffff);
 
     for (i = 0; i < 3; i++) {
         c = (i == 2) ? bottomColor : fillColor;
         genRect(layer,skx,sky,w,height,strokeWidth,strokeColor,c);
         genRect(layer,skx+w,sky,w,height,strokeWidth,strokeColor,c);
         genRect(layer,skx+w+w,sky,w,height,strokeWidth,strokeColor,c);
+        c = (i == 2) ? white : bottomColor;
+        tableText(layer,skx+offsetx, sky-offsety, labels[i], 13, "BebasNeue-Regular", 0, null,c);
+
         sky -= height;
     }
     strokeWidth = 0.5; // points
