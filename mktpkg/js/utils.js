@@ -139,7 +139,7 @@ function colorComponents(h) {
     return x;
 }
 
-function aiFillColor(h) {
+function aiGenColor(h) {
     var rgb = colorComponents(h);
     var c = new RGBColor();
     c.red = rgb.r;
