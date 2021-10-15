@@ -96,6 +96,7 @@ func TestRentStep(ctx context.Context) {
 	rs := db.RentStep{
 		RSID:  0,
 		RSLID: 1,
+		Opt:   "A Rent Step",
 		Dt:    time.Date(2020, time.March, 23, 0, 0, 0, 0, time.UTC),
 		Rent:  float64(2750.00),
 	}

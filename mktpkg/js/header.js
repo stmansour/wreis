@@ -22,6 +22,10 @@ var jb = {
         "Private",
         "Public"
         ],
+    roofStructureLabels: [      // roof responsibility
+        "Tenant Responsible",
+        "Landlord Responsible"
+        ],
     guarantorLabels: [      // who is guarantor
         "Corporate",
         "Franchise",

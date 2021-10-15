@@ -126,6 +126,16 @@ function generateMarketPackage() {
     t = jb.doc.textFrames.getByName("TO=OptionsToRenew");
     t.contents = "(" + property["renewOptions"].length + ")";
     fmtIndexedName(property.LeaseType,"TO-LeaseType",jb.leaseTypeLabels,"lease type");
+    own = ((property.FLAGS & (1<<1)) == 0) ? 0 : 1;
+    fmtIndexedName(own,"TO-RoofStructure",jb.roofStructureLabels,"roof structure flag");
+    t = jb.doc.textFrames.getByName("TO-Headquarters");
+    t.contents = property.HQCity + "," + property.HQState;
+    t = jb.doc.textFrames.getByName("TO-Website");
+    t.contents = property.URL;
+    t = jb.doc.textFrames.getByName("TO-YearsInTheBusiness");
+    var now = new Date();
+    t.contents = (property.YearFounded > 0) ? "" + now.getFullYear() - property.YearFounded : " ";
+
     //---------------------------------------------------------------------------
     //  PAGE 5 - Executive Summary
     //---------------------------------------------------------------------------
