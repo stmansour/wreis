@@ -94,10 +94,6 @@ function generateMarketPackage() {
         t.contents = fmtWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits];
     }
     fmtIndexedName(property.OwnershipType,"FO-TypeOwnership",jb.ownershipTypeLabels,"ownership type");
-
-    //---------------------------------------------------------------------------
-    //  PAGE 4 - Financial Overview
-    //---------------------------------------------------------------------------
     t = jb.doc.textFrames.getByName("FO-TenantTradeName");
     t.contents = property.TenantTradeName;
     fmtIndexedName(property.LeaseGuarantor,"FO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
@@ -109,6 +105,27 @@ function generateMarketPackage() {
     fmtIndexedName(own,"FO-Ownership",jb.ownershipLabels,"ownership type");
     genTable();
 
+    //---------------------------------------------------------------------------
+    //  PAGE 4 - Tenant Overview
+    //---------------------------------------------------------------------------
+    t = jb.doc.textFrames.getByName("TO-TenantTradeName");
+    t.contents = property.TenantTradeName;
+    t = jb.doc.textFrames.getByName("TO-PropertyName");
+    t.contents = property.Name;
+    t = jb.doc.textFrames.getByName("TO-PropertyAddressLine1");
+    t.contents = property.Address;
+    t = jb.doc.textFrames.getByName("TO-PropertyAddressLine2");
+    t.contents = property.City + ", " + property.State + "  " + property.PostalCode;
+    own = ((property.FLAGS & (1<<3)) == 0) ? 0 : 1;
+    fmtIndexedName(own,"TO-Ownership",jb.ownershipLabels,"ownership type");
+    t = jb.doc.textFrames.getByName("TO-ParentCompany");
+    t.contents = property.ParentCompany;
+    fmtIndexedName(property.LeaseGuarantor,"TO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
+    t = jb.doc.textFrames.getByName("TO-StockSymbol");
+    t.contents = property.Symbol;
+    t = jb.doc.textFrames.getByName("TO=OptionsToRenew");
+    t.contents = "(" + property["renewOptions"].length + ")";
+    fmtIndexedName(property.LeaseType,"TO-LeaseType",jb.leaseTypeLabels,"lease type");
     //---------------------------------------------------------------------------
     //  PAGE 5 - Executive Summary
     //---------------------------------------------------------------------------
