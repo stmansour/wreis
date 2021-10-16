@@ -144,6 +144,17 @@ function generateMarketPackage() {
     //  PAGE 6 - Aerial Photo
     //---------------------------------------------------------------------------
     placeAerialImage();
+
+    //---------------------------------------------------------------------------
+    //  PAGE 7 - Area Map
+    //---------------------------------------------------------------------------
+    var b = jb.doc.pathItems.getByName("AM-Background");
+    var layer = jb.doc.layers.getByName("Area Map").layers.getByName("AM-Header");
+    if (layer == null) {
+        alert("could not find Area Map.AM-Header");
+        return;
+    }
+    placeImage(layer,"Img3.png","AM-AreaMap",b);
 }
 
 generateMarketPackage();
