@@ -77,6 +77,22 @@ function fitFullPageItem(item, p, hdr) {
     fitItem(item,p);
 }
 
+// placeImageInArea
+//
+// imgFName  - the image file name
+// imgAIName - the name to give the image in the AI file
+// pName     - name of the path item that sets the bounds into which the image
+//             will be placed
+// layers    - an array of layer names. The image will be placed in the last
+//------------------------------------------------------------------------------
+function placeImageInArea(imgFName, imgAIName, pName, layer) {
+    var b = jb.doc.pathItems.getByName(pName);
+    if (null == layer) {
+        alert("placeImageInArea:  layer could not be found");
+        return;
+    }
+    placeImage(layer,imgFName,imgAIName,b);
+}
 
 function placeCoverImage() {
     var fname = jb.cwd + "/Img1.png";

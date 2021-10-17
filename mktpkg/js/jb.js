@@ -1,4 +1,76 @@
+function addSubjectImages() {
+    var n = 0;
+    app.selection = null;  // ensure nothing is selected
 
+    for (var j = 5; j <= 8; j++) {
+        var s = "Img" + j;
+        if (property[s] == "") {
+            continue;
+        }
+        //-------------------------------------
+        // Add an artboard for this image...
+        //-------------------------------------
+        var ab = jb.doc.artboards.getByName("Subject Property 1").artboardRect;
+        //                            0    1     2       3
+        // artboardRect contains: [ left, top, right, bottom ]
+        var width = ab[2] - ab[0];
+        var dx = 36 + n*(36 + width);
+        var x1 = ab[2] + dx;
+        var x2 = x1 + width;
+        var nabRect = [x1, ab[1], x2, ab[3]];  // this is where the new artboard goes
+        var nab =  jb.doc.artboards.add(nabRect);
+        n += 1;
+        nab.name = "Subject Property " + (n+1);
+        var layer = jb.doc.layers.add();
+        layer.name = nab.name;
+
+        //----------------------------------------------------------------
+        // copy the header and footer from Subject Property 1.
+        //   * Get Layer SubjectProperty1
+        //   * mark it has objects selected
+        //   * deselect the image named SubjectProperty1
+        //----------------------------------------------------------------
+        var sourceLayer = jb.doc.layers.getByName("Subject Property 1");  // page layer
+        sourceLayer.hasSelectedArtwork = true;
+        var img = sourceLayer.placedItems.getByName("SubjectProperty1");  // the image
+        img.selected = false;
+        app.copy();
+
+        //----------------------------------------------------------------
+        // Now paste, this will make new copies in sourceLayer.  Then we
+        // have to move them out of the source layer into the new Subject
+        // Property n layer we created above.
+        //----------------------------------------------------------------
+        app.paste();
+        var docSelected = app.activeDocument.selection;
+        var anObj = null;
+        for (s = 0; s < docSelected.length; s++) {
+             anObj = docSelected[s];
+             anObj.move(layer, ElementPlacement.PLACEATEND);
+        }
+
+        //----------------------------------------------------------------
+        // All the objects were pasted in place, so we need to move them
+        // to the right.
+        //----------------------------------------------------------------
+        dx = n*(37 + width);
+        for (i = 0; i < layer.pathItems.length; i++) {
+            layer.pathItems[i].left += dx;
+        }
+        for (i = 0; i < layer.placedItems.length; i++) {
+            layer.placedItems[i].left += dx;
+        }
+        for (i = 0; i < layer.textFrames.length; i++) {
+            layer.textFrames[i].left += dx;
+        }
+
+        //----------------------------------------------------------------
+        // All the objects were pasted in place, so we need to move them
+        // to the right.
+        //----------------------------------------------------------------
+        placeImageInArea("Img"+j+".png","SubjectProperty"+(j-3),"SP1-Background",jb.doc.layers.getByName("Subject Property "+(j-3)));
+    }
+}
 
 //----------------------------------------------------------------------------
 //  MAIN ROUTINE
@@ -148,13 +220,17 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     //  PAGE 7 - Area Map
     //---------------------------------------------------------------------------
-    var b = jb.doc.pathItems.getByName("AM-Background");
-    var layer = jb.doc.layers.getByName("Area Map").layers.getByName("AM-Header");
-    if (layer == null) {
-        alert("could not find Area Map.AM-Header");
-        return;
-    }
-    placeImage(layer,"Img3.png","AM-AreaMap",b);
+    placeImageInArea("Img3.png","AM-AreaMap","AM-Background",jb.doc.layers.getByName("Area Map"));
+
+    //---------------------------------------------------------------------------
+    //  PAGE 8 - Subject Property
+    //
+    //  These start with the cover image (Img1.png) and will include images
+    //  5 - 8 if present.
+    //---------------------------------------------------------------------------
+    placeImageInArea("Img1.png","SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));
+    addSubjectImages();
+
 }
 
 generateMarketPackage();
