@@ -10,3 +10,6 @@ package:
 
 db:
 	/usr/local/bin/mysql --no-defaults wreis < mpt.sql
+
+check:
+	shellcheck mpak.sh

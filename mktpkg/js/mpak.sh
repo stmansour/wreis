@@ -69,7 +69,7 @@ dojsonPOST () {
 		COOK="${COOKIES}"
 	fi
 	CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-	${CMD} | tee serverreply | python -m json.tool >${3} 2>>${LOGFILE}
+	${CMD} | tee serverreply | python -m json.tool > "${3}" 2>>${LOGFILE}
 }
 
 #-----------------------------------------------------------------------------
@@ -96,8 +96,8 @@ LIReq() {
     else
         DONE=1
     fi
-    while (( ${DONE} == 0 )); do
-        read -p 'username: ' USERNAME
+    while (( DONE == 0 )); do
+        read -rp 'username: ' USERNAME
         if (( ${#USERNAME} < 1 )); then
             echo "come on now, you gotta give me something..."
         else
@@ -111,13 +111,13 @@ LIReq() {
         echo "you can export it in an environment variable as follows:"
         echo "    PASSWD=\"your password\""
         echo "    export PASSWD"
-        read -sp 'password: ' PASSWD
+        read -rsp 'password: ' PASSWD
         echo
         echo "got it."
     fi
 
     DONE=0
-    if (( ${PRID} == 0 )); then
+    if (( PRID == 0 )); then
         echo "You must supply a Property ID (PRID) greater than 0"
     else
         DONE=1
@@ -126,7 +126,7 @@ LIReq() {
         if [ ${PRID} -eq 0 ]; then
             read -p 'PRID: ' ptmp
             if [[ ${ptmp} =~ ^[0-9]+$ ]]; then
-                if (( $ptmp < 1)); then
+                if (( ptmp < 1)); then
                     echo "the PRID must be greater than 0"
                 else
                     PRID=${ptmp}
@@ -163,13 +163,13 @@ LIReq() {
 GetProperty () {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "${HOST}/v1/property/${PRID}" "request" "response"  # URL, JSONfname, serverresponse
-    ERR=$(cat response | grep "status" | grep "error" | wc -l)
-    if [ ${ERR} -eq 1 ]; then
+    ERR=$(grep "status" < response | grep -c "error")
+    if (( ERR == 1 )); then
         echo "*** SERVER REPLIED WITH AN ERROR ***"
-        cat response | grep "message"
+        grep "message" <response | sed 's/"//g' | sed 's/  *message: //' | sed 's/\\n,//'
         exit 1
     fi
-    cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/},/};/' > "${PROPJSON}"
+    sed 's/^[{}]$//' <response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/},/};/' > "${PROPJSON}"
 
     GetImages
 
@@ -202,7 +202,7 @@ GetImages () {
 GetRenewOptions () {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "${HOST}/v1/renewoptions/${ROLID}" "request" "response"  # URL, JSONfname, serverresponse
-    cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"renewOptions\"] = /" > "${ROPTJSON}"
+    sed 's/^[{}]$//' < response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"renewOptions\"] = /" > "${ROPTJSON}"
 }
 
 #-----------------------------------------------------------------------------
@@ -211,7 +211,7 @@ GetRenewOptions () {
 GetRentSteps () {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "${HOST}/v1/rentsteps/${RSLID}" "request" "response"  # URL, JSONfname, serverresponse
-    cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"rentSteps\"] = /" > "${RENTJSON}"
+    sed 's/^[{}]$//' < response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"rentSteps\"] = /" > "${RENTJSON}"
 }
 
 #-----------------------------------------------------------------------------
