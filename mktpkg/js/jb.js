@@ -41,11 +41,14 @@ function addSubjectImages() {
         var x1 = ab[2] + dx;
         var x2 = x1 + width;
         var nabRect = [x1, ab[1], x2, ab[3]];  // this is where the new artboard goes
-        var nab =  jb.doc.artboards.add(nabRect);
+        var insertIndex = idxSP1 + n+1;
+        // var nab =  jb.doc.artboards.add(nabRect);
+        app.activeDocument.artboards.insert(nabRect,insertIndex);
+        var nab =  app.activeDocument.artboards[insertIndex];
         n += 1;
         nab.name = "Subject Property " + (n+1);
         var nabABR = nab.artboardRect;
-        var layer = jb.doc.layers.add();
+        var layer = app.activeDocument.layers.add();
         layer.name = nab.name;
         var idxnab = findArtboardIndex(nab.name);
 
@@ -57,7 +60,7 @@ function addSubjectImages() {
         //   * deselect the image named SubjectProperty1
         //----------------------------------------------------------------
         app.activeDocument.artboards.setActiveArtboardIndex(idxSP1);
-        var sourceLayer = jb.doc.layers.getByName("Subject Property 1");  // page layer
+        var sourceLayer = app.activeDocument.layers.getByName("Subject Property 1");  // page layer
         sourceLayer.hasSelectedArtwork = true;
         var img = sourceLayer.placedItems.getByName("SubjectProperty1");  // the image
         img.selected = false;
@@ -79,13 +82,13 @@ function addSubjectImages() {
              anObj.move(layer, ElementPlacement.PLACEATEND);
         }
 
-
         //----------------------------------------------------------------
-        // All the objects were pasted in place.  The window was centered
-        // around the cover page artboard, so we need to move them.
-        // It's a 2-step process.  First move them so that they line up
-        // with the coverpage.  Second, move from cover page to
-        // Subject Property page location
+        // All the objects were pasted in place based on the current
+        // window size... it will always be different.
+        // To get all objects where they need to be is a 2-step delta
+        // calculation.
+        // First compute the delta to line them up with the coverpage.
+        // Second, move from cover page to Subject Property page location
         //----------------------------------------------------------------
         var pi = layer.pathItems.getByName("SP1-PageOutline");
         var ddx = cpABR[0] - pi.left;
@@ -113,7 +116,7 @@ function addSubjectImages() {
         // All the objects were pasted in place, so we need to move them
         // to the right.
         //----------------------------------------------------------------
-        placeImageInArea("Img"+j+".png","SubjectProperty"+(j-3),"SP1-Background",jb.doc.layers.getByName("Subject Property "+(j-3)));
+        placeImageInArea("Img"+j+".png","SubjectProperty"+(j-3),"SP1-Background",app.activeDocument.layers.getByName("Subject Property "+(j-3)));
     }
 }
 
