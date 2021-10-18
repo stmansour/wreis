@@ -839,6 +839,7 @@ function closePropertyForm() {
 
 function setTermRemaining() {
     var s = "n/a";
+    var now = new Date();
     var s1=w2ui.propertyForm.record.RentCommencementDt;
     if (s1 == null || typeof s1 != "string" ) {
         setInnerHTML("PRTermRemaining",s);
@@ -860,6 +861,11 @@ function setTermRemaining() {
     }
     var d2=new Date(s2);
     var m=monthDiff(d1,d2);
-    s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
+    // Handle the case where the expiration date has passed...
+    if (now.getTime() > d2.getTime()) {
+        s = "Lease has expired";
+    } else {
+        s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
+    }
     setInnerHTML("PRTermRemaining",s);
 }

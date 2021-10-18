@@ -209,71 +209,45 @@ function generateMarketPackage() {
     setTextContents("TOC-MarketOverview",pn + 1);
     setTextContents("TOC-DemographicReport",pn + 2);
 
-
     //---------------------------------------------------------------------------
     //  PAGE 3 - Financial Overview
     //---------------------------------------------------------------------------
     var t = jb.doc.textFrames.getByName("FO-Price");
-    jb.chattr = t.textRange.characterAttributes;    // we save this for use later
-    setTextContents("FO-Price",property.Price);
-    setTextContents("FO-DownPayment",property.DownPayment);
-    setTextContents("FO-RentableSF",property.RentableArea);
-    setTextContents("FO-Roof", (property.FLAGS & 0x1 > 0) ? "Landlord Responsible" : "Tenant Responsible");
-    setTextContents("FO-RightOfFirstRefusal", (property.FLAGS & 0x4 > 0) ? "Yes" : "No");
-    setTextContents("FO-CapRate",property.CapRate);
-
-    t = jb.doc.textFrames.getByName("FO-LeaseTermRemaining");
     var dt = new Date();
-    t.contents = fmtDateDiffInYears(dt, property.LeaseExpirationDt);
-
-
-    t = jb.doc.textFrames.getByName("FO-BuildRenovationYear");
-    if (property.RenovationYear > 0) {
-        t.contents = '' + property.RenovationYear;
-    } else {
-        t.contents = 'n/a';
-    }
-    t = jb.doc.textFrames.getByName("FO-LotSize");
-    if (property.LotSizeUnits + 1 > jb.lotSizeLabels.length) {
-        t.contents = "(unknown units)";
-    } else {
-        t.contents = fmtWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits];
-    }
+    jb.chattr = t.textRange.characterAttributes;    // we save this for use later
+    setTextContents("FO-Price",fmtCurrency(property.Price));
+    setTextContents("FO-DownPayment",fmtCurrency(property.DownPayment));
+    setTextContents("FO-RentableSF",fmtWithCommas(property.RentableArea));
+    setTextContents("FO-BuildRenovationYear",property.BuildYear + ((property.RenovationYear > 0) ? ' / ' + property.RenovationYear : "") );
+    fmtIndexedName(((property.FLAGS & (1<<1)) == 0) ? 0 : 1,"FO-Roof",jb.roofStructureLabels,"roof structure flag");
+    setTextContents("FO-RightOfFirstRefusal", (property.FLAGS & (1<<2) > 0) ? "Yes" : "No");
+    setTextContents("FO-CapRate",fmtAsPercent(property.CapRate));
+    setTextContents("FO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt));
+    setTextContents("FO-LotSize", (property.LotSizeUnits + 1 > jb.lotSizeLabels.length) ? "(unknown units)" : fmtWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits]);
     fmtIndexedName(property.OwnershipType,"FO-TypeOwnership",jb.ownershipTypeLabels,"ownership type");
-    t = jb.doc.textFrames.getByName("FO-TenantTradeName");
-    t.contents = property.TenantTradeName;
+    setTextContents("FO-TenantTradeName",property.TenantTradeName);
     fmtIndexedName(property.LeaseGuarantor,"FO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
     fmtIndexedName(property.LeaseType,"FO-LeaseType",jb.leaseTypeLabels,"lease type");
-    t = jb.doc.textFrames.getByName("FO-OriginalLeaseTerm");
-    t.contents = property.OriginalLeaseTerm + " years";
+    setTextContents("FO-OriginalLeaseTerm",property.OriginalLeaseTerm + " years");
     fmtDate(property.LeaseExpirationDt, "FO-LeaseExpirationDate");
-    var own = ((property.FLAGS & (1<<3)) == 0) ? 0 : 1;
-    fmtIndexedName(own,"FO-Ownership",jb.ownershipLabels,"ownership type");
+    fmtIndexedName(((property.FLAGS & (1<<3)) == 0) ? 0 : 1,"FO-Ownership",jb.ownershipLabels,"ownership type");
     genTable();
 
     //---------------------------------------------------------------------------
     //  PAGE 4 - Tenant Overview
     //---------------------------------------------------------------------------
-    t = jb.doc.textFrames.getByName("TO-TenantTradeName");
-    t.contents = property.TenantTradeName;
-    t = jb.doc.textFrames.getByName("TO-PropertyName");
-    t.contents = property.Name;
-    t = jb.doc.textFrames.getByName("TO-PropertyAddressLine1");
-    t.contents = property.Address;
-    t = jb.doc.textFrames.getByName("TO-PropertyAddressLine2");
-    t.contents = property.City + ", " + property.State + "  " + property.PostalCode;
-    own = ((property.FLAGS & (1<<3)) == 0) ? 0 : 1;
-    fmtIndexedName(own,"TO-Ownership",jb.ownershipLabels,"ownership type");
-    t = jb.doc.textFrames.getByName("TO-ParentCompany");
-    t.contents = property.ParentCompany;
+    setTextContents("TO-TenantTradeName",property.TenantTradeName);
+    setTextContents("TO-PropertyName",property.Name);
+    setTextContents("TO-PropertyAddressLine1",property.Address);
+    setTextContents("TO-PropertyAddressLine2",property.City + ", " + property.State + "  " + property.PostalCode);
+    setTextContents("TO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt));
+    fmtIndexedName(((property.FLAGS & (1<<3)) == 0) ? 0 : 1,"TO-Ownership",jb.ownershipLabels,"ownership type");
+    setTextContents("TO-ParentCompany",property.ParentCompany);
     fmtIndexedName(property.LeaseGuarantor,"TO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
-    t = jb.doc.textFrames.getByName("TO-StockSymbol");
-    t.contents = property.Symbol;
-    t = jb.doc.textFrames.getByName("TO=OptionsToRenew");
-    t.contents = "(" + property["renewOptions"].length + ")";
+    setTextContents("TO-StockSymbol",property.Symbol);
+    setTextContents("TO=OptionsToRenew","(" + property["renewOptions"].length + ")");
     fmtIndexedName(property.LeaseType,"TO-LeaseType",jb.leaseTypeLabels,"lease type");
-    own = ((property.FLAGS & (1<<1)) == 0) ? 0 : 1;
-    fmtIndexedName(own,"TO-RoofStructure",jb.roofStructureLabels,"roof structure flag");
+    fmtIndexedName(((property.FLAGS & (1<<1)) == 0) ? 0 : 1,"TO-RoofStructure",jb.roofStructureLabels,"roof structure flag");
     t = jb.doc.textFrames.getByName("TO-Headquarters");
     t.contents = property.HQCity + "," + property.HQState;
     t = jb.doc.textFrames.getByName("TO-Website");
