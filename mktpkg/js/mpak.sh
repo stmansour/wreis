@@ -16,6 +16,14 @@ CWD=$(pwd)
 HOST="http://localhost:8276"
 #HOST="https://showponyinvestments.com"
 
+ShowPlan() {
+    cat << EOF
+             Server: ${HOST}
+               User: ${USER}
+    Property (PRID): ${PRID}
+EOF
+}
+
 #------------------------------------------------------------------------------
 #  encodeRequest is just like encodeURI except that it saves the output
 #      into a file named "request"
@@ -125,7 +133,7 @@ GetImages () {
             iname=$(echo "Img${i}" | sed 's/ *//g')
             iurl=$(grep "${iname}" ${PROPJSON} | awk '{print $2}' | sed 's/[",]//g')
             if [ "${iurl}x" != "x" ]; then
-                echo -n " img${i}... "
+                echo -n "[img${i}]"
                 fname=$(basename -- "${iurl}")
                 ext="${fname##*.}"
                 curl -s "${iurl}" -o "${iname}.${ext}"
@@ -164,13 +172,15 @@ BuildJS () {
 ###############################################################################
 ###############################################################################
 
-while getopts "cs" o; do
+while getopts "csp:" o; do
 	echo "o = ${o}"
 	case "${o}" in
 	c)	Clean
 		echo "cleaned temporary files"
         exit 0
 		;;
+    p)  PRID="${OPTARG}"
+        ;;
     s)  SKIPIMAGES=1
         echo "do not load images"
         ;;
@@ -183,18 +193,13 @@ shift $((OPTIND-1))
 
 Clean       # Remove any old files
 LIReq       # Log in
-
-echo -n "Pulling information for Property (PRID): ${PRID}... "
+ShowPlan
 GetProperty
-
-echo -n "Getting RenewOptions... "
 GetRenewOptions
-echo -n "Getting RentSteps... "
 GetRentSteps
-echo "Done"
-
-echo "Generating script to create Adobe Illustrator marketing package... "
 BuildJS
-echo "Done"
+echo
+echo "Finished"
+echo "Execute Adobe Illustrator script named ${OUTFILE}"
 
 exit 0

@@ -19,6 +19,7 @@
 //  11.     Subject Property 2  [2468, -1288, 3260, -1900]
 //  12.     Subject Property 3  [3296, -1288, 4088, -1900]
 //  13.     Subject Property 4  [4124, -1288, 4916, -1900]
+//
 
 var jb = {
     portfolio: null,        // the portfolio.ai we are auto-generating

@@ -142,11 +142,21 @@ function genTable() {
     //------------------------------------------------------
     // Generate the rows...
     //------------------------------------------------------
-    var nrows = property.renewOptions.length + property.rentSteps.length;
-    // alert("nrows = " + nrows);
+    if (typeof property.renewOptions == "undefined" && typeof property.rentSteps == "undefined") {
+        return;
+    }
+
+    var nrows = 0;
+    if (typeof property.renewOptions != "undefined") {
+        nrows += property.renewOptions.length;
+    }
+    if (typeof property.rentSteps == "undefined") {
+        nrows += property.rentSteps.length;
+    }
     if (nrows == 0) {
         return;
     }
+
     var y = top - height;
     var x = left;
     var offsetx = 10;   // from the left
@@ -155,30 +165,35 @@ function genTable() {
     var col3 = 310;     // from left edge
     var monthly = 0.0;  // monthly amount
     var fill = false;   // every other rect should be filled
+    var i;
 
     //---------------------------------
     // Do the Rent Steps first...
     //---------------------------------
-    for (var i = 0; i < property.rentSteps.length; i++) {
-        genAODRect(layer,x,y,width,height,fill);
-        tableAODText(layer,x+offsetx, y-offsety, property.rentSteps[i].Opt);
-        tableAODText(layer,x+offsetx+col2, y-offsety, fmtCurrency(property.rentSteps[i].Rent));
-        monthly = property.rentSteps[i].Rent / 12.0;
-        tableAODText(layer,x+offsetx+col3, y-offsety, fmtCurrency(monthly));
-        y -=height;
-        fill = !fill;
+    if (typeof property.rentSteps != "undefined") {
+        for (i = 0; i < property.rentSteps.length; i++) {
+            genAODRect(layer,x,y,width,height,fill);
+            tableAODText(layer,x+offsetx, y-offsety, property.rentSteps[i].Opt);
+            tableAODText(layer,x+offsetx+col2, y-offsety, fmtCurrency(property.rentSteps[i].Rent));
+            monthly = property.rentSteps[i].Rent / 12.0;
+            tableAODText(layer,x+offsetx+col3, y-offsety, fmtCurrency(monthly));
+            y -=height;
+            fill = !fill;
+        }
     }
     //---------------------------------
     // Now the Renewal Options
     //---------------------------------
-    for (i = 0; i < property.renewOptions.length; i++) {
-        genAODRect(layer,x,y,width,height,fill);
-        tableAODText(layer,x+offsetx, y-offsety, property.renewOptions[i].Opt);
-        tableAODText(layer,x+offsetx+col2, y-offsety, fmtCurrency(property.renewOptions[i].Rent));
-        monthly = property.renewOptions[i].Rent / 12.0;
-        tableAODText(layer,x+offsetx+col3, y-offsety, fmtCurrency(monthly));
-        y -=height;
-        fill = !fill;
+    if (typeof property.renewOptions != "undefined") {
+        for (i = 0; i < property.renewOptions.length; i++) {
+            genAODRect(layer,x,y,width,height,fill);
+            tableAODText(layer,x+offsetx, y-offsety, property.renewOptions[i].Opt);
+            tableAODText(layer,x+offsetx+col2, y-offsety, fmtCurrency(property.renewOptions[i].Rent));
+            monthly = property.renewOptions[i].Rent / 12.0;
+            tableAODText(layer,x+offsetx+col3, y-offsety, fmtCurrency(monthly));
+            y -=height;
+            fill = !fill;
+        }
     }
 
     //---------------------------------
