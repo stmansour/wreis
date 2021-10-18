@@ -156,7 +156,7 @@ function buildPropertyUIElements() {
             {field: 'recid',                size: '60px', caption: 'recid', sortable: true, hidden: true},
             {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
             {field: 'Name',                 size: '200px', caption: 'Name', sortable: true, hidden: false},
-            {field: 'YearFounded',      size: '60px', caption: 'YearFounded', sortable: true, hidden: true},
+            {field: 'YearFounded',          size: '60px', caption: 'YearFounded', sortable: true, hidden: true},
             {field: 'ParentCompany',        size: '60px', caption: 'ParentCompany', sortable: true, hidden: true},
             {field: 'URL',                  size: '60px', caption: 'URL', sortable: true, hidden: true},
             {field: 'Symbol',               size: '60px', caption: 'Symbol', sortable: true, hidden: true},
@@ -405,9 +405,9 @@ function buildPropertyUIElements() {
             {field: 'LotSize',              type: 'float',    required: false},
             {field: 'LotSizeUnits',         type: 'hidden', required: false},
             {field: 'CapRate',              type: 'percent',  required: false},
-            {field: 'AvgCap',               type: 'percent',  required: false},
-            {field: 'BuildYear',            type: 'number',    required: false},
-            {field: 'RenovationYear',       type: 'number',    required: false},
+            {field: 'AvgCap',               type: 'percent', required: false},
+            {field: 'BuildYear',            type: 'number',  required: false},
+            {field: 'RenovationYear',       type: 'number',  required: false},
             {field: 'FlowState',            type: 'hidden†', required: false},
             {field: 'FLAGS',                type: 'text', required: false},
             {field: 'OwnershipType',        type: 'hidden', required: false},
@@ -456,12 +456,13 @@ function buildPropertyUIElements() {
         onRefresh: function(event) {
             event.onComplete = function() {
                 var r = w2ui.propertyForm.record;
-                var Own = ( (r.FLAGS & (1<<3)) == 0) ? 0 : 1;
+                // var Own = ((r.FLAGS & (1<<3)) == 0) ? 0 : 1;
                 setDropDownSelectedIndex("LotSizeUnitsDD",r.LotSizeUnits);
                 setDropDownSelectedIndex("OwnershipTypeDD",r.OwnershipType);
-                setDropDownSelectedIndex("OwnershipDD",Own);
+                setDropDownSelectedIndex("OwnershipDD",((r.FLAGS & (1<<3)) == 0) ? 0 : 1);
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
+                setDropDownSelectedIndex("RoofResponsibilityDD",((r.FLAGS & (1<<1)) == 0) ? 0 : 1);
                 setTermRemaining();
             };
         },
@@ -678,9 +679,15 @@ function savePropertyForm() {
     rec.LeaseType = getDropDownSafe("LeaseTypeDD",rec.LeaseType);
     rec.LeaseGuarantor = getDropDownSafe("LeaseGuarantorDD",rec.LeaseGuarantor);
 
-    var Own = ( (rec.FLAGS & (1<<3)) == 0) ? 0 : 1;
-    var b = getDropDownSafe("OwnershipDD",Own);
     var mask = 1<<3;
+    var b = getDropDownSafe("OwnershipDD",( (rec.FLAGS & mask) == 0) ? 0 : 1);
+    if (b === 0) {
+        rec.FLAGS &= ~mask;
+    } else {
+        rec.FLAGS |= mask;
+    }
+    mask = 1<<1;
+    b = getDropDownSafe("RoofResponsibilityDD",((rec.FLAGS & mask) == 0) ? 0 : 1);  // initialize to value at last download
     if (b === 0) {
         rec.FLAGS &= ~mask;
     } else {
