@@ -6,6 +6,24 @@ function arboardPositionString() {
     return s;
 }
 
+// layer = layer containing objects to move
+// dx,dy = the offset to apply to each object
+//------------------------------------------------------------------------------
+function moveLayerObjects(layer,dx,dy) {
+    for (i = 0; i < layer.pathItems.length; i++) {
+        layer.pathItems[i].left += dx;
+        layer.pathItems[i].top += dy;
+    }
+    for (i = 0; i < layer.placedItems.length; i++) {
+        layer.placedItems[i].left += dx;
+        layer.placedItems[i].top += dy;
+    }
+    for (i = 0; i < layer.textFrames.length; i++) {
+        layer.textFrames[i].left += dx;
+        layer.textFrames[i].top += dy;
+    }
+}
+
 function findArtboardIndex(a) {
     for (var i = 0; i < app.activeDocument.artboards.length; i++) {
         if (a == app.activeDocument.artboards[i].name) {
@@ -14,6 +32,32 @@ function findArtboardIndex(a) {
     }
     return -1;
 }
+
+function setTextContents(pname,val) {
+    var t = jb.doc.textFrames.getByName(pname);
+    t.contents = val;
+}
+
+// returns the total number of photos that will be shown in the Subject Property
+// area.
+// -----------------------------------------------------------------------------
+function subjectPropertyPhotoCount() {
+    var n = 0;
+    // cover photo
+    if (property.Img0 != "") {
+        n++;
+    }
+    // other photos
+    var s;
+    for (var j = 5; j <= 8; j++) {
+        s = "Img" + j;
+        if (property[s] != "") {
+            n++;
+        }
+    }
+    return n;
+}
+
 function addSubjectImages() {
     var n = 0;
     app.selection = null;  // ensure nothing is selected
@@ -42,7 +86,6 @@ function addSubjectImages() {
         var x2 = x1 + width;
         var nabRect = [x1, ab[1], x2, ab[3]];  // this is where the new artboard goes
         var insertIndex = idxSP1 + n+1;
-        // var nab =  jb.doc.artboards.add(nabRect);
         app.activeDocument.artboards.insert(nabRect,insertIndex);
         var nab =  app.activeDocument.artboards[insertIndex];
         n += 1;
@@ -96,21 +139,7 @@ function addSubjectImages() {
 
         dx = ddx + nabABR[0] - cpABR[0];      // delta x from Cover page to new page
         var dy = ddy + nabABR[1] - cpABR[1];  // delta y from Cover page to new page
-
-        // alert('SP1-PageOutline left top = ' + pi.left + "," + pi.top + "\ncpABR = " +cpABR + "\nddy = " + ddy);
-
-        for (i = 0; i < layer.pathItems.length; i++) {
-            layer.pathItems[i].left += dx;
-            layer.pathItems[i].top += dy;
-        }
-        for (i = 0; i < layer.placedItems.length; i++) {
-            layer.placedItems[i].left += dx;
-            layer.placedItems[i].top += dy;
-        }
-        for (i = 0; i < layer.textFrames.length; i++) {
-            layer.textFrames[i].left += dx;
-            layer.textFrames[i].top += dy;
-        }
+        moveLayerObjects(layer,dx,dy);
 
         //----------------------------------------------------------------
         // All the objects were pasted in place, so we need to move them
@@ -161,40 +190,37 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     //  PAGE 1 - Cover Page
     //---------------------------------------------------------------------------
-    var t = jb.doc.textFrames.getByName("propertyName");
-    t.contents = property.Name;
-    t = jb.doc.textFrames.getByName("streetAddress");
-    t.contents = property.Address;
-    t = jb.doc.textFrames.getByName("cityStateZip");
-    t.contents = property.City + ", " + property.State + "  " + property.PostalCode;
+    setTextContents("propertyName",property.Name);
+    setTextContents("streetAddress",property.Address);
+    setTextContents("cityStateZip",property.City + ", " + property.State + "  " + property.PostalCode);
     placeCoverImage();
+
+    //---------------------------------------------------------------------------
+    //  PAGE 2 - Table of Contents
+    //---------------------------------------------------------------------------
+    var sp = subjectPropertyPhotoCount();
+    var s = "8";
+    var pn = 8;
+    if (sp > 1) {
+        pn += sp - 1;
+        s += " - " + pn;
+    }
+    setTextContents("Page-Property Photos",s);
+    setTextContents("TOC-MarketOverview",pn + 1);
+    setTextContents("TOC-DemographicReport",pn + 2);
+
 
     //---------------------------------------------------------------------------
     //  PAGE 3 - Financial Overview
     //---------------------------------------------------------------------------
-    t = jb.doc.textFrames.getByName("FO-Price");
-    t.contents = fmtCurrency(property.Price);
+    var t = jb.doc.textFrames.getByName("FO-Price");
     jb.chattr = t.textRange.characterAttributes;    // we save this for use later
-
-    t = jb.doc.textFrames.getByName("FO-DownPayment");
-    t.contents = fmtCurrency(property.DownPayment);
-    t = jb.doc.textFrames.getByName("FO-RentableSF");
-    t.contents = fmtWithCommas(property.RentableArea);
-    t = jb.doc.textFrames.getByName("FO-Roof");
-    if (property.FLAGS & 0x1 > 0) {
-        t.contents = "Landlord Responsible";
-    } else {
-        t.contents = "Tenant Responsible";
-    }
-    t = jb.doc.textFrames.getByName("FO-RightOfFirstRefusal");
-    if (property.FLAGS & 0x4 > 0) {
-        t.contents = "Yes";
-    } else {
-        t.contents = "No";
-    }
-
-    t = jb.doc.textFrames.getByName("FO-CapRate");
-    t.contents = fmtAsPercent(property.CapRate);
+    setTextContents("FO-Price",property.Price);
+    setTextContents("FO-DownPayment",property.DownPayment);
+    setTextContents("FO-RentableSF",property.RentableArea);
+    setTextContents("FO-Roof", (property.FLAGS & 0x1 > 0) ? "Landlord Responsible" : "Tenant Responsible");
+    setTextContents("FO-RightOfFirstRefusal", (property.FLAGS & 0x4 > 0) ? "Yes" : "No");
+    setTextContents("FO-CapRate",property.CapRate);
 
     t = jb.doc.textFrames.getByName("FO-LeaseTermRemaining");
     var dt = new Date();
