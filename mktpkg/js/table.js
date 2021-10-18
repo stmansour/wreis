@@ -150,7 +150,7 @@ function genTable() {
     if (typeof property.renewOptions != "undefined") {
         nrows += property.renewOptions.length;
     }
-    if (typeof property.rentSteps == "undefined") {
+    if (typeof property.rentSteps != "undefined") {
         nrows += property.rentSteps.length;
     }
     if (nrows == 0) {
@@ -214,7 +214,7 @@ function genTable() {
     var white = aiGenColor(0xffffff);
 
     var rent = "";  // if there are no rentSteps, just show blank
-    if (property.rentSteps.length > 0) {
+    if (typeof property.rentSteps != "undefined" && property.rentSteps.length > 0) {
         rent = fmtCurrency(property.rentSteps[0].Rent);
     }
 
@@ -261,6 +261,7 @@ function genTable() {
         width: width,
         height: y - b.bottom,
     };
-
-    placeImage(layer, "Img1.png", "coverShot", pb);
+    if (property.Img1 != "") {
+        placeImage(layer, "Img1.png", "coverShot", pb);
+    }
 }
