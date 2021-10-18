@@ -14,7 +14,7 @@ SKIPIMAGES=0
 CWD=$(pwd)
 
 HOST="http://localhost:8276"
-#HOST="https://showponyinvestments.com"
+# HOST="https://showponyinvestments.com"
 
 ShowPlan() {
     cat << EOF
@@ -116,7 +116,14 @@ LIReq() {
 GetProperty () {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
     dojsonPOST "${HOST}/v1/property/${PRID}" "request" "response"  # URL, JSONfname, serverresponse
+    ERR=$(cat response | grep "status" | grep "error" | wc -l)
+    if [ ${ERR} -eq 1 ]; then
+        echo "*** SERVER REPLIED WITH AN ERROR ***"
+        cat response | grep "message"
+        exit 1
+    fi
     cat response | sed 's/^[{}]$//' | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/},/};/' > "${PROPJSON}"
+
     GetImages
 
     # we need RSLID and ROLID

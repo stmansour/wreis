@@ -36,6 +36,9 @@ function fmtIndexedName(i,aiName,arr,errLabel) {
         alert("fmtIndexedName: arr.length < 1 for ainame = " + aiName);
         return;
     }
+    if (i < 0) {
+        i = 0;
+    }
     t = jb.doc.textFrames.getByName(aiName);
     if (i + 1 > arr.length) {
         t.contents = "(unknown "+errLabel+")";

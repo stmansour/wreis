@@ -635,11 +635,15 @@ func getProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcErrorReturn(w, err)
 		return
 	}
-	if a.PRID > 0 {
+	if a.PRID == d.ID {
 		var gg PropertyGrid
 		util.MigrateStructVals(&a, &gg)
 		gg.Recid = gg.PRID
 		g.Record = gg
+	} else {
+		err = fmt.Errorf("Could not find property with PRID = %d", d.ID)
+		SvcErrorReturn(w, err)
+		return
 	}
 	g.Status = "success"
 	SvcWriteResponse(&g, w)
