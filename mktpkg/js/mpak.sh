@@ -10,6 +10,7 @@ OUTFILE="jbx.js"
 PROPJSON="property.json"
 ROPTJSON="ropt.json"
 RENTJSON="rent.json"
+SKIPIMAGES=0
 CWD=$(pwd)
 
 HOST="http://localhost:8276"
@@ -66,7 +67,10 @@ dojsonPOST () {
 # Clean - remove old files first...
 #-----------------------------------------------------------------------------
 Clean() {
-    rm -f request response loginrequest log serverreply "${OUTFILE}" property.json portfolio.ai "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" Img*
+    rm -f request response loginrequest log serverreply "${OUTFILE}" property.json portfolio.ai "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}"
+    if [ ${SKIPIMAGES} -eq 0 ]; then
+        rm -f Img*
+    fi
 }
 
 #-----------------------------------------------------------------------------
@@ -116,16 +120,18 @@ GetProperty () {
 # GetImages
 #-----------------------------------------------------------------------------
 GetImages () {
-    for (( i = 1; i < 9; i++ )); do
-        iname=$(echo "Img${i}" | sed 's/ *//g')
-        iurl=$(grep "${iname}" ${PROPJSON} | awk '{print $2}' | sed 's/[",]//g')
-        if [ "${iurl}x" != "x" ]; then
-            echo -n " img${i}... "
-            fname=$(basename -- "${iurl}")
-            ext="${fname##*.}"
-            curl -s "${iurl}" -o "${iname}.${ext}"
-        fi
-    done
+    if [ ${SKIPIMAGES} -eq 0 ]; then
+        for (( i = 1; i < 9; i++ )); do
+            iname=$(echo "Img${i}" | sed 's/ *//g')
+            iurl=$(grep "${iname}" ${PROPJSON} | awk '{print $2}' | sed 's/[",]//g')
+            if [ "${iurl}x" != "x" ]; then
+                echo -n " img${i}... "
+                fname=$(basename -- "${iurl}")
+                ext="${fname##*.}"
+                curl -s "${iurl}" -o "${iname}.${ext}"
+            fi
+        done
+    fi
 }
 
 #-----------------------------------------------------------------------------
@@ -158,13 +164,16 @@ BuildJS () {
 ###############################################################################
 ###############################################################################
 
-while getopts "c" o; do
+while getopts "cs" o; do
 	echo "o = ${o}"
 	case "${o}" in
 	c)	Clean
 		echo "cleaned temporary files"
         exit 0
 		;;
+    s)  SKIPIMAGES=1
+        echo "do not load images"
+        ;;
     *)  echo "Unrecognized option:  ${o}"
         exit 1
         ;;

@@ -1,6 +1,23 @@
+function arboardPositionString() {
+    var s = '';
+    for (var i = 0; i < app.activeDocument.artboards.length; i++) {
+        s += '' + i + '. ' + app.activeDocument.artboards[i].name + '  [' + app.activeDocument.artboards[i].artboardRect + "]\n";
+    }
+    return s;
+}
+
+function findArtboardIndex(a) {
+    for (var i = 0; i < app.activeDocument.artboards.length; i++) {
+        if (a == app.activeDocument.artboards[i].name) {
+            return i;
+        }
+    }
+    return -1;
+}
 function addSubjectImages() {
     var n = 0;
     app.selection = null;  // ensure nothing is selected
+    var cpABR = app.activeDocument.artboards.getByName("Offering").artboardRect;
 
     for (var j = 5; j <= 8; j++) {
         var s = "Img" + j;
@@ -10,7 +27,13 @@ function addSubjectImages() {
         //-------------------------------------
         // Add an artboard for this image...
         //-------------------------------------
-        var ab = jb.doc.artboards.getByName("Subject Property 1").artboardRect;
+        var artb = app.activeDocument.artboards.getByName("Subject Property 1");
+        var ab = artb.artboardRect;
+        var idxSP1 = findArtboardIndex(artb.name);
+        if (idxSP1 < 0) {
+            alert("no index found for Subject Property 1 artboard!");
+            return;
+        }
         //                            0    1     2       3
         // artboardRect contains: [ left, top, right, bottom ]
         var width = ab[2] - ab[0];
@@ -21,15 +44,19 @@ function addSubjectImages() {
         var nab =  jb.doc.artboards.add(nabRect);
         n += 1;
         nab.name = "Subject Property " + (n+1);
+        var nabABR = nab.artboardRect;
         var layer = jb.doc.layers.add();
         layer.name = nab.name;
+        var idxnab = findArtboardIndex(nab.name);
 
         //----------------------------------------------------------------
         // copy the header and footer from Subject Property 1.
+        //   * set current artboard to Subject Property 1
         //   * Get Layer SubjectProperty1
         //   * mark it has objects selected
         //   * deselect the image named SubjectProperty1
         //----------------------------------------------------------------
+        app.activeDocument.artboards.setActiveArtboardIndex(idxSP1);
         var sourceLayer = jb.doc.layers.getByName("Subject Property 1");  // page layer
         sourceLayer.hasSelectedArtwork = true;
         var img = sourceLayer.placedItems.getByName("SubjectProperty1");  // the image
@@ -37,10 +64,13 @@ function addSubjectImages() {
         app.copy();
 
         //----------------------------------------------------------------
-        // Now paste, this will make new copies in sourceLayer.  Then we
+        // Now paste, this will make new copies in sourceLayer.
+        // Set current artboard to new artboard first...
+        // Then we
         // have to move them out of the source layer into the new Subject
         // Property n layer we created above.
         //----------------------------------------------------------------
+        app.activeDocument.artboards.setActiveArtboardIndex(idxnab);
         app.paste();
         var docSelected = app.activeDocument.selection;
         var anObj = null;
@@ -49,19 +79,34 @@ function addSubjectImages() {
              anObj.move(layer, ElementPlacement.PLACEATEND);
         }
 
+
         //----------------------------------------------------------------
-        // All the objects were pasted in place, so we need to move them
-        // to the right.
+        // All the objects were pasted in place.  The window was centered
+        // around the cover page artboard, so we need to move them.
+        // It's a 2-step process.  First move them so that they line up
+        // with the coverpage.  Second, move from cover page to
+        // Subject Property page location
         //----------------------------------------------------------------
-        dx = n*(37 + width);
+        var pi = layer.pathItems.getByName("SP1-PageOutline");
+        var ddx = cpABR[0] - pi.left;
+        var ddy = cpABR[1] - pi.top;
+
+        dx = ddx + nabABR[0] - cpABR[0];      // delta x from Cover page to new page
+        var dy = ddy + nabABR[1] - cpABR[1];  // delta y from Cover page to new page
+
+        // alert('SP1-PageOutline left top = ' + pi.left + "," + pi.top + "\ncpABR = " +cpABR + "\nddy = " + ddy);
+
         for (i = 0; i < layer.pathItems.length; i++) {
             layer.pathItems[i].left += dx;
+            layer.pathItems[i].top += dy;
         }
         for (i = 0; i < layer.placedItems.length; i++) {
             layer.placedItems[i].left += dx;
+            layer.placedItems[i].top += dy;
         }
         for (i = 0; i < layer.textFrames.length; i++) {
             layer.textFrames[i].left += dx;
+            layer.textFrames[i].top += dy;
         }
 
         //----------------------------------------------------------------
@@ -215,7 +260,7 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     //  PAGE 6 - Aerial Photo
     //---------------------------------------------------------------------------
-    placeAerialImage();
+    placeImageInArea("Img2.png","AP-AerialPhoto","AP-Background",jb.doc.layers.getByName("Aerial Photo"));
 
     //---------------------------------------------------------------------------
     //  PAGE 7 - Area Map

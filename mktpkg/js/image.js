@@ -108,24 +108,19 @@ function placeCoverImage() {
     fitFullPageItem(placedItem,b,"coverPageHeaderBar");
 }
 
-function placeAerialImage() {
-    var layer = jb.doc.layers.getByName("Aerial Photo");
-    var placedItem = layer.placedItems.add();
-    var fname = jb.cwd + "/Img2.png";
-    try {
-        placedItem.file = new File(fname);
-    } catch (error) {
-        alert(fname + ': ' + error);
-        return;
-    }
-    placedItem.name = "aerialPhoto";
-
-    var aab = jb.doc.artboards.getByName("Aerial Photo");
-    if (aab == null) {
-        alert("artboard not found:  Aerial Photo");
-        return;
-    }
-
-    var b = getArtboardBounds(aab);
-    fitFullPageItem(placedItem,b,"aerialPhotoHeaderBar");
-}
+// function placeAerialImage() {
+//     var layer = jb.doc.layers.getByName("Aerial Photo");
+//     var placedItem = layer.placedItems.add();
+//     var fname = jb.cwd + "/Img2.png";
+//     try {
+//         placedItem.file = new File(fname);
+//     } catch (error) {
+//         alert(fname + ': ' + error);
+//         return;
+//     }
+//     placedItem.name = "aerialPhoto";
+//
+//     var aab = layer.pathItems.getByName("AP-background");
+//     var b = getArtboardBounds(aab);
+//     fitFullPageItem(placedItem,b,"aerialPhotoHeaderBar");
+// }
