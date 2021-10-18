@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-
 LOGFILE="log"
 REQCOUNT=0
 COOKIES=
-USER="smansour"
-PRID=1
+PRID=0
 OUTFILE="jbx.js"
 PROPJSON="property.json"
 ROPTJSON="ropt.json"
@@ -17,10 +15,13 @@ HOST="http://localhost:8276"
 # HOST="https://showponyinvestments.com"
 
 ShowPlan() {
+
     cat << EOF
+*************************************************************************
              Server: ${HOST}
-               User: ${USER}
+               User: ${USERNAME}
     Property (PRID): ${PRID}
+*************************************************************************
 EOF
 }
 
@@ -85,6 +86,24 @@ Clean() {
 # Login...
 #-----------------------------------------------------------------------------
 LIReq() {
+    DONE=0
+    if [ "${USERNAME}x" = "x" ]; then
+        echo "Your username is required to access the WREIS server."
+        echo "You can enter it at the prompt, or to avoid having to enter it"
+        echo "you can export it in an environment variable as follows:"
+        echo "    USERNAME=\"your username\""
+        echo "    export USERNAME"
+    else
+        DONE=1
+    fi
+    while (( ${DONE} == 0 )); do
+        read -p 'username: ' USERNAME
+        if (( ${#USERNAME} < 1 )); then
+            echo "come on now, you gotta give me something..."
+        else
+            DONE=1
+        fi
+    done
 
     if [ "${PASSWD}x" = "x" ]; then
         echo "Your password is required to access the WREIS server."
@@ -92,9 +111,35 @@ LIReq() {
         echo "you can export it in an environment variable as follows:"
         echo "    PASSWD=\"your password\""
         echo "    export PASSWD"
-        read -sp 'Password: ' PASSWD
+        read -sp 'password: ' PASSWD
+        echo
+        echo "got it."
     fi
-    encodeRequest "{\"user\":\"${USER}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
+
+    DONE=0
+    if (( ${PRID} == 0 )); then
+        echo "You must supply a Property ID (PRID) greater than 0"
+    else
+        DONE=1
+    fi
+    while [ ${DONE} -eq 0 ]; do
+        if [ ${PRID} -eq 0 ]; then
+            read -p 'PRID: ' ptmp
+            if [[ ${ptmp} =~ ^[0-9]+$ ]]; then
+                if (( $ptmp < 1)); then
+                    echo "the PRID must be greater than 0"
+                else
+                    PRID=${ptmp}
+                    DONE=1
+                fi
+            else
+                echo "you must enter a number"
+            fi
+        fi
+    done
+
+    echo -n "Logging into server... "
+    encodeRequest "{\"user\":\"${USERNAME}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
     dojsonPOST "${HOST}/v1/authn/" "request" "response"  # URL, JSONfname, serverresponse
 
     #-----------------------------------------------------------------------------
@@ -104,10 +149,12 @@ LIReq() {
     #-----------------------------------------------------------------------------
     TOKEN=$(grep Token "response" | awk '{print $2;}' | sed 's/[",]//g')
     if [ "${TOKEN}x" == "x" ]; then
-        echo "Login failed"
+        echo
+        echo "Login failed. Check your username and password and try again."
         exit 1
     fi
     COOKIES="-b air=${TOKEN}"   # COOKIES is used by dojsonPOST()
+    echo "successfully logged in"
 }
 
 #-----------------------------------------------------------------------------
@@ -180,13 +227,14 @@ BuildJS () {
 ###############################################################################
 
 while getopts "csp:" o; do
-	echo "o = ${o}"
+	# echo "o = ${o}"
 	case "${o}" in
 	c)	Clean
 		echo "cleaned temporary files"
         exit 0
 		;;
     p)  PRID="${OPTARG}"
+        echo "PRID set to ${PRID}"
         ;;
     s)  SKIPIMAGES=1
         echo "do not load images"
