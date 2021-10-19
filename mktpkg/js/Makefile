@@ -6,6 +6,7 @@ clean:
 test:
 	echo "completed"
 package:
+	cat elems/utils.js elems/image.js elems/table.js elems/jb.js > core.js
 	echo "completed"
 
 db:
