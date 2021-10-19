@@ -197,6 +197,9 @@ function generateMarketPackage() {
     if (property.Img1 != "") {
         placeImageInArea("Img1.png","CoverShot","CP-CoverPhotoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
     }
+    if (property.Img4 != "") {
+        placeImageInArea("Img4.png","CoverLogo","CP-LogoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
+    }
 
     //---------------------------------------------------------------------------
     //  PAGE 2 - Table of Contents
@@ -211,6 +214,9 @@ function generateMarketPackage() {
     setTextContents("Page-Property Photos",s);
     setTextContents("TOC-MarketOverview",pn + 1);
     setTextContents("TOC-DemographicReport",pn + 2);
+    if (property.Img4 != "") {
+        placeImageInArea("Img4.png","TOCLogo","TOC-LogoArea",jb.doc.layers.getByName("TOC - Table Of Contents"));
+    }
 
     //---------------------------------------------------------------------------
     //  PAGE 3 - Financial Overview
@@ -226,7 +232,7 @@ function generateMarketPackage() {
     setTextContents("FO-RightOfFirstRefusal", (property.FLAGS & (1<<2) > 0) ? "Yes" : "No");
     setTextContents("FO-CapRate",fmtAsPercent(property.CapRate));
     setTextContents("FO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt));
-    setTextContents("FO-LotSize", (property.LotSizeUnits + 1 > jb.lotSizeLabels.length) ? "(unknown units)" : fmtWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits]);
+    setTextContents("FO-LotSize", (property.LotSizeUnits + 1 > jb.lotSizeLabels.length) ? "(unknown units)" : fmtAsFloatWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits]);
     fmtIndexedName(property.OwnershipType,"FO-TypeOwnership",jb.ownershipTypeLabels,"ownership type");
     setTextContents("FO-TenantTradeName",property.TenantTradeName);
     fmtIndexedName(property.LeaseGuarantor,"FO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
@@ -262,6 +268,10 @@ function generateMarketPackage() {
     t = jb.doc.textFrames.getByName("TO-YearsInTheBusiness");
     var now = new Date();
     t.contents = (property.YearFounded > 0) ? "" + now.getFullYear() - property.YearFounded : " ";
+
+    if (property.Img4 != "") {
+        placeImageInArea("Img4.png","TOLogo","TO-LogoArea",jb.doc.layers.getByName("Tenant Overview"));
+    }
 
     //---------------------------------------------------------------------------
     //  PAGE 5 - Executive Summary

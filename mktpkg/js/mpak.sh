@@ -25,6 +25,36 @@ ShowPlan() {
 EOF
 }
 
+Usage() {
+    cat <<FEOF
+mpak.sh
+
+DESCRIPTION
+    mpak.sh is a shell script to create an Adobe Illustrator script that
+    produces the WREIS Marketing Package based on the Property ID.
+
+USAGE
+    mpak.sh [OPTIONS]
+
+    OPTIONS:
+
+    -c	Clean. Removes any temporary files in the directory.
+
+    -p  PRID
+        PRID specifies the Property ID for which the marketing package will
+        be created.  It must be a number greater than 0.
+
+    -s  Causes the images to NOT be downloaded. Only use this option if you
+        really know what you are doing.
+
+    -u  Display this usage writeup.
+
+Examples
+    ./mpak.sh -p 34
+
+FEOF
+}
+
 #------------------------------------------------------------------------------
 #  encodeRequest is just like encodeURI except that it saves the output
 #      into a file named "request"
@@ -226,7 +256,7 @@ BuildJS () {
 ###############################################################################
 ###############################################################################
 
-while getopts "csp:" o; do
+while getopts "csp:u" o; do
 	# echo "o = ${o}"
 	case "${o}" in
 	c)	Clean
@@ -239,7 +269,11 @@ while getopts "csp:" o; do
     s)  SKIPIMAGES=1
         echo "do not load images"
         ;;
+    u)  Usage
+        exit 0
+        ;;
     *)  echo "Unrecognized option:  ${o}"
+        Usage
         exit 1
         ;;
     esac

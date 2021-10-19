@@ -23,6 +23,10 @@ function fmtWithCommas(x) {
     return number_format(x,0,'.',',');
 }
 
+function fmtAsFloatWithCommas(x) {
+    return number_format(x,2,'.',',');
+}
+
 function fmtCurrency(x) {
     return '$' + number_format(x,2,'.',',');
 }

@@ -4,7 +4,9 @@
 // p    - the size and location of the rectangle into which the image is fitted
 //------------------------------------------------------------------------------
 function fitItem(item, p) {
-    if (item.width > item.height) {
+    var wratio = p.width / item.width;
+    var hratio = p.height / item.height;
+    if (hratio > wratio) {
         // landscape, scale height using ratio from width
         var newheight = (p.width * item.height) / item.width;
         item.width = p.width;
@@ -83,7 +85,7 @@ function fitFullPageItem(item, p, hdr) {
 // imgAIName - the name to give the image in the AI file
 // pName     - name of the path item that sets the bounds into which the image
 //             will be placed
-// layers    - an array of layer names. The image will be placed in the last
+// layer     - layer into which image will be placed
 //------------------------------------------------------------------------------
 function placeImageInArea(imgFName, imgAIName, pName, layer) {
     var b = jb.doc.pathItems.getByName(pName);
