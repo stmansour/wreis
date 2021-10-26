@@ -113,7 +113,7 @@ function tableAODText(l,x,y,s) {
 //-----------------------------------------------------------------------------
 function genTable() {
     var hbn = "AnnOpDt-Hdr";
-    var MINY = 75;
+    var MINY = 700;
     var l1 = jb.doc.layers.getByName("Financial Overview");
     if (l1==null) {
         alert("could not get layer Financial Overview" );
@@ -206,6 +206,11 @@ function genTable() {
     var upperLY = sky;
     var w = width/3;
 
+    if (sky < MINY) {
+        // alert("*** JB WARNING ***  not enough room for skeleton table or image on Financial Overview");
+        return;
+    }
+
     var strokeWidth = 0.35; // points
     var strokeColor = aiGenColor(0xffffff);
     var fillColor = aiGenColor(0xcdd1ce);
@@ -235,9 +240,11 @@ function genTable() {
     strokeWidth = 0.5; // points
     genRect(layer,upperLX,upperLY,width,3*height,strokeWidth,bottomColor,null); // encompassing rect
 
-    if (y < MINY) {
+    if (sky < MINY) {
+        // alert("*** JB WARNING ***  not enough room for image on Financial Overview");
         return;
     }
+
     //-------------------------------------------------
     // Now add a smaller version of the cover image...
     //-------------------------------------------------
