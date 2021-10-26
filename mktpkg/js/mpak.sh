@@ -11,8 +11,8 @@ RENTJSON="rent.json"
 SKIPIMAGES=0
 CWD=$(pwd)
 
-HOST="http://localhost:8276"
-# HOST="https://showponyinvestments.com"
+# HOST="http://localhost:8276"
+HOST="https://showponyinvestments.com"
 
 ShowPlan() {
 
@@ -215,12 +215,13 @@ GetImages () {
     if [ ${SKIPIMAGES} -eq 0 ]; then
         for (( i = 1; i < 9; i++ )); do
             iname=$(echo "Img${i}" | sed 's/ *//g')
-            iurl=$(grep "${iname}" ${PROPJSON} | awk '{print $2}' | sed 's/[",]//g')
+            iurl=$(grep "${iname}" ${PROPJSON} | sed 's/^  *"I..[0-9][0-9]*...//' | sed 's/[",]//g')
             if [ "${iurl}x" != "x" ]; then
                 echo -n "[img${i}]"
                 fname=$(basename -- "${iurl}")
                 ext="${fname##*.}"
-                curl -s "${iurl}" -o "${iname}.${ext}"
+                url=$(echo "${iurl}" | sed 's/ /%20/g')
+                curl -s "${url}" -o "${iname}.${ext}"
             fi
         done
     fi

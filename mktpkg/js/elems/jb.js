@@ -145,7 +145,7 @@ function addSubjectImages() {
         // All the objects were pasted in place, so we need to move them
         // to the right.
         //----------------------------------------------------------------
-        placeImageInArea("Img"+j+".png","SubjectProperty"+(j-3),"SP1-Background",app.activeDocument.layers.getByName("Subject Property "+(j-3)));
+        placeImageInArea(j,"SubjectProperty"+(j-3),"SP1-Background",app.activeDocument.layers.getByName("Subject Property "+(j-3)));
     }
 }
 
@@ -195,10 +195,10 @@ function generateMarketPackage() {
     setTextContents("cityStateZip",property.City + ", " + property.State + "  " + property.PostalCode);
     //placeCoverImage();
     if (property.Img1 != "") {
-        placeImageInArea("Img1.png","CoverShot","CP-CoverPhotoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
+        placeImageInArea(1,"CoverShot","CP-CoverPhotoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
     }
     if (property.Img4 != "") {
-        placeImageInArea("Img4.png","CoverLogo","CP-LogoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
+        placeImageInArea(4,"CoverLogo","CP-LogoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
     }
 
     //---------------------------------------------------------------------------
@@ -215,7 +215,7 @@ function generateMarketPackage() {
     setTextContents("TOC-MarketOverview",pn + 1);
     setTextContents("TOC-DemographicReport",pn + 2);
     if (property.Img4 != "") {
-        placeImageInArea("Img4.png","TOCLogo","TOC-LogoArea",jb.doc.layers.getByName("TOC - Table Of Contents"));
+        placeImageInArea(4,"TOCLogo","TOC-LogoArea",jb.doc.layers.getByName("TOC - Table Of Contents"));
     }
 
     //---------------------------------------------------------------------------
@@ -270,7 +270,7 @@ function generateMarketPackage() {
     t.contents = (property.YearFounded > 0) ? "" + now.getFullYear() - property.YearFounded : " ";
 
     if (property.Img4 != "") {
-        placeImageInArea("Img4.png","TOLogo","TO-LogoArea",jb.doc.layers.getByName("Tenant Overview"));
+        placeImageInArea(4,"TOLogo","TO-LogoArea",jb.doc.layers.getByName("Tenant Overview"));
     }
 
     //---------------------------------------------------------------------------
@@ -281,24 +281,24 @@ function generateMarketPackage() {
     //  PAGE 6 - Aerial Photo
     //---------------------------------------------------------------------------
     if (property.Img2 != "") {
-        placeImageInArea("Img2.png","AP-AerialPhoto","AP-Background",jb.doc.layers.getByName("Aerial Photo"));
+        placeImageInArea(2,"AP-AerialPhoto","AP-Background",jb.doc.layers.getByName("Aerial Photo"));
     }
 
     //---------------------------------------------------------------------------
     //  PAGE 7 - Area Map
     //---------------------------------------------------------------------------
     if (property.Img3 != "") {
-        placeImageInArea("Img3.png","AM-AreaMap","AM-Background",jb.doc.layers.getByName("Area Map"));
+        placeImageInArea(3,"AM-AreaMap","AM-Background",jb.doc.layers.getByName("Area Map"));
     }
 
     //---------------------------------------------------------------------------
     //  PAGE 8 - Subject Property
     //
-    //  These start with the cover image (Img1.png) and will include images
+    //  These start with the cover image (Img1.)+fileExtension(property.Img1) and will include images
     //  5 - 8 if present.
     //---------------------------------------------------------------------------
     if (property.Img1 != "") {
-        placeImageInArea("Img1.png","SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));
+        placeImageInArea(1,"SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));
     }
     addSubjectImages();
 }

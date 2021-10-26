@@ -19,6 +19,10 @@ function number_format(number, decimals, dec_point, thousands_sep) {
     return s.join(dec);
 }
 
+function fileExtension(s) {
+    return s.split('.').pop();
+}
+
 function fmtWithCommas(x) {
     return number_format(x,0,'.',',');
 }
