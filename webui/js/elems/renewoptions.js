@@ -1,6 +1,7 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise,
-    setPropertyFormActionButtons, savePropertyFormWithCB,
+    setPropertyFormActionButtons, savePropertyFormWithCB, number_format,
+    setInnerHTML,
 */
 
 "use strict";
@@ -137,6 +138,12 @@ function buildRenewOptionsUIElements() {
         onRefresh: function(event) {
             event.onComplete = function(event) {
                 EnableRenewOptionFormFields();
+                SetMonthlyRORentString();
+            };
+        },
+        onChange: function(event) {
+            event.onComplete = function(event) {
+                SetMonthlyRORentString();
             };
         },
     });
@@ -252,6 +259,13 @@ function internalFinishROCB(data,success) {
         w2ui.propertyRenewOptionForm.error(data.message);
     }
 }
+
+function SetMonthlyRORentString() {
+    var y = w2ui.propertyRenewOptionForm.record.Rent/12;
+    var s = "$" + number_format(y,2,'.',',');
+    setInnerHTML("ROmonthly",s);
+}
+
 
 function RenewOptionTypeChange(event) {
     if (event.type != "click") {

@@ -234,7 +234,7 @@ function RentStepSave() {
     if (w2ui.propertyForm.record.PRID < 1) {
         savePropertyFormWithCB(RSPropertySaveCB);   // need to save property first
     }
-    saveRentStepsWithCB(internalFinishCB);
+    saveRentStepsWithCB(internalFinishRSCB);
 }
 
 
@@ -248,13 +248,13 @@ function RentStepSave() {
 function RSPropertySaveCB(data,success) {
     if (success) {
         w2ui.propertyForm.record.PRID = data.recid;
-        saveRentStepsWithCB(internalFinishCB);
+        saveRentStepsWithCB(internalFinishRSCB);
     } else {
         w2ui.propertyRentStepForm.error(data.message);
     }
 }
 
-function internalFinishCB(data,success) {
+function internalFinishRSCB(data,success) {
     if (success) {
         if (w2ui.propertyForm.record.RSLID < 1) {
             w2ui.propertyForm.record.RSLID = data.recid;
@@ -396,10 +396,10 @@ function saveRentStepsWithCB(cbf) {
 function RentStepsSaveCB(data,success) {
     if (success) {
         if (data.status === "error") {
-            w2ui.propertyGrid.error('ERROR: '+ data.message);
+            w2ui.propertyRentStepsGrid.error('ERROR: '+ data.message);
         }
         propData.bRentStepsLoaded = false;
     } else {
-        w2ui.propertyGrid.error("Save RentSteps failed. " + data);
+        w2ui.propertyRentStepsGrid.error("Save RentSteps failed. " + data);
     }
 }
