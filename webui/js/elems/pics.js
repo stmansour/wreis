@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, document, FormData,
-    fetch,w2confirm, doDeletePhoto,window,
+    fetch,w2confirm, doDeletePhoto,window, setTimeout
 */
 
 "use strict";
@@ -63,41 +63,19 @@ function AwaitImagePanelRenderComplete() {
     for (i = 1; i <= AppPics.NumImgs; i++) {
         var ImgID = 'Img'+i;
         if (r[ImgID].length > 0) {
-            var id = "phototable" + i;
-            var image = document.getElementById(id);
+            var image = SetSpinner(i);
+            // var id = "phototable" + i;
+            // var image = document.getElementById(id);
             if (image != null) {
                 image.src = r[ImgID];
                 document.getElementById('spnFilePath' + i).innerHTML = '';
             }
             image.width = 190;
+        } else {
+            SetImageDefault(i);
         }
     }
 }
-
-// // propChangeImage allows the user to change the selected image.
-// //
-// // INPUTS
-// // x = the index number 1 - 8 for which image they're switching
-// //
-// //-----------------------------------------------------------------------
-// function propChangeImage(x) {
-//     var f = document.getElementById("FileUpload"+x);
-//     if (f == null) {
-//         return;
-//     }
-//     var fp = document.getElementById("spnFilePath" + x);
-//     if (fp == null ) {
-//         return;
-//     }
-//     var image = "Img" + x;
-//     var idx = x;
-//     f.onchange = function() {
-//         var fileName = f.value.split('\\')[f.value.split('\\').length - 1];
-//         fp.innerHTML = "uploading " + fileName;
-//         w2ui.propertyForm.record[image] = fileName;
-//         SavePhotoToServer(fileName,idx,f.files[0]);
-//     }
-// }
 
 function SetUpImageCatchers() {
     var fileupload1 = document.getElementById("FileUpload1");
@@ -205,6 +183,35 @@ function SetUpImageCatchers() {
     };
 }
 
+// SetSpinner.  Change the image in image slot x to the spinner
+//
+// INPUTS
+//    x = index
+//    fname = file name of image
+//
+// RETURNS
+//    the HTML image object for image index x
+//-----------------------------------------------------------------------------
+function SetImageCore(x,fname) {
+    var id = "phototable" + x;
+    var image = document.getElementById(id);
+    if (image == null) {
+        console.log('ERROR: could not find image: ' + id);
+        return;
+    }
+    image.src = fname;
+    image.width = 100;
+    return image;
+}
+
+function SetSpinner(x) {
+    return SetImageCore(x,"/static/html/images/spinner.gif");
+}
+
+function SetImageDefault(x) {
+    return SetImageCore(x, "/static/html/images/building-100.png");
+}
+
 // SavePhotoToServer.  Save the specified image to the property currently in
 // w2ui.propertyForm and save it under the supplied index.
 //
@@ -213,20 +220,13 @@ function SetUpImageCatchers() {
 //    x = index
 //    file = the actual file from the <input ...> object
 //-----------------------------------------------------------------------------
- function SavePhotoToServer(f,x,file)
+function SavePhotoToServer(f,x,file)
 {
     if (typeof file === "undefined") {
         document.getElementById('spnFilePath' + x).innerHTML = '';
         return;
     }
-    var id = "phototable" + x;
-    var image = document.getElementById(id);
-    if (image == null) {
-        console.log('ERROR: could not find image: ' + id);
-        return;
-    }
-    image.src = "/static/html/images/spinner.gif";
-    image.width = 190;
+    var image = SetSpinner(x);
     let data = { cmd:'save', PRID: propData.PRID, idx: x, fileName: f };
     let formData = new FormData();
     let url = '/v1/propertyphoto/' + propData.PRID + '/' + x;

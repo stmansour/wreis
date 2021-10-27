@@ -266,7 +266,6 @@ function SetMonthlyRORentString() {
     setInnerHTML("ROmonthly",s);
 }
 
-
 function RenewOptionTypeChange(event) {
     if (event.type != "click") {
         return;
