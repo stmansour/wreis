@@ -656,12 +656,14 @@ function getDropDownSafe(s,y) {
     return y;
 }
 
-// savePropertyForm grabs all the data that is associated with the propertForm,
-//      converts anything that needs attention and calls the server's save
-//      function.
+// prepareSaveData returns the data to push to the server to save the property
 //------------------------------------------------------------------------------
-function savePropertyForm() {
+function prepareSaveData() {
     var rec = w2ui.propertyForm.record;
+
+    if (rec.Name == "") {
+        rec.Name = "New Property";
+    }
 
     //-----------------------------------------
     // Handle any conversions necessary...
@@ -672,7 +674,6 @@ function savePropertyForm() {
     rec.LeaseExpirationDt = varToUTCString(rec.LeaseExpirationDt);
     rec.CreateTime = varToUTCString(rec.CreateTime);
     rec.LastModTime = varToUTCString(rec.LastModTime);
-
 
     rec.LotSizeUnits = getDropDownSafe("LotSizeUnitsDD",rec.LotSizeUnits);
     rec.OwnershipType = getDropDownSafe("OwnershipTypeDD",rec.OwnershipType);
@@ -711,9 +712,17 @@ function savePropertyForm() {
         record: rec,
         states: [0,0,0,0,0,0,0]
     };
+    return params;
+}
 
+// savePropertyForm grabs all the data that is associated with the propertForm,
+//      converts anything that needs attention and calls the server's save
+//      function.
+//------------------------------------------------------------------------------
+function savePropertyForm() {
+    var params = prepareSaveData();
     var dat = JSON.stringify(params);
-    var url = '/v1/property/' + rec.PRID;
+    var url = '/v1/property/' + params.record.PRID;
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
@@ -727,7 +736,25 @@ function savePropertyForm() {
     .fail(function(data){
             w2ui.propertyGrid.error("Save RentableLeaseStatus failed. " + data);
     });
+}
 
+// savePropertyFormWithCB saves the current property and calls the supplied
+// callback function. This function has two parameters:
+//     data - data returned from post
+//     done - boolean: true = success, false = post failed
+//-----------------------------------------------------------------------------
+function savePropertyFormWithCB(cbf) {
+    var params = prepareSaveData();
+    var dat = JSON.stringify(params);
+    var url = '/v1/property/' + params.record.PRID;
+
+    return $.post(url, dat, null, "json")
+    .done(function(data) {
+        cbf(data,true);
+    })
+    .fail(function(data){
+        cbf(data,false);
+    });
 }
 
 function propertySaveDoneCB() {

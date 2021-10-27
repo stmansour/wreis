@@ -11,7 +11,7 @@ RENTJSON="rent.json"
 SKIPIMAGES=0
 CWD=$(pwd)
 
-# HOST="http://localhost:8276"
+HOST="http://localhost:8276"
 HOST="https://showponyinvestments.com"
 
 ShowPlan() {
@@ -263,6 +263,7 @@ var jb = {
     doc: null,              // the working document
     chattr: null,           // the default font and attributes
     cwd: "",                // the current working directory
+    subjProp: 6,            // index of first subject property after cover photo
     lotSizeLabels: [        // what units for LotSize
         "sqft", "acres"
         ],

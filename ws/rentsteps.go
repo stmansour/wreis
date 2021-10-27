@@ -147,6 +147,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	util.Console("Entered %s\n", funcname)
 	// util.Console("record data = %s\n", d.data)
 
+	var ReturnRSLID = int64(0)
 	var foo SaveRentSteps
 	data := []byte(d.data)
 	err := json.Unmarshal(data, &foo)
@@ -181,6 +182,9 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				tx.Rollback()
 				SvcErrorReturn(w, err)
 				return
+			}
+			if ReturnRSLID < 1 {
+				ReturnRSLID = RSLID // save the return id
 			}
 
 			// util.Console("Created.  Now updating property with RSLID = %d\n", RSLID)
@@ -225,7 +229,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			SvcWriteSuccessResponse(w)
+			SvcWriteSuccessResponseWithID(w, ReturnRSLID)
 			return
 		}
 	}
@@ -248,6 +252,10 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	// util.Console("%s: RSLID = %d, len(a) = %d, len(foo) = %d\n", funcname, d.ID, len(a), len(foo.Records))
 	for i := 0; i < len(foo.Records); i++ {
+		if ReturnRSLID < 1 {
+			ReturnRSLID = d.ID // save the return id
+		}
+
 		// util.Console("i = %d, foo.Records[i].RSID = %d\n", i, foo.Records[i].RSID)
 		if foo.Records[i].RSID < 1 {
 			// util.Console("IN PATH A")
@@ -320,7 +328,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcErrorReturn(w, err)
 		return
 	}
-	SvcWriteSuccessResponse(w)
+	SvcWriteSuccessResponseWithID(w, ReturnRSLID)
 }
 
 // RentStepsUpdate updates the supplied RentSteps in the database with the supplied

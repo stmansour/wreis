@@ -113,7 +113,7 @@ function tableAODText(l,x,y,s) {
 //-----------------------------------------------------------------------------
 function genTable() {
     var hbn = "AnnOpDt-Hdr";
-    var MINY = 700;
+    var MINY = 750;
     var l1 = jb.doc.layers.getByName("Financial Overview");
     if (l1==null) {
         alert("could not get layer Financial Overview" );

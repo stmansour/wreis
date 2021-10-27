@@ -49,7 +49,7 @@ function subjectPropertyPhotoCount() {
     }
     // other photos
     var s;
-    for (var j = 5; j <= 8; j++) {
+    for (var j = jb.subjProp; j <= 8; j++) {
         s = "Img" + j;
         if (property[s] != "") {
             n++;
@@ -63,7 +63,7 @@ function addSubjectImages() {
     app.selection = null;  // ensure nothing is selected
     var cpABR = app.activeDocument.artboards.getByName("Offering").artboardRect;
 
-    for (var j = 5; j <= 8; j++) {
+    for (var j = jb.subjProp; j <= 8; j++) {
         var s = "Img" + j;
         if (property[s] == "") {
             continue;
@@ -145,7 +145,7 @@ function addSubjectImages() {
         // All the objects were pasted in place, so we need to move them
         // to the right.
         //----------------------------------------------------------------
-        placeImageInArea(j,"SubjectProperty"+(j-3),"SP1-Background",app.activeDocument.layers.getByName("Subject Property "+(j-3)));
+        placeImageInArea(j,"SubjectProperty"+(j-4),"SP1-Background",app.activeDocument.layers.getByName("Subject Property "+(j-4)));
     }
 }
 
@@ -205,8 +205,8 @@ function generateMarketPackage() {
     //  PAGE 2 - Table of Contents
     //---------------------------------------------------------------------------
     var sp = subjectPropertyPhotoCount();
-    var s = "8";
-    var pn = 8;
+    var s = "9";
+    var pn = 9;
     if (sp > 1) {
         pn += sp - 1;
         s += " - " + pn;
@@ -292,10 +292,17 @@ function generateMarketPackage() {
     }
 
     //---------------------------------------------------------------------------
-    //  PAGE 8 - Subject Property
+    //  PAGE 7 - Location Map
+    //---------------------------------------------------------------------------
+    if (property.Img3 != "") {
+        placeImageInArea(5,"LM-LocationMap","LM-Background",jb.doc.layers.getByName("Location Map"));
+    }
+
+    //---------------------------------------------------------------------------
+    //  PAGE 9 - Subject Property
     //
     //  These start with the cover image (Img1.)+fileExtension(property.Img1) and will include images
-    //  5 - 8 if present.
+    //  6 - 8 if present.
     //---------------------------------------------------------------------------
     if (property.Img1 != "") {
         placeImageInArea(1,"SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));

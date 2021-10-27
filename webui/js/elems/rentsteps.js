@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise, w2utils, setInnerHTML,
-    number_format, setPropertyFormActionButtons,
+    number_format, setPropertyFormActionButtons, savePropertyFormWithCB,
 */
 
 "use strict";
@@ -188,6 +188,9 @@ function finishRentStepsGridToolbar() {
     t.on('*', RentStepTypeChange);
 }
 
+//=========================
+//        DELETE
+//=========================
 function RentStepDelete() {
     var r = w2ui.propertyRentStepForm.record;
     var g = w2ui.propertyRentStepsGrid;
@@ -200,6 +203,9 @@ function RentStepDelete() {
     g.render();
 }
 
+//=========================
+//         SAVE
+//=========================
 function RentStepSave() {
     var r = w2ui.propertyRentStepForm.record;
     var g = w2ui.propertyRentStepsGrid;
@@ -216,8 +222,48 @@ function RentStepSave() {
     }
     g.set(r.recid,r);
 
-    closeRentStepForm();
-    g.render();
+    // Save all rentsteps whether or not the entire property gets saved.
+    // This is a non-standard way of doing things,
+    // but it was requested by Kristin after she accidentally lost 25 rent steps
+    // after enterning them but not saving the entire property.
+    //
+    // The edge case here is when the property hasn't been saved and the PRID
+    // is 0.  In this case, we can save what we have in the property then save
+    // the RentStep...
+    //--------------------------------------------------------------------------
+    if (w2ui.propertyForm.record.PRID < 1) {
+        savePropertyFormWithCB(PropertySaveCB);   // need to save property first
+    }
+    saveRentStepsWithCB(internalFinishCB);
+}
+
+
+//------------------------------------------------------------------------------
+// PropertySaveCB is called when savePropertyFormWithCB completes.
+//
+// INPUTS
+//      data    = data returned from post
+//      success = boolean, true if post succeeds, false otherwise
+//------------------------------------------------------------------------------
+function PropertySaveCB(data,success) {
+    if (success) {
+        w2ui.propertyForm.record.PRID = data.recid;
+        saveRentStepsWithCB(internalFinishCB);
+    } else {
+        w2ui.propertyRentStepForm.error(data.message);
+    }
+}
+
+function internalFinishCB(data,success) {
+    if (success) {
+        if (w2ui.propertyForm.record.RSLID < 1) {
+            w2ui.propertyForm.record.RSLID = data.recid;
+        }
+        closeRentStepForm();
+        w2ui.propertyRentStepsGrid.render();
+    } else {
+        w2ui.propertyRentStepForm.error(data.message);
+    }
 }
 
 function SetMonthlyRentString() {
@@ -294,7 +340,12 @@ function closeRentStepForm() {
     setPropertyFormActionButtons(true); // turn on the property form buttons now
 }
 
-function saveRentSteps() {
+function saveRentSteps(cb) {
+    var cbf = RentStepsSaveCB;  // the default callback
+    if (typeof cb === "function" ) {
+        cbf = cb;
+    }
+
     //-----------------------------------------------------------------------
     // If we never loaded the rentsteps, then they weren't changed, so just
     // return success.
@@ -308,7 +359,10 @@ function saveRentSteps() {
             }
         });
     }
+    saveRentStepsWithCB(cbf);
+}
 
+function saveRentStepsWithCB(cbf) {
     //-----------------------------------------------------------------------
     // We have loaded the rentsteps, so we need to go through the save...
     //-----------------------------------------------------------------------
@@ -328,12 +382,24 @@ function saveRentSteps() {
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
+        cbf(data,true);
+    })
+    .fail(function(data){
+        cbf(data,false);
+    });
+}
+
+//------------------------------------------------------------------------------
+// data = data returned from post
+// success = boolean, true if post succeeds, false if it fails
+//------------------------------------------------------------------------------
+function RentStepsSaveCB(data,success) {
+    if (success) {
         if (data.status === "error") {
             w2ui.propertyGrid.error('ERROR: '+ data.message);
         }
         propData.bRentStepsLoaded = false;
-    })
-    .fail(function(data){
-            w2ui.propertyGrid.error("Save RentSteps failed. " + data);
-    });
+    } else {
+        w2ui.propertyGrid.error("Save RentSteps failed. " + data);
+    }
 }
