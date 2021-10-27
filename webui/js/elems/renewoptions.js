@@ -1,6 +1,6 @@
 /*global
     w2ui, app, $, console, dateFmtStr, propData, Promise,
-    setPropertyFormActionButtons,
+    setPropertyFormActionButtons, savePropertyFormWithCB,
 */
 
 "use strict";
@@ -176,6 +176,9 @@ function finishRenewOptionsGridToolbar() {
     t.on('*', RenewOptionTypeChange);
 }
 
+//=========================
+//        DELETE
+//=========================
 function RenewOptionDelete() {
     var r = w2ui.propertyRenewOptionForm.record;
     var g = w2ui.propertyRenewOptionsGrid;
@@ -188,6 +191,9 @@ function RenewOptionDelete() {
     g.render();
 }
 
+//=========================
+//         SAVE
+//=========================
 function RenewOptionSave() {
     var r = w2ui.propertyRenewOptionForm.record;
     var g = w2ui.propertyRenewOptionsGrid;
@@ -204,8 +210,47 @@ function RenewOptionSave() {
     }
     g.set(r.recid,r);
 
-    closeRenewOptionForm();
-    g.render();
+    // Save all RenewOptions here whether or not the entire property gets saved.
+    // This is a non-standard way of doing things,
+    // but it was requested by Kristin after she accidentally lost 25 rent steps
+    // after enterning them but not saving the entire property.
+    //
+    // The edge case here is when the property hasn't been saved and the PRID
+    // is 0.  In this case, we can save what we have in the property then save
+    // the RenewOptions...
+    //--------------------------------------------------------------------------
+    if (w2ui.propertyForm.record.PRID < 1) {
+        savePropertyFormWithCB(ROPropertySaveCB);   // need to save property first
+    }
+    saveRenewOptionsWithCB(internalFinishROCB);
+}
+
+//------------------------------------------------------------------------------
+// RSPropertySaveCB is called when savePropertyFormWithCB completes.
+//
+// INPUTS
+//      data    = data returned from post
+//      success = boolean, true if post succeeds, false otherwise
+//------------------------------------------------------------------------------
+function ROPropertySaveCB(data,success) {
+    if (success) {
+        w2ui.propertyForm.record.PRID = data.recid;
+        saveRenewOptionsWithCB(internalFinishROCB);
+    } else {
+        w2ui.propertyRentStepForm.error(data.message);
+    }
+}
+
+function internalFinishROCB(data,success) {
+    if (success) {
+        if (w2ui.propertyForm.record.ROLID < 1) {
+            w2ui.propertyForm.record.ROLID = data.recid;
+        }
+        closeRenewOptionForm();
+        w2ui.propertyRenewOptionsGrid.render();
+    } else {
+        w2ui.propertyRenewOptionForm.error(data.message);
+    }
 }
 
 function RenewOptionTypeChange(event) {
@@ -276,7 +321,12 @@ function closeRenewOptionForm() {
 }
 
 
-function saveRenewOptions() {
+function saveRenewOptions(cb) {
+    var cbf = RenewOptionsSaveCB;  // the default callback
+    if (typeof cb === "function" ) {
+        cbf = cb;
+    }
+
     //-----------------------------------------------------------------------
     // If we never loaded the renewoptions, then they weren't changed, so just
     // return success.
@@ -290,7 +340,10 @@ function saveRenewOptions() {
             }
         });
     }
+    saveRenewOptionsWithCB(cbf);
+}
 
+function saveRenewOptionsWithCB(cbf) {
     //-----------------------------------------------------------------------
     // We have loaded the renewoptions, so we need to go through the save...
     //-----------------------------------------------------------------------
@@ -312,12 +365,24 @@ function saveRenewOptions() {
 
     return $.post(url, dat, null, "json")
     .done(function(data) {
-        if (data.status === "error") {
-            w2ui.propertyGrid.error('ERROR: '+ data.message);
-        }
-        propData.bRenewOptionsLoaded = false;
+        cbf(data,true);
     })
     .fail(function(data){
-            w2ui.propertyGrid.error("Save RenewOptions failed. " + data);
+        cbf(data,false);
     });
+}
+
+//------------------------------------------------------------------------------
+// data = data returned from post
+// success = boolean, true if post succeeds, false if it fails
+//------------------------------------------------------------------------------
+function RenewOptionsSaveCB(data,success) {
+    if (success) {
+        if (data.status === "error") {
+            w2ui.propertyRenewOptionsGrid.error('ERROR: '+ data.message);
+        }
+        propData.bRenewOptionsLoaded = false;
+    } else {
+        w2ui.propertyRenewOptionsGrid.error("Save RenewOptions failed. " + data);
+    }
 }

@@ -232,20 +232,20 @@ function RentStepSave() {
     // the RentStep...
     //--------------------------------------------------------------------------
     if (w2ui.propertyForm.record.PRID < 1) {
-        savePropertyFormWithCB(PropertySaveCB);   // need to save property first
+        savePropertyFormWithCB(RSPropertySaveCB);   // need to save property first
     }
     saveRentStepsWithCB(internalFinishCB);
 }
 
 
 //------------------------------------------------------------------------------
-// PropertySaveCB is called when savePropertyFormWithCB completes.
+// RSPropertySaveCB is called when savePropertyFormWithCB completes.
 //
 // INPUTS
 //      data    = data returned from post
 //      success = boolean, true if post succeeds, false otherwise
 //------------------------------------------------------------------------------
-function PropertySaveCB(data,success) {
+function RSPropertySaveCB(data,success) {
     if (success) {
         w2ui.propertyForm.record.PRID = data.recid;
         saveRentStepsWithCB(internalFinishCB);

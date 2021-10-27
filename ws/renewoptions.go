@@ -158,6 +158,8 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
+	var ReturnedROLID = int64(0)
+
 	//------------------------------------------------------------------------
 	// Make sure we have a list for this set of RenewOptions
 	//------------------------------------------------------------------------
@@ -176,6 +178,9 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			}
 			// util.Console("New ROLID = %d\n", ROLID)
 			// util.Console("foo.PRID = %d\n", foo.PRID)
+			if ReturnedROLID < 1 {
+				ReturnedROLID = ROLID
+			}
 
 			//---------------------------------------------------
 			// now update this property to point to the list...
@@ -221,7 +226,7 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 				SvcErrorReturn(w, err)
 				return
 			}
-			SvcWriteSuccessResponse(w)
+			SvcWriteSuccessResponseWithID(w, ReturnedROLID)
 			return
 		}
 	}
@@ -246,6 +251,9 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	// util.Console("%s: ROLID = %d  num items = %d\n", funcname, d.ID, len(a))
 	for i := 0; i < len(foo.Records); i++ {
+		if ReturnedROLID < 1 {
+			ReturnedROLID = d.ID
+		}
 		if foo.Records[i].ROID < 1 {
 			var x db.RenewOption
 			util.Console("ADD: foo.Records[i].ROID = %d\n", foo.Records[i].ROID)
@@ -315,7 +323,7 @@ func saveRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcErrorReturn(w, err)
 		return
 	}
-	SvcWriteSuccessResponse(w)
+	SvcWriteSuccessResponseWithID(w, ReturnedROLID)
 }
 
 // RenewOptionsUpdate updates the supplied RenewOptions in the database with the supplied
