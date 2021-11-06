@@ -109,8 +109,8 @@ function resizePlaceAndCrop(img, bb) {
         // center the scaled image
         //---------------------------------------------------------------------
         var top = img.top;
-        img.left = bb.left
-        icy = img.top - img.height/2
+        img.left = bb.left;
+        icy = img.top - img.height/2;
         img.top = top + bcy - icy;
 
     } else {
@@ -128,14 +128,14 @@ function resizePlaceAndCrop(img, bb) {
         // center the scaled image
         //---------------------------------------------------------------------
         var left = img.left;
-        img.top = bb.top
+        img.top = bb.top;
         img.left = left + bcx - icx;
     }
 
     //---------------------------------------------------------------------
     // crop it
     //---------------------------------------------------------------------
-    var rasterOpts = new RasterizeOptions;
+    var rasterOpts = new RasterizeOptions();
     rasterOpts.antiAliasingMethod = AntiAliasingMethod.ARTOPTIMIZED; // the other option is TYPEOPTIMIZED
     rasterOpts.resolution = 72;
     doc.rasterize(img, bb.geometricBounds, rasterOpts);
@@ -223,20 +223,3 @@ function placeCoverImage() {
     var b = getArtboardBounds(jb.ab);
     fitFullImageInPageItem(placedItem,b,"coverPageHeaderBar");
 }
-
-// function placeAerialImage() {
-//     var layer = jb.doc.layers.getByName("Aerial Photo");
-//     var placedItem = layer.placedItems.add();
-//     var fname = jb.cwd + "/Img2." + fileExtension(property.Img2);
-//     try {
-//         placedItem.file = new File(fname);
-//     } catch (error) {
-//         alert(fname + ': ' + error);
-//         return;
-//     }
-//     placedItem.name = "aerialPhoto";
-//
-//     var aab = layer.pathItems.getByName("AP-background");
-//     var b = getArtboardBounds(aab);
-//     fitFullImageInPageItem(placedItem,b,"aerialPhotoHeaderBar");
-// }
