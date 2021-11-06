@@ -1,6 +1,10 @@
 
 function imageFilename(n) {
-    return jb.cwd + "/Img" + n + "." + fileExtension(property["Img"+n]);
+    var s = property["Img"+n];
+    if (s == "") {
+        return s;
+    }
+    return jb.cwd + "/Img" + n + "." + fileExtension(s);
 }
 
 
@@ -56,6 +60,9 @@ function fitItem(item, p) {
 function placeImage(layer,n,nameInAI,p) {
     var placedItem = layer.placedItems.add();
     var fqname = imageFilename(n);  // fully qualified name
+    if (fqname == "") {
+        return;
+    }
     try {
         placedItem.file = new File(fqname);
     } catch (error) {
@@ -66,15 +73,107 @@ function placeImage(layer,n,nameInAI,p) {
     fitItem(placedItem,p);
 }
 
+// resizePlaceAndCrop -
+//      resizes, centers, and crops the image to totally fill the area defined
+//       by bb (bounding box)
+//
+// img       = the image to resize, center, and crop
+// bb        = the object of the bounds. Members left, top, width, and height
+//             define the useable area
+//------------------------------------------------------------------------------
+function resizePlaceAndCrop(img, bb) {
+    var doc = app.activeDocument;
+    //--------------------------------------------------------------------------
+    // 1. scale it in such a way that the image fully covers the bounding area.
+    // 2. center the scaled image in the bb
+    // 3. crop it to fit the bounding box
+    //--------------------------------------------------------------------------
+    var wratio = bb.width / img.width;
+    var hratio = bb.height / img.height;
+    var bcx = bb.left + bb.width/2;
+    var bcy = bb.top - bb.height/2;
 
-// fitFullPageItem  center an image on the page, resize to maintain aspect ratio
+    var MINSIZE = 10;
+    if (hratio < wratio) {
+        //---------------------------------------------------------------------
+        // landscape, scale height using ratio from width
+        //---------------------------------------------------------------------
+        var newheight = (bb.width * img.height) / img.width;
+        if (newheight < MINSIZE) {
+            return;
+        }
+        img.width = bb.width;
+        img.height = newheight;
+
+        //---------------------------------------------------------------------
+        // center the scaled image
+        //---------------------------------------------------------------------
+        var top = img.top;
+        img.left = bb.left
+        icy = img.top - img.height/2
+        img.top = top + bcy - icy;
+
+    } else {
+        //---------------------------------------------------------------------
+        // portrait, scale width using ratio from height
+        //---------------------------------------------------------------------
+        var nw = (bb.height * img.width) / img.height;
+        if (nw < MINSIZE) {
+            return;
+        }
+        img.height = bb.height;
+        img.width = nw;
+
+        //---------------------------------------------------------------------
+        // center the scaled image
+        //---------------------------------------------------------------------
+        var left = img.left;
+        img.top = bb.top
+        img.left = left + bcx - icx;
+    }
+
+    //---------------------------------------------------------------------
+    // crop it
+    //---------------------------------------------------------------------
+    var rasterOpts = new RasterizeOptions;
+    rasterOpts.antiAliasingMethod = AntiAliasingMethod.ARTOPTIMIZED; // the other option is TYPEOPTIMIZED
+    rasterOpts.resolution = 72;
+    doc.rasterize(img, bb.geometricBounds, rasterOpts);
+}
+
+// placeResizeCenterCropImage - inserts the image with filename fname int area p. The
+//              image will be expanded so that it is centered in the  space
+//
+// layer     = layer to add image to
+// n         = index number of the image (1..n)
+// nameInAI  = name to give the new Illustrator item
+// bb        = the object of the bounds. members left, top, width, and height define
+//             the useable area
+//------------------------------------------------------------------------------
+function placeResizeCenterCropImage(layer,n,nameInAI,bb) {
+    var img = layer.placedItems.add();
+    var fqname = imageFilename(n);  // fully qualified name
+    if (fqname == "") {
+        return;
+    }
+    try {
+        img.file = new File(fqname);
+    } catch (error) {
+        alert(fqname + ': ' + error);
+        return;
+    }
+    img.name = nameInAI;
+    resizePlaceAndCrop(img,bb);
+}
+
+// fitFullImageInPageItem  center an image on the page, resize to maintain aspect ratio
 //
 // item - the image
 // p    - the size and location of the artboard (the page)
 // hdr  - the name of the path defining the header of the page.  It is assumed
 //        to be a rectangle located at the top of the artboard.
 //------------------------------------------------------------------------------
-function fitFullPageItem(item, p, hdr) {
+function fitFullImageInPageItem(item, p, hdr) {
     var bar = jb.doc.pathItems.getByName(hdr);
     var bt = bar.visibleBounds;
     var b = {
@@ -122,7 +221,7 @@ function placeCoverImage() {
     }
     placedItem.name = "coverPicture";
     var b = getArtboardBounds(jb.ab);
-    fitFullPageItem(placedItem,b,"coverPageHeaderBar");
+    fitFullImageInPageItem(placedItem,b,"coverPageHeaderBar");
 }
 
 // function placeAerialImage() {
@@ -139,5 +238,5 @@ function placeCoverImage() {
 //
 //     var aab = layer.pathItems.getByName("AP-background");
 //     var b = getArtboardBounds(aab);
-//     fitFullPageItem(placedItem,b,"aerialPhotoHeaderBar");
+//     fitFullImageInPageItem(placedItem,b,"aerialPhotoHeaderBar");
 // }

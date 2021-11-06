@@ -17,11 +17,11 @@ var propData = {
     bRenewOptionsLoaded: false, // "  same as above for RenewOptions
     bTrafficLoaded: false,      // " for Traffic
     bStateLoaded: false,        // " for state info
-    statefilter: [1,2,3,4,5,6,7], // how to filter properties  (1-7) = open, (8) = closed
+    statefilter: [1,2,3,4,5,6,7,8], // how to filter properties  (1-8) = open, (9) = closed
     showTerminated: 0,          // 0 = don't show terminated properties, 1 = show terminated properties
     myQueue: 0,                 // 0 = don't show my queue, 1 = show my queue
     formWidth: 575,             // how wide is the entry / edit form
-    numStates: 7,               // states go from 1 to 7 -- this is a full complement of sates, the states array may have less
+    numStates: 8,               // states go from 1 to 8 -- this is a full complement of sates, the states array may have less
     states: [],                 // the server will be queried for these on existing properties, or filled with an inital state on new
     rsType: 0,                  // 0 = options, 1 = date
     roType: 0,                  // 0 = options, 1 = date
@@ -269,9 +269,9 @@ function buildPropertyUIElements() {
         event.onComplete = function (event) {
             var found = false;
             switch (event.item.id) {
-            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6,7];                 break;
-            case "closedProperties": found=true; propData.statefilter    = [8];                             break;
-            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7,8];               break;
+            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6,7,8];               break;
+            case "closedProperties": found=true; propData.statefilter    = [9];                             break;
+            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7,8,9];             break;
             case "showTerminated":   found=true; propData.showTerminated = propData.showTerminated ? 0 : 1; break;
             case "myQueue":          found=true; propData.myQueue        = (propData.myQueue == 1) ? 0 : 1; break;
             }

@@ -323,6 +323,11 @@ while getopts "csp:u" o; do
 done
 shift $((OPTIND-1))
 
+if [ "${1}x" != "x" ]; then
+    Usage
+    exit 1
+fi
+
 Clean       # Remove any old files
 LIReq       # Log in
 ShowPlan

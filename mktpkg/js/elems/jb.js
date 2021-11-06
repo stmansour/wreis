@@ -171,6 +171,8 @@ function generateMarketPackage() {
     var template = 'template00.ai';
     var fname = Folder.myDocuments + '/wreis/' + template;
     var f = new File(fname);
+    var lyr;  // layer
+    var bb;   // bounding box (any object with top,left,width,height )
     app.open(f);
 
     //---------------------------------------------------------------------------
@@ -195,7 +197,10 @@ function generateMarketPackage() {
     setTextContents("cityStateZip",property.City + ", " + property.State + "  " + property.PostalCode);
     //placeCoverImage();
     if (property.Img1 != "") {
-        placeImageInArea(1,"CoverShot","CP-CoverPhotoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
+        // placeImageInArea(1,"CoverShot","CP-CoverPhotoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
+        lyr = jb.doc.layers.getByName("COVER PAGE - Offering");
+        bb = lyr.pathItems.getByName("CP-CoverPhotoArea");
+        placeResizeCenterCropImage(lyr,1,"CoverShot",bb);
     }
     if (property.Img4 != "") {
         placeImageInArea(4,"CoverLogo","CP-LogoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));

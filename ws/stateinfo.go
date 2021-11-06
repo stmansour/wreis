@@ -12,21 +12,22 @@ import (
 
 // places where we should avoid hardcoding inline
 const (
-	fn          = "?? unknown"
-	ln          = "user ??"
-	FINALSTATE  = 8  // this should be the highest state number
+	fn         = "?? unknown"
+	ln         = "user ??"
+	FINALSTATE = 8 // this should be the highest state number
 )
 
 // StateInfo deals with state changes to the StateInfo structs. The states are:
 //
 //		1. New Record Entry
 //		2. First Task List
-//		3. Marketing Package
-//		4. Ready To List
-//		5. Listed
-//      6. Contract Pending
-//		7. Under Contract
-//		8. Closed
+//		3. Marketing Package Review
+//      4. Final Marketing Package Review
+//		5. Ready To List
+//		6. Listed
+//      7. Contract Pending
+//		8. Under Contract
+//		9. Closed
 //
 // The following actions apply to states:
 //
@@ -634,8 +635,10 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	}
 
 	// now create the new next StateInfo
-	if a.FlowState <= FINALSTATE  {
-		a.FlowState++
+	if a.FlowState <= FINALSTATE {
+		if a.FlowState != FINALSTATE {
+			a.FlowState++
+		}
 		a.SIID = 0
 		a.FLAGS = 0
 		a.OwnerDt = time.Now()
