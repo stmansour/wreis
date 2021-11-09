@@ -5,14 +5,17 @@ js:
 	echo "completed"
 clean:
 	./mpak.sh -c
-	rm -f res/core.js
+	rm -rf res/core.js tmp
 	echo "completed"
 test:
 	echo "completed"
 package:
-	mkdir -p "${DIST}/mpak/res"
-	cp res/core.js res/template00.ai "${DIST}/mpak/res/"
-	cp mpak.sh "${DIST}/mpak/"
+	mkdir -p tmp/mpak/res
+	cp res/template00.ai tmp/mpak/res/
+	cp res/core.js  tmp/mpak/res/
+	cp mpak.sh tmp/mpak/
+	cd tmp ; tar cvf mpak.tar . ; gzip mpak.tar
+	cp tmp/mpak.tar.gz "${DIST}/"
 	echo "completed"
 
 db:
