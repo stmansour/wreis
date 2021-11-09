@@ -11,10 +11,10 @@ clean:
 test:
 	echo "completed"
 package:
-	mkdir -p "${LDIST}/mpak/res"
-	cp res/template00.ai "${LDIST}/mpak/res/"
-	cp res/core.js  "${LDIST}/mpak/res/"
-	cp mpak.sh "${LDIST}/mpak/"
+	mkdir -p "${LDIST}/res"
+	cp res/template00.ai "${LDIST}/res/"
+	cp res/core.js  "${LDIST}/res/"
+	cp mpak.sh "${LDIST}/"
 	tar cvf mpak.tar mpak ; gzip mpak.tar
 	cp mpak.tar.gz "${DIST}/"
 	rm -rf mpak.tar.gz mpak
