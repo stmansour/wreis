@@ -168,7 +168,7 @@ function generateMarketPackage() {
     // to the file system correctly even on Windows.  We will look for a folder
     // named ~/Documents/wreis and open the file template00.ai
     //---------------------------------------------------------------------------
-    var template = 'template00.ai';
+    var template = 'res/template00.ai';
     var fname = Folder.myDocuments + '/wreis/' + template;
     var f = new File(fname);
     var lyr;  // layer
@@ -197,10 +197,7 @@ function generateMarketPackage() {
     setTextContents("cityStateZip",property.City + ", " + property.State + "  " + property.PostalCode);
     //placeCoverImage();
     if (property.Img1 != "") {
-        // placeImageInArea(1,"CoverShot","CP-CoverPhotoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
-        lyr = jb.doc.layers.getByName("COVER PAGE - Offering");
-        bb = lyr.pathItems.getByName("CP-CoverPhotoArea");
-        placeResizeCenterCropImage(lyr,1,"CoverShot",bb);
+        fillWithImage("COVER PAGE - Offering","CP-CoverPhotoArea",1,"CoverShot");
     }
     if (property.Img4 != "") {
         placeImageInArea(4,"CoverLogo","CP-LogoArea",jb.doc.layers.getByName("COVER PAGE - Offering"));
@@ -286,7 +283,7 @@ function generateMarketPackage() {
     //  PAGE 6 - Aerial Photo
     //---------------------------------------------------------------------------
     if (property.Img2 != "") {
-        placeImageInArea(2,"AP-AerialPhoto","AP-Background",jb.doc.layers.getByName("Aerial Photo"));
+        fillWithImage("Aerial Photo","AP-background",2,"AP-AerialPhoto");
     }
 
     //---------------------------------------------------------------------------
@@ -294,6 +291,7 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     if (property.Img3 != "") {
         placeImageInArea(3,"AM-AreaMap","AM-Background",jb.doc.layers.getByName("Area Map"));
+        // fillWithImage("Area Map","AM-Background",3,"AM-AreaMap");
     }
 
     //---------------------------------------------------------------------------
@@ -301,6 +299,7 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     if (property.Img3 != "") {
         placeImageInArea(5,"LM-LocationMap","LM-Background",jb.doc.layers.getByName("Location Map"));
+        // fillWithImage("Location Map","LM-Background",5,"LM-LocationMap");
     }
 
     //---------------------------------------------------------------------------
@@ -311,6 +310,7 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     if (property.Img1 != "") {
         placeImageInArea(1,"SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));
+        // fillWithImage("Subject Property 1","SP1-Background",1,"SubjectProperty1");
     }
     addSubjectImages();
 }

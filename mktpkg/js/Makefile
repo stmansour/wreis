@@ -1,16 +1,18 @@
 DIST=../../dist/wreis
 js:
-	cat elems/utils.js elems/image.js elems/table.js elems/jb.js > core.js
+	mkdir -p res
+	cat elems/utils.js elems/image.js elems/table.js elems/jb.js > res/core.js
 	echo "completed"
 clean:
 	./mpak.sh -c
-	rm -f core.js
+	rm -f res/core.js
 	echo "completed"
 test:
 	echo "completed"
 package:
-	mkdir -p "${DIST}/mpak"
-	cp core.js mpak.sh template00.ai "${DIST}/mpak/"
+	mkdir -p "${DIST}/mpak/res"
+	cp res/core.js res/template00.ai "${DIST}/mpak/res/"
+	cp mpak.sh "${DIST}/mpak/"
 	echo "completed"
 
 db:

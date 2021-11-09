@@ -80,8 +80,9 @@ function placeImage(layer,n,nameInAI,p) {
 // img       = the image to resize, center, and crop
 // bb        = the object of the bounds. Members left, top, width, and height
 //             define the useable area
+// name      = name for the newly created image
 //------------------------------------------------------------------------------
-function resizePlaceAndCrop(img, bb) {
+function resizePlaceAndCrop(img, bb, name) {
     var doc = app.activeDocument;
     //--------------------------------------------------------------------------
     // 1. scale it in such a way that the image fully covers the bounding area.
@@ -128,9 +129,11 @@ function resizePlaceAndCrop(img, bb) {
         // center the scaled image
         //---------------------------------------------------------------------
         var left = img.left;
-        img.top = bb.top;
+        icx = img.left + img.width/2;
         img.left = left + bcx - icx;
     }
+
+    // alert('img.left = ' + img.left + ', img.top = ' + img.top + ', img.width = ' + img.width + ', img.height = ' + img.height);
 
     //---------------------------------------------------------------------
     // crop it
@@ -138,7 +141,8 @@ function resizePlaceAndCrop(img, bb) {
     var rasterOpts = new RasterizeOptions();
     rasterOpts.antiAliasingMethod = AntiAliasingMethod.ARTOPTIMIZED; // the other option is TYPEOPTIMIZED
     rasterOpts.resolution = 72;
-    doc.rasterize(img, bb.geometricBounds, rasterOpts);
+    var newimg = doc.rasterize(img, bb.geometricBounds, rasterOpts);
+    newimg.name = name;
 }
 
 // placeResizeCenterCropImage - inserts the image with filename fname int area p. The
@@ -152,6 +156,8 @@ function resizePlaceAndCrop(img, bb) {
 //------------------------------------------------------------------------------
 function placeResizeCenterCropImage(layer,n,nameInAI,bb) {
     var img = layer.placedItems.add();
+    // img.name = nameInAI;
+
     var fqname = imageFilename(n);  // fully qualified name
     if (fqname == "") {
         return;
@@ -162,8 +168,22 @@ function placeResizeCenterCropImage(layer,n,nameInAI,bb) {
         alert(fqname + ': ' + error);
         return;
     }
-    img.name = nameInAI;
-    resizePlaceAndCrop(img,bb);
+    resizePlaceAndCrop(img,bb,nameInAI);
+}
+
+// fillWithImage - fills an area with an image - will resize and crop image as
+//                 needed to fill the area.
+//
+// INPUTS
+// lname     = namd of layer to add image to
+// rname     = name of rectangle (pathItem) defining area to fill
+// n         = index number of the image (1..n)
+// nameInAI  = name to give the new Illustrator item
+//------------------------------------------------------------------------------
+function fillWithImage(lname,rname,n,nameInAI) {
+    var lyr = app.activeDocument.layers.getByName(lname);
+    var bb = lyr.pathItems.getByName(rname);
+    placeResizeCenterCropImage(lyr,n,nameInAI,bb);
 }
 
 // fitFullImageInPageItem  center an image on the page, resize to maintain aspect ratio

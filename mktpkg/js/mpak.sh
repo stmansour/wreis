@@ -10,6 +10,7 @@ ROPTJSON="ropt.json"
 RENTJSON="rent.json"
 SKIPIMAGES=0
 CWD=$(pwd)
+SAVECOREFILES=0
 
 HOST="http://localhost:8276"
 HOST="https://showponyinvestments.com"
@@ -293,7 +294,13 @@ var jb = {
 };
 FFEOF
     echo "jb.cwd = \"${CWD}\";" >> "${OUTFILE}"
-    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" core.js >> "${OUTFILE}"
+    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" res/core.js >> "${OUTFILE}"
+
+    if (( SAVECOREFILES != 1 )); then
+        echo "REMOVING FILES..."
+        rm -rf "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" log request response serverreply
+    fi
+
 }
 
 ###############################################################################
