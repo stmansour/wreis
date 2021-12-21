@@ -12,6 +12,7 @@ test:
 	echo "completed"
 package:
 	mkdir -p "${LDIST}/res"
+	mkdir -p "${DIST}/static/"
 	cp res/template00.ai "${LDIST}/res/"
 	cp res/core.js  "${LDIST}/res/"
 	cp mpak.sh "${LDIST}/"
