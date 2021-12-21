@@ -3,8 +3,8 @@ package ws
 import (
 	"fmt"
 	"html/template"
-	"mojo/util"
 	"net/http"
+	util "wreis/util/lib"
 )
 
 // WREISUISupport is a structure of data that will be passed to all html pages.

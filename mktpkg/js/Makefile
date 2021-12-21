@@ -16,7 +16,7 @@ package:
 	cp res/core.js  "${LDIST}/res/"
 	cp mpak.sh "${LDIST}/"
 	tar cvf mpak.tar mpak ; gzip mpak.tar
-	cp mpak.tar.gz "${DIST}/"
+	cp mpak.tar.gz "${DIST}/static/"
 	rm -rf mpak.tar.gz mpak
 	echo "completed"
 

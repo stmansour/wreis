@@ -11,3 +11,10 @@ func Ulog(format string, a ...interface{}) {
 	log.Print(p)
 	// debug.PrintStack()
 }
+
+// LogAndPrintError is Phonebooks's standard logger
+func LogAndPrintError(f string, err error) {
+	p := fmt.Sprintf("%s: %s", f, err.Error())
+	log.Print(p)
+	fmt.Printf(p)
+}

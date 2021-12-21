@@ -34,6 +34,28 @@ func Mkstr(n int, c byte) string {
 	return string(p)
 }
 
+// SafeURLFilename is a function that makes filenames safe for urls.
+// Filenames that will be used in a URL could contain characters that will
+// cause problems.  This function replaces those characters with dashes.
+//
+// INPUTS
+//  f = filename to change
+//
+// Mapping:
+//  ' ' -> '-'
+//  ',' -> '-'
+//------------------------------------------------------------------------------
+func SafeURLFilename(f string) string {
+	p := []byte(f)
+	n := len(p)
+	for i := 0; i < n; i++ {
+		if p[i] == ' ' || p[i] == ',' {
+			p[i] = '-'
+		}
+	}
+	return string(p)
+}
+
 // IntFromString converts the supplied string to an int64 value. If there
 // is a problem in the conversion, it generates an error message. To suppress
 // the error message, pass in "" for errmsg.
