@@ -6,6 +6,29 @@
   UTCDateStringToW2UIValidDate,stringToDate,
 */
 
+
+// copyStringToClipboard copies the supplied string to the clipboard
+//
+// Usage example:
+//      copyStringToClipboard("abc123");
+//
+// INPUTS
+//      str = string to copy
+// RETURNS:
+//      nothing
+//------------------------------------------------------------------------------
+function copyStringToClipboard (str) {
+    var el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');    // Set non-editable to avoid focus and move outside of view
+    el.style = {position: 'absolute', left: '-9999px'};  // make it unseen
+    document.body.appendChild(el);
+
+    el.select();    // Select text inside element
+    document.execCommand('copy');   // Copy text to clipboard
+    document.body.removeChild(el);  // Remove temporary element
+}
+
 // monthDiff returns the number of months between 2 dates
 //
 //------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ ShowPlan() {
     cat << EOF
 *************************************************************************
              Server: ${HOST}
-               User: ${USERNAME}
+               User: ${WUNAME}
     Property (PRID): ${PRID}
 *************************************************************************
 EOF
@@ -32,7 +32,24 @@ mpak.sh
 
 DESCRIPTION
     mpak.sh is a shell script to create an Adobe Illustrator script that
-    produces the WREIS Marketing Package based on the Property ID.
+    produces the WREIS Marketing Package based on the Property ID.  It does
+    this by logging into the WREIS server and retrieving the information
+    it needs to build the marketing package for a specific property. Then it
+    creates a script for Adobe Illustrator in a file named jbx.js. Open
+    Illustrator, then select File -> Scripts -> Other Script... , then select
+    jbx.js . This will create a new tab called portfolio.ai and it will create
+    the marketing package based on the data it downloaded.
+
+    In order to log into the server, you will need to provide your username and
+    password.  The script will ask for these values if it needs them.
+    Alternatively, you can create environment variables for WUNAME and PASSWD
+    that the script can use. Here is an example:
+
+        bash$ WUNAME="jsmith"
+        bash$ PASSWD="mysecretpassword"
+        bash$ export WUNAME PASSWD
+
+
 
 USAGE
     mpak.sh [OPTIONS]
@@ -118,18 +135,18 @@ Clean() {
 #-----------------------------------------------------------------------------
 LIReq() {
     DONE=0
-    if [ "${USERNAME}x" = "x" ]; then
+    if [ "${WUNAME}x" = "x" ]; then
         echo "Your username is required to access the WREIS server."
         echo "You can enter it at the prompt, or to avoid having to enter it"
         echo "you can export it in an environment variable as follows:"
-        echo "    USERNAME=\"your username\""
-        echo "    export USERNAME"
+        echo "    WUNAME=\"your username\""
+        echo "    export WUNAME"
     else
         DONE=1
     fi
     while (( DONE == 0 )); do
-        read -rp 'username: ' USERNAME
-        if (( ${#USERNAME} < 1 )); then
+        read -rp 'username: ' WUNAME
+        if (( ${#WUNAME} < 1 )); then
             echo "come on now, you gotta give me something..."
         else
             DONE=1
@@ -170,7 +187,7 @@ LIReq() {
     done
 
     echo -n "Logging into server... "
-    encodeRequest "{\"user\":\"${USERNAME}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
+    encodeRequest "{\"user\":\"${WUNAME}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
     dojsonPOST "${HOST}/v1/authn/" "request" "response"  # URL, JSONfname, serverresponse
 
     #-----------------------------------------------------------------------------
