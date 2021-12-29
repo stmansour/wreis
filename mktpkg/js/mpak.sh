@@ -4,7 +4,7 @@ LOGFILE="log"
 REQCOUNT=0
 COOKIES=
 PRID=0
-OUTFILE="jbx.js"
+OUTFILE="jb.jsx"
 PROPJSON="property.json"
 ROPTJSON="ropt.json"
 RENTJSON="rent.json"
@@ -35,9 +35,9 @@ DESCRIPTION
     produces the WREIS Marketing Package based on the Property ID.  It does
     this by logging into the WREIS server and retrieving the information
     it needs to build the marketing package for a specific property. Then it
-    creates a script for Adobe Illustrator in a file named jbx.js. Open
+    creates a script for Adobe Illustrator in a file named ${OUTFILE}. Open
     Illustrator, then select File -> Scripts -> Other Script... , then select
-    jbx.js . This will create a new tab called portfolio.ai and it will create
+    ${OUTFILE} . This will create a new tab called portfolio.ai and it will create
     the marketing package based on the data it downloaded.
 
     In order to log into the server, you will need to provide your username and
@@ -283,7 +283,7 @@ var jb = {
     cwd: "",                // the current working directory
     subjProp: 6,            // index of first subject property after cover photo
     lotSizeLabels: [        // what units for LotSize
-        "sqft", "acres"
+        "SF", "Acres"
         ],
     ownershipTypeLabels: [      // OwnershipTypetype
         "Fee Simple",

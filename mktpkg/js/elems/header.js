@@ -12,7 +12,7 @@ var jb = {
     chattr: null,           // the default font and attributes
     cwd: "",                // the current working directory
     lotSizeLabels: [        // what units for LotSize
-        "sqft", "acres"
+        "SF", "Acres"
         ],
     ownershipTypeLabels: [      // OwnershipTypetype
         "Fee Simple",

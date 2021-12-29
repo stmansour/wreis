@@ -227,13 +227,13 @@ function generateMarketPackage() {
     var dt = new Date();
     jb.chattr = t.textRange.characterAttributes;    // we save this for use later
     setTextContents("FO-Price",fmtCurrency(property.Price));
-    setTextContents("FO-DownPayment",fmtCurrency(property.DownPayment));
-    setTextContents("FO-RentableSF",fmtWithCommas(property.RentableArea));
+    setTextContents("FO-DownPayment", "100% / " + fmtCurrency(property.DownPayment));
+    setTextContents("FO-RentableSF",fmtWithCommas(property.RentableArea) + " SF");
     setTextContents("FO-BuildRenovationYear",property.BuildYear + ((property.RenovationYear > 0) ? ' / ' + property.RenovationYear : "") );
     fmtIndexedName(((property.FLAGS & (1<<1)) == 0) ? 0 : 1,"FO-Roof",jb.roofStructureLabels,"roof structure flag");
     setTextContents("FO-RightOfFirstRefusal", (property.FLAGS & (1<<2) > 0) ? "Yes" : "No");
     setTextContents("FO-CapRate",fmtAsPercent(property.CapRate));
-    setTextContents("FO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt));
+    setTextContents("FO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt,property.OriginalLeaseTerm));
     setTextContents("FO-LotSize", (property.LotSizeUnits + 1 > jb.lotSizeLabels.length) ? "(unknown units)" : fmtAsFloatWithCommas(property.LotSize) + ' ' + jb.lotSizeLabels[property.LotSizeUnits]);
     fmtIndexedName(property.OwnershipType,"FO-TypeOwnership",jb.ownershipTypeLabels,"ownership type");
     setTextContents("FO-TenantTradeName",property.TenantTradeName);
@@ -251,7 +251,7 @@ function generateMarketPackage() {
     setTextContents("TO-PropertyName",property.Name);
     setTextContents("TO-PropertyAddressLine1",property.Address);
     setTextContents("TO-PropertyAddressLine2",property.City + ", " + property.State + "  " + property.PostalCode);
-    setTextContents("TO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt));
+    setTextContents("TO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt,property.OriginalLeaseTerm));
     fmtIndexedName(((property.FLAGS & (1<<3)) == 0) ? 0 : 1,"TO-Ownership",jb.ownershipLabels,"ownership type");
     setTextContents("TO-ParentCompany",property.ParentCompany);
     fmtIndexedName(property.LeaseGuarantor,"TO-LeaseGuarantor",jb.guarantorLabels,"guarantor");

@@ -48,6 +48,7 @@ CREATE TABLE Property (
                                                                1<<4  (unused at this time)
                                                                1<<5  (unused at this time)
                                                                1<<6  (TERMINATED - consistent with StateInfo)
+                                                               1<<7  0 = Actual Site,  1 = Representative Photo
                                                             */
     OwnershipType SMALLINT NOT NULL DEFAULT 0,              -- 0 = fee simple, 1 = leasehold
     TenantTradeName VARCHAR(256) NOT NULL DEFAULT '',       -- trade name of business

@@ -234,12 +234,18 @@ function genTable() {
         if (rent != "") {
             tableText(layer,skx+offsetx+col3, sky-offsety, rent, 11, "ArialNarrow", 0, null,c);
         }
+        if (i == 2 && property.CapRate != 0) {
+            tableText(layer,skx+offsetx+col2, sky-offsety, fmtAsPercent(property.CapRate), 11, "ArialNarrow", 0, null,c);
+        }
 
         sky -= height;
     }
     strokeWidth = 0.5; // points
     genRect(layer,upperLX,upperLY,width,3*height,strokeWidth,bottomColor,null); // encompassing rect
 
+    //---------------------------------------------
+    // Now the bottom image if there is room...
+    //---------------------------------------------
     if (sky < MINY) {
         // alert("*** JB WARNING ***  not enough room for image on Financial Overview");
         return;

@@ -135,7 +135,7 @@ function dateDiffInYears(dateold, datenew) {
     return diff;
 }
 
-function fmtDateDiffInYears(d1,d2) {
+function fmtDateDiffInYears(d1,d2,dmaxyears) {
     var t;
     if (typeof d1 === "string") {
         t = AIDate(d1);
@@ -147,6 +147,9 @@ function fmtDateDiffInYears(d1,d2) {
     }
     var diff = DateDiff.inYears(d1,d2);
     if (diff > 0) {
+        if ( diff > dmaxyears) {
+            diff = dmaxyears;
+        }
         return '' + diff + " Years";
     }
     return 'Lease has expired';
