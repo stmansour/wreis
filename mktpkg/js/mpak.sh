@@ -267,6 +267,7 @@ GetRentSteps () {
 # BuildJS
 #-----------------------------------------------------------------------------
 BuildJS () {
+    C="${CWD}"
     cat > "${OUTFILE}" <<FFEOF
 //
 //  jbx.js - the portfolio writer :-)
@@ -280,7 +281,7 @@ var jb = {
     ab: null,               // active artboard
     doc: null,              // the working document
     chattr: null,           // the default font and attributes
-    cwd: "",                // the current working directory
+    cwd: "${CWD}",          // the current working directory
     subjProp: 6,            // index of first subject property after cover photo
     lotSizeLabels: [        // what units for LotSize
         "SF", "Acres"
@@ -310,7 +311,6 @@ var jb = {
     ],
 };
 FFEOF
-    echo "jb.cwd = \"${CWD}\";" >> "${OUTFILE}"
     cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" res/core.js >> "${OUTFILE}"
 
     if (( SAVECOREFILES != 1 )); then

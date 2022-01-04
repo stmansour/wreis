@@ -168,9 +168,8 @@ function generateMarketPackage() {
     // to the file system correctly even on Windows.  We will look for a folder
     // named ~/Documents/wreis and open the file template00.ai
     //---------------------------------------------------------------------------
-    var template = 'res/template00.ai';
-    var fname = Folder.myDocuments + '/wreis/' + template;
-    var f = new File(fname);
+    var template = jb.cwd + '/res/template00.ai';
+    var f = new File(template);
     var lyr;  // layer
     var bb;   // bounding box (any object with top,left,width,height )
     app.open(f);
@@ -178,7 +177,7 @@ function generateMarketPackage() {
     //---------------------------------------------------------------------------
     // immediately save this as a new document: portfolio.ai
     //---------------------------------------------------------------------------
-    fname = Folder.myDocuments + '/wreis/portfolio.ai';
+    fname = jb.cwd + '/portfolio.ai';
     var portfolio = new File(fname);
     app.activeDocument.saveAs(portfolio);
 
