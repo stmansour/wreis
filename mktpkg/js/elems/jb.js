@@ -253,9 +253,10 @@ function generateMarketPackage() {
     setTextContents("TO-PropertyAddressLine2",property.City + ", " + property.State + "  " + property.PostalCode);
     setTextContents("TO-LeaseTermRemaining",fmtDateDiffInYears(dt, property.LeaseExpirationDt,property.OriginalLeaseTerm));
     fmtIndexedName(((property.FLAGS & (1<<3)) == 0) ? 0 : 1,"TO-Ownership",jb.ownershipLabels,"ownership type");
-    setTextContents("TO-ParentCompany",property.ParentCompany);
+    setTextContents("TO-Company",property.TenantTradeName);
     fmtIndexedName(property.LeaseGuarantor,"TO-LeaseGuarantor",jb.guarantorLabels,"guarantor");
     setTextContents("TO-StockSymbol",property.Symbol);
+    setTextContents("TO-Year1NOI",fmtCurrency(property.NOI));
     s = " ";
     if (typeof property.RenewOptions != "undefined") {
         s = "(" + property["renewOptions"].length + ")";
@@ -269,7 +270,8 @@ function generateMarketPackage() {
     t.contents = property.URL;
     t = jb.doc.textFrames.getByName("TO-YearsInTheBusiness");
     var now = new Date();
-    t.contents = (property.YearFounded > 0) ? "" + now.getFullYear() - property.YearFounded : " ";
+    // t.contents = (property.YearFounded > 0) ? "" + now.getFullYear() - property.YearFounded : " ";
+    t.contents = (property.YearFounded > 0) ? "" + property.YearFounded : " ";
 
     if (property.Img4 != "") {
         placeImageInArea(4,"TOLogo","TO-LogoArea",jb.doc.layers.getByName("Tenant Overview"));

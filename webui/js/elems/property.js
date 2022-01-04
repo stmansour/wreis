@@ -463,7 +463,7 @@ function buildPropertyUIElements() {
                 setDropDownSelectedIndex("LeaseTypeDD",r.LeaseType);
                 setDropDownSelectedIndex("LeaseGuarantorDD",r.LeaseGuarantor);
                 setDropDownSelectedIndex("RoofResponsibilityDD",((r.FLAGS & (1<<1)) == 0) ? 0 : 1);
-                setTermRemaining();
+                // setTermRemaining();
             };
         },
         onChange: function(event) {
@@ -471,7 +471,7 @@ function buildPropertyUIElements() {
                 switch( event.target ) {
                     case "RentCommencementDt":
                     case "LeaseExpirationDt":
-                        setTermRemaining();
+                        // setTermRemaining();
                         break;
                 }
             };
@@ -703,6 +703,10 @@ function prepareSaveData() {
     if (typeof x == "string") {
         rec.RenovationYear = parseInt(x);
     }
+    x = rec.YearFounded;
+    if (typeof x == "string") {
+        rec.YearFounded = parseInt(x);
+    }
 
     //-----------------------------------------
     // Now send it to the server
@@ -871,35 +875,35 @@ function closePropertyForm() {
     w2ui.propertyGrid.render();
 }
 
-function setTermRemaining() {
-    var s = "n/a";
-    var now = new Date();
-    var s1=w2ui.propertyForm.record.RentCommencementDt;
-    if (s1 == null || typeof s1 != "string" ) {
-        setInnerHTML("PRTermRemaining",s);
-        return;
-    }
-    if (s1.length == 0) {
-        setInnerHTML("PRTermRemaining",s);
-        return;
-    }
-    var d1=new Date(s1);
-    var s2=w2ui.propertyForm.record.LeaseExpirationDt;
-    if (s2 == null || typeof s2 != "string") {
-        setInnerHTML("PRTermRemaining",s);
-        return;
-    }
-    if (s2.length == 0) {
-        setInnerHTML("PRTermRemaining",s);
-        return;
-    }
-    var d2=new Date(s2);
-    var m=monthDiff(d1,d2);
-    // Handle the case where the expiration date has passed...
-    if (now.getTime() > d2.getTime()) {
-        s = "Lease has expired";
-    } else {
-        s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
-    }
-    setInnerHTML("PRTermRemaining",s);
-}
+// function setTermRemaining() {
+//     var s = "n/a";
+//     var now = new Date();
+//     var s1=w2ui.propertyForm.record.RentCommencementDt;
+//     if (s1 == null || typeof s1 != "string" ) {
+//         setInnerHTML("PRTermRemaining",s);
+//         return;
+//     }
+//     if (s1.length == 0) {
+//         setInnerHTML("PRTermRemaining",s);
+//         return;
+//     }
+//     var d1=new Date(s1);
+//     var s2=w2ui.propertyForm.record.LeaseExpirationDt;
+//     if (s2 == null || typeof s2 != "string") {
+//         setInnerHTML("PRTermRemaining",s);
+//         return;
+//     }
+//     if (s2.length == 0) {
+//         setInnerHTML("PRTermRemaining",s);
+//         return;
+//     }
+//     var d2=new Date(s2);
+//     var m=monthDiff(d1,d2);
+//     // Handle the case where the expiration date has passed...
+//     if (now.getTime() > d2.getTime()) {
+//         s = "Lease has expired";
+//     } else {
+//         s = Math.floor(m/12) + ' years ' + Math.floor(m%12) + ' months';
+//     }
+//     setInnerHTML("PRTermRemaining",s);
+// }
