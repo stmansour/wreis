@@ -87,6 +87,21 @@ DBNAME="wreis"
 #=====================================================
 
 cat > "${MODFILE}" << LEOF
+ALTER TABLE Property CHANGE Img1 Img1 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img2 Img2 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img3 Img3 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img4 Img4 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img5 Img5 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img6 Img6 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img7 Img7 VARCHAR(256) NOT NULL DEFAULT '';
+ALTER TABLE Property CHANGE Img8 Img8 VARCHAR(256) NOT NULL DEFAULT '';
+
+ALTER TABLE Property ADD Img9 VARCHAR(256) NOT NULL DEFAULT '' AFTER Img8;
+ALTER TABLE Property ADD Img10 VARCHAR(256) NOT NULL DEFAULT '' AFTER Img9;
+ALTER TABLE Property ADD Img11 VARCHAR(256) NOT NULL DEFAULT '' AFTER Img10;
+ALTER TABLE Property ADD Img12 VARCHAR(256) NOT NULL DEFAULT '' AFTER Img11;
+ALTER TABLE RenewOptions ADD MPText VARCHAR(256) NOT NULL DEFAULT '' AFTER ROLID;
+ALTER TABLE RentSteps ADD MPText VARCHAR(256) NOT NULL DEFAULT '' AFTER RSLID
 LEOF
 
 #=====================================================
@@ -96,6 +111,8 @@ declare -a dbs=(
 	'ws/xb.sql'
 	'ws/xh.sql'
 	'photo/xa.sql'
+	'../mktpkg/js/mpt.sql'
+	'../mktpkg/samples/mktdb.sql'
 )
 
 for f in "${dbs[@]}"

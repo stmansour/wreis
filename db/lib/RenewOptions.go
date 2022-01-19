@@ -11,6 +11,7 @@ import (
 //-----------------------------------------------------------------------------
 type RenewOptions struct {
 	ROLID       int64         // id of RenewOptionsList to which this record belongs
+	MPText      string        // text for marketing package
 	FLAGS       uint64        // 1<<0
 	LastModTime time.Time     // when was the record last written
 	LastModBy   int64         // id of user that did the modify
@@ -112,6 +113,7 @@ func GetRenewOptionsItems(ctx context.Context, id int64) ([]RenewOption, error) 
 //-----------------------------------------------------------------------------
 func InsertRenewOptions(ctx context.Context, a *RenewOptions) (int64, error) {
 	fields := []interface{}{
+		a.MPText,
 		a.FLAGS,
 		a.CreateBy,
 		a.LastModBy,
@@ -164,6 +166,7 @@ func InsertRenewOptionsWithList(ctx context.Context, a *RenewOptions) (int64, er
 func ReadRenewOptions(row *sql.Row, a *RenewOptions) error {
 	err := row.Scan(
 		&a.ROLID,
+		&a.MPText,
 		&a.FLAGS,
 		&a.CreateTime,
 		&a.CreateBy,
@@ -185,6 +188,7 @@ func ReadRenewOptions(row *sql.Row, a *RenewOptions) error {
 //-----------------------------------------------------------------------------
 func UpdateRenewOptions(ctx context.Context, a *RenewOptions) error {
 	fields := []interface{}{
+		a.MPText,
 		a.FLAGS,
 		a.LastModBy,
 		a.ROLID,

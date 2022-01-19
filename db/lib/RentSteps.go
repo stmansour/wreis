@@ -12,6 +12,7 @@ import (
 //-----------------------------------------------------------------------------
 type RentSteps struct {
 	RSLID       int64      // id of RentStepsList to which this record belongs
+	MPText      string     // for Marketing Package
 	FLAGS       uint64     // 1<<0 = 0 means count based, 1 means date based
 	LastModTime time.Time  // when was the record last written
 	LastModBy   int64      // id of user that did the modify
@@ -132,6 +133,7 @@ func InsertRentSteps(ctx context.Context, a *RentSteps) (int64, error) {
 		return a.RSLID, ErrSessionRequired
 	}
 	fields := []interface{}{
+		a.MPText,
 		a.FLAGS,
 		sess.UID,
 		sess.UID,
@@ -197,6 +199,7 @@ func InsertRentStepsWithList(ctx context.Context, a *RentSteps) (int64, error) {
 func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 	err := row.Scan(
 		&a.RSLID,
+		&a.MPText,
 		&a.FLAGS,
 		&a.CreateTime,
 		&a.CreateBy,
@@ -223,6 +226,7 @@ func UpdateRentSteps(ctx context.Context, a *RentSteps) error {
 		return ErrSessionRequired
 	}
 	fields := []interface{}{
+		a.MPText,
 		a.FLAGS,
 		sess.UID,
 		a.RSLID,

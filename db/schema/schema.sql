@@ -35,6 +35,7 @@ CREATE TABLE Property (
     DownPayment DECIMAL(19,4) NOT NULL DEFAULT 0,
     RentableArea BIGINT NOT NULL DEFAULT 0,
     RentableAreaUnits SMALLINT NOT NULL DEFAULT 0,          -- 0 = sqft, 1 = acres,
+    PropertyType SMALLINT NOT NULL DEFAULT 0,               -- Kristin to provide
     LotSize DECIMAL(19,4) NOT NULL DEFAULT 0,
     LotSizeUnits SMALLINT NOT NULL DEFAULT 0,               -- 0 = sqft, 1 = acres,
     CapRate FLOAT NOT NULL DEFAULT 0,                       -- percentage
@@ -70,14 +71,18 @@ CREATE TABLE Property (
     HQCity VARCHAR(100) NOT NULL DEFAULT '',
     HQState CHAR(25) NOT NULL DEFAULT '',
 
-    Img1 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img2 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img3 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img4 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img5 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img6 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img7 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
-    Img8 VARCHAR(2048) NOT NULL DEFAULT '',                 -- full url to image
+    Img1 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img2 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img3 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img4 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img5 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img6 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img7 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img8 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img9 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img10 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img11 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
+    Img12 VARCHAR(256) NOT NULL DEFAULT '',                 -- full url to image
 
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
     LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
@@ -88,6 +93,7 @@ CREATE TABLE Property (
 
 CREATE TABLE RenewOptions (
     ROLID BIGINT NOT NULL AUTO_INCREMENT,                   -- Renew Options List ID
+    MPText VARCHAR(256) NOT NULL DEFAULT '',                -- text string for Marketing Package generator
     /*
     ++  bit 0 - There are 2 fundamental ways in which Renew Options are specified.
     **          bit 0 set to 0 means that each RenewOption record specifies an absolute
@@ -104,62 +110,63 @@ CREATE TABLE RenewOptions (
     **     Year 10                222,118.32    7/4/2026     2          116.424.54
     **                                          ...
     */
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = counts, 1 = dates (see comment above)
+    FLAGS BIGINT NOT NULL DEFAULT 0,                          -- 1<<0 = 0 = counts, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
-    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    LastModBy BIGINT NOT NULL DEFAULT 0,                      -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
-    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    CreateBy BIGINT NOT NULL DEFAULT 0,                       -- employee UID (from phonebook) that created this record
     PRIMARY KEY (ROLID)
 );
 
 CREATE TABLE RenewOption (
-    ROID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Renew Option, part of a list
-    ROLID BIGINT NOT NULL DEFAULT 0,                        -- Renew Options List ID to which this RO belongs
-    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
-    Opt VARCHAR(128) NOT NULL DEFAULT '',                   -- option period comment (valid when FLAGS bit 0 = 0)
-    Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Monthly Rent Amount
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = options (Opt), 1 = dates (Dt) (see comment above)
+    ROID BIGINT NOT NULL AUTO_INCREMENT,                      -- A Renew Option, part of a list
+    ROLID BIGINT NOT NULL DEFAULT 0,                          -- Renew Options List ID to which this RO belongs
+    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',           -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    Opt VARCHAR(128) NOT NULL DEFAULT '',                     -- option period comment (valid when FLAGS bit 0 = 0)
+    Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                    -- Monthly Rent Amount
+    FLAGS BIGINT NOT NULL DEFAULT 0,                          -- 1<<0 = 0 = options (Opt), 1 = dates (Dt) (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
-    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    LastModBy BIGINT NOT NULL DEFAULT 0,                      -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
-    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    CreateBy BIGINT NOT NULL DEFAULT 0,                       -- employee UID (from phonebook) that created this record
     PRIMARY KEY (ROID)
 );
 
 CREATE TABLE RentSteps (
-    RSLID BIGINT NOT NULL AUTO_INCREMENT,                   -- RentStep List ID
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = count, 1 = dates -- See comment for RenewOptions FLAGS
+    RSLID BIGINT NOT NULL AUTO_INCREMENT,                     -- RentStep List ID
+    MPText VARCHAR(256) NOT NULL DEFAULT '',                  -- text string for Marketing Package generator
+    FLAGS BIGINT NOT NULL DEFAULT 0,                          -- 1<<0 = 0 = count, 1 = dates -- See detailed comment for RenewOptions FLAGS
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
-    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    LastModBy BIGINT NOT NULL DEFAULT 0,                      -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
-    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    CreateBy BIGINT NOT NULL DEFAULT 0,                       -- employee UID (from phonebook) that created this record
     PRIMARY KEY (RSLID)
 );
 
 CREATE TABLE RentStep (
-    RSID BIGINT NOT NULL AUTO_INCREMENT,                    -- A Rent Step, part of a list
-    RSLID BIGINT NOT NULL DEFAULT 0,                        -- RentStep List ID to which this RS belongs
-    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',         -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
-    Opt VARCHAR(128) NOT NULL DEFAULT '',                   -- option period comment
-    Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                  -- Rent commencement date
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        -- 1<<0 = 0 = options, 1 = dates (see comment above)
+    RSID BIGINT NOT NULL AUTO_INCREMENT,                      -- A Rent Step, part of a list
+    RSLID BIGINT NOT NULL DEFAULT 0,                          -- RentStep List ID to which this RS belongs
+    Dt DATE NOT NULL DEFAULT '1970-01-01 00:00:00',           -- Date that the rent went into effect, valid only when ROLID FLAGS bit 0 = 1
+    Opt VARCHAR(128) NOT NULL DEFAULT '',                     -- option period comment
+    Rent DECIMAL(19,4) NOT NULL DEFAULT 0,                    -- Rent commencement date
+    FLAGS BIGINT NOT NULL DEFAULT 0,                          -- 1<<0 = 0 = options, 1 = dates (see comment above)
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
-    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    LastModBy BIGINT NOT NULL DEFAULT 0,                      -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
-    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    CreateBy BIGINT NOT NULL DEFAULT 0,                       -- employee UID (from phonebook) that created this record
     PRIMARY KEY (RSID)
 );
 
 CREATE TABLE Traffic (
-    TID BIGINT NOT NULL AUTO_INCREMENT,                     -- A Traffic ID
-    PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
-    FLAGS BIGINT NOT NULL DEFAULT 0,                        --
-    Count BIGINT NOT NULL DEFAULT 0,                        -- number of vehicles per day, or whatever - see Description
-    Description VARCHAR(128) NOT NULL DEFAULT '',           -- Describes Count
+    TID BIGINT NOT NULL AUTO_INCREMENT,                       -- A Traffic ID
+    PRID BIGINT NOT NULL DEFAULT 0,                           -- Associated Property
+    FLAGS BIGINT NOT NULL DEFAULT 0,                          --
+    Count BIGINT NOT NULL DEFAULT 0,                          -- number of vehicles per day, or whatever - see Description
+    Description VARCHAR(128) NOT NULL DEFAULT '',             -- Describes Count
     LastModTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  -- when was this record last written
-    LastModBy BIGINT NOT NULL DEFAULT 0,                    -- employee UID (from phonebook) that modified it
+    LastModBy BIGINT NOT NULL DEFAULT 0,                      -- employee UID (from phonebook) that modified it
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- when was this record created
-    CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
+    CreateBy BIGINT NOT NULL DEFAULT 0,                       -- employee UID (from phonebook) that created this record
     PRIMARY KEY (TID)
 );
 
@@ -191,4 +198,10 @@ CREATE TABLE StateInfo (
     CreateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,-- when was this record created
     CreateBy BIGINT NOT NULL DEFAULT 0,                     -- employee UID (from phonebook) that created this record
     PRIMARY KEY (SIID)
+);
+
+CREATE TABLE PropBrokers (
+    PRID BIGINT NOT NULL DEFAULT 0,                         -- Associated Property
+    UID BIGINT NOT NULL DEFAULT 0,                          -- Broker UID
+    COID BIGINT NOT NULL DEFAULT 0                         -- Company Code
 );

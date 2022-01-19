@@ -61,6 +61,10 @@ type Property struct {
 	Img6               string
 	Img7               string
 	Img8               string
+	Img9               string
+	Img10              string
+	Img11              string
+	Img12              string
 	LastModTime        time.Time    // when was the record last written
 	LastModBy          int64        // id of user that did the modify
 	CreateTime         time.Time    // when was this record created
@@ -166,6 +170,10 @@ func InsertProperty(ctx context.Context, a *Property) (int64, error) {
 		a.Img6,
 		a.Img7,
 		a.Img8,
+		a.Img9,
+		a.Img10,
+		a.Img11,
+		a.Img12,
 		sess.UID,
 		sess.UID,
 	}
@@ -261,6 +269,10 @@ func ReadProperty(row *sql.Row, a *Property) error {
 		&a.Img6,
 		&a.Img7,
 		&a.Img8,
+		&a.Img9,
+		&a.Img10,
+		&a.Img11,
+		&a.Img12,
 		&a.LastModTime,
 		&a.LastModBy,
 		&a.CreateTime,
@@ -329,6 +341,10 @@ func ReadProperties(rows *sql.Rows, a *Property) error {
 		&a.Img6,
 		&a.Img7,
 		&a.Img8,
+		&a.Img9,
+		&a.Img10,
+		&a.Img11,
+		&a.Img12,
 		&a.LastModTime,
 		&a.LastModBy,
 		&a.CreateTime,
@@ -398,6 +414,10 @@ func UpdateProperty(ctx context.Context, a *Property) error {
 		a.Img6,
 		a.Img7,
 		a.Img8,
+		a.Img9,
+		a.Img10,
+		a.Img11,
+		a.Img12,
 		sess.UID,
 		a.PRID, // 49
 	}

@@ -49,7 +49,7 @@ function subjectPropertyPhotoCount() {
     }
     // other photos
     var s;
-    for (var j = jb.subjProp; j <= 8; j++) {
+    for (var j = jb.subjProp; j <= 12; j++) {
         s = "Img" + j;
         if (property[s] != "") {
             n++;
@@ -63,7 +63,7 @@ function addSubjectImages() {
     app.selection = null;  // ensure nothing is selected
     var cpABR = app.activeDocument.artboards.getByName("Offering").artboardRect;
 
-    for (var j = jb.subjProp; j <= 8; j++) {
+    for (var j = jb.subjProp; j <= 12; j++) {
         var s = "Img" + j;
         if (property[s] == "") {
             continue;
@@ -169,7 +169,7 @@ function generateMarketPackage() {
     // named ~/Documents/wreis and open the file template00.ai
     //---------------------------------------------------------------------------
     var template = jb.cwd + '/res/template00.ai';
-    var f = new File(template);
+      var f = new File(template);
     var lyr;  // layer
     var bb;   // bounding box (any object with top,left,width,height )
     app.open(f);
@@ -288,7 +288,19 @@ function generateMarketPackage() {
     }
 
     //---------------------------------------------------------------------------
-    //  PAGE 7 - Area Map
+    //  PAGE 7 - Subject Property
+    //
+    //  These start with the cover image (Img1.)+fileExtension(property.Img1)
+    //  and will include images 6 - 8 if present.
+    //---------------------------------------------------------------------------
+    if (property.Img1 != "") {
+        placeImageInArea(1,"SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));
+        // fillWithImage("Subject Property 1","SP1-Background",1,"SubjectProperty1");
+    }
+    addSubjectImages();
+
+    //---------------------------------------------------------------------------
+    //  PAGE 7+n - Area Map  (n = total count of subject photos + cover photo)
     //---------------------------------------------------------------------------
     if (property.Img3 != "") {
         placeImageInArea(3,"AM-AreaMap","AM-Background",jb.doc.layers.getByName("Area Map"));
@@ -296,24 +308,13 @@ function generateMarketPackage() {
     }
 
     //---------------------------------------------------------------------------
-    //  PAGE 7 - Location Map
+    //  PAGE 8+n - Location Map  (n = total count of subject photos + cover photo)
     //---------------------------------------------------------------------------
     if (property.Img3 != "") {
         placeImageInArea(5,"LM-LocationMap","LM-Background",jb.doc.layers.getByName("Location Map"));
         // fillWithImage("Location Map","LM-Background",5,"LM-LocationMap");
     }
 
-    //---------------------------------------------------------------------------
-    //  PAGE 9 - Subject Property
-    //
-    //  These start with the cover image (Img1.)+fileExtension(property.Img1) and will include images
-    //  6 - 8 if present.
-    //---------------------------------------------------------------------------
-    if (property.Img1 != "") {
-        placeImageInArea(1,"SubjectProperty1","SP1-Background",jb.doc.layers.getByName("Subject Property 1"));
-        // fillWithImage("Subject Property 1","SP1-Background",1,"SubjectProperty1");
-    }
-    addSubjectImages();
 }
 
 generateMarketPackage();

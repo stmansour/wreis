@@ -74,6 +74,10 @@ type PropertyGrid struct {
 	Img6               string
 	Img7               string
 	Img8               string
+	Img9               string
+	Img10              string
+	Img11              string
+	Img12              string
 	CreateTime         util.JSONDateTime
 	CreateBy           int64
 	LastModTime        util.JSONDateTime
@@ -130,6 +134,10 @@ var propFieldsMap = map[string][]string{
 	"Img6":               {"Property.Img6"},
 	"Img7":               {"Property.Img7"},
 	"Img8":               {"Property.Img8"},
+	"Img9":               {"Property.Img9"},
+	"Img10":              {"Property.Img10"},
+	"Img11":              {"Property.Img11"},
+	"Img12":              {"Property.Img12"},
 	"CreateTime":         {"Property.CreateTime"},
 	"CreateBy":           {"Property.CreateBy"},
 	"LastModTime":        {"Property.LastModTime"},
@@ -183,6 +191,10 @@ var propQuerySelectFields = []string{
 	"Property.Img6",
 	"Property.Img7",
 	"Property.Img8",
+	"Property.Img9",
+	"Property.Img10",
+	"Property.Img11",
+	"Property.Img12",
 	"Property.CreateTime",
 	"Property.CreateBy",
 	"Property.LastModTime",
@@ -504,6 +516,10 @@ func PropertyRowScan(rows *sql.Rows) (PropertyGrid, error) {
 		&q.Img6,
 		&q.Img7,
 		&q.Img8,
+		&q.Img9,
+		&q.Img10,
+		&q.Img11,
+		&q.Img12,
 		&q.CreateTime,
 		&q.CreateBy,
 		&q.LastModTime,

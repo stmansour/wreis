@@ -185,14 +185,18 @@ CREATE TABLE `Property` (
   `NOI` decimal(19,4) NOT NULL DEFAULT '0.0000',
   `HQCity` varchar(100) NOT NULL DEFAULT '',
   `HQState` char(25) NOT NULL DEFAULT '',
-  `Img1` varchar(2048) NOT NULL DEFAULT '',
-  `Img2` varchar(2048) NOT NULL DEFAULT '',
-  `Img3` varchar(2048) NOT NULL DEFAULT '',
-  `Img4` varchar(2048) NOT NULL DEFAULT '',
-  `Img5` varchar(2048) NOT NULL DEFAULT '',
-  `Img6` varchar(2048) NOT NULL DEFAULT '',
-  `Img7` varchar(2048) NOT NULL DEFAULT '',
-  `Img8` varchar(2048) NOT NULL DEFAULT '',
+  `Img1` varchar(256) NOT NULL DEFAULT '',
+  `Img2` varchar(256) NOT NULL DEFAULT '',
+  `Img3` varchar(256) NOT NULL DEFAULT '',
+  `Img4` varchar(256) NOT NULL DEFAULT '',
+  `Img5` varchar(256) NOT NULL DEFAULT '',
+  `Img6` varchar(256) NOT NULL DEFAULT '',
+  `Img7` varchar(256) NOT NULL DEFAULT '',
+  `Img8` varchar(256) NOT NULL DEFAULT '',
+  `Img9` varchar(1024) NOT NULL DEFAULT '',
+  `Img10` varchar(2048) NOT NULL DEFAULT '',
+  `Img11` varchar(2048) NOT NULL DEFAULT '',
+  `Img12` varchar(2048) NOT NULL DEFAULT '',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `LastModBy` bigint(20) NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -207,7 +211,7 @@ CREATE TABLE `Property` (
 
 LOCK TABLES `Property` WRITE;
 /*!40000 ALTER TABLE `Property` DISABLE KEYS */;
-INSERT INTO `Property` VALUES (1,'Bill\'s Boar Emporium',8,'','http://bbb.com/','BBE',12345.6700,40000.0000,8790,0,40.0000,1,0.7,0.6,1975,2007,0,0,'Bill\'s Boar Emporium',0,0,20,'2003-04-15 07:00:00','2020-03-22 07:00:00',0,0,1,'1234 Elm Street','','Corn Bluff','AK','98765','USA','roof leaks',30000.0000,'Corn Bluff','AK','','','','','','','','','2021-01-21 17:32:26',211,'2020-07-16 08:34:53',190),(2,'Bill\'s Bungalo Emporium',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000.0000,0,0.3,0.27,1980,0,5,1,'Bill\'s Bungalo Emporium',0,1,30,'2018-06-15 00:00:00','2020-06-15 00:00:00',1,0,2,'1234 Elm Street','','Kalamazoo','MI','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','2021-01-21 01:17:04',198,'2020-07-16 08:36:02',191),(3,'Sally\'s Sludge Salon',5,'','https://bbe.com/','',12345.8900,510000.0000,16000,0,26.0000,1,0.3,0.27,1985,2009,2,0,'Sally\'s Sludge Salon',0,2,31,'2018-06-16 00:00:00','2020-06-16 00:00:00',2,3,3,'1235 Elm Street','','Suck-egg Hollow','TN','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','2021-01-21 02:20:52',199,'2020-07-16 08:36:02',192),(4,'Mungo\'s Mud',5,'','https://bbe.com/','',12345.8900,0.0000,24171,0,60000.0000,0,0.3,0.27,1990,0,5,1,'Mungo\'s Mud',1,3,32,'2005-01-01 08:00:00','2020-06-16 07:00:00',0,0,4,'1236 Elm Street','','Rabbit Hash','KY','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','2021-01-21 17:33:10',211,'2020-07-16 08:36:02',193),(5,'Jimbo\'s Junk Yard',5,'','https://bbe.com/','',12345.8900,29000.0000,18500,0,17.0000,1,0.3,0.27,1995,2011,2,0,'Jimbo\'s Junk Yard',1,1,33,'2018-06-18 00:00:00','2020-06-18 00:00:00',0,4,5,'1237 Elm Street','','Gumlog','GA','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','2021-01-21 02:20:52',201,'2020-07-16 08:36:02',194),(6,'Rosita\'s Taco Town',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000.0000,0,0.3,0.27,2000,0,5,1,'Rosita\'s Taco Town',0,2,34,'2013-02-28 08:00:00','2020-06-18 07:00:00',0,0,6,'1238 Elm Street','','Frog Eye','AL','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','2021-01-21 17:33:49',211,'2020-07-16 08:36:02',195),(7,'Wings \'n Such',5,'','https://bbe.com/','',12345.8900,400000.0000,6500,0,9.0000,1,0.3,0.27,2005,2018,2,0,'Wings \'n Such',0,3,35,'2018-06-20 00:00:00','2020-06-20 00:00:00',0,0,7,'1239 Elm Street','','Nimrod','MN','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','2021-01-21 02:20:52',203,'2020-07-16 08:36:02',196);
+INSERT INTO `Property` VALUES (1,'Bill\'s Boar Emporium',8,'','http://bbb.com/','BBE',12345.6700,40000.0000,8790,0,40.0000,1,0.7,0.6,1975,2007,0,0,'Bill\'s Boar Emporium',0,0,20,'2003-04-15 07:00:00','2020-03-22 07:00:00',0,0,1,'1234 Elm Street','','Corn Bluff','AK','98765','USA','roof leaks',30000.0000,'Corn Bluff','AK','','','','','','','','','','','','','2021-01-21 17:32:26',211,'2020-07-16 08:34:53',190),(2,'Bill\'s Bungalo Emporium',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000.0000,0,0.3,0.27,1980,0,5,1,'Bill\'s Bungalo Emporium',0,1,30,'2018-06-15 00:00:00','2020-06-15 00:00:00',1,0,2,'1234 Elm Street','','Kalamazoo','MI','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','','','','','2021-01-21 01:17:04',198,'2020-07-16 08:36:02',191),(3,'Sally\'s Sludge Salon',5,'','https://bbe.com/','',12345.8900,510000.0000,16000,0,26.0000,1,0.3,0.27,1985,2009,2,0,'Sally\'s Sludge Salon',0,2,31,'2018-06-16 00:00:00','2020-06-16 00:00:00',2,3,3,'1235 Elm Street','','Suck-egg Hollow','TN','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','','','','','2021-01-21 02:20:52',199,'2020-07-16 08:36:02',192),(4,'Mungo\'s Mud',5,'','https://bbe.com/','',12345.8900,0.0000,24171,0,60000.0000,0,0.3,0.27,1990,0,5,1,'Mungo\'s Mud',1,3,32,'2005-01-01 08:00:00','2020-06-16 07:00:00',0,0,4,'1236 Elm Street','','Rabbit Hash','KY','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','','','','','2021-01-21 17:33:10',211,'2020-07-16 08:36:02',193),(5,'Jimbo\'s Junk Yard',5,'','https://bbe.com/','',12345.8900,29000.0000,18500,0,17.0000,1,0.3,0.27,1995,2011,2,0,'Jimbo\'s Junk Yard',1,1,33,'2018-06-18 00:00:00','2020-06-18 00:00:00',0,4,5,'1237 Elm Street','','Gumlog','GA','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','','','','','2021-01-21 02:20:52',201,'2020-07-16 08:36:02',194),(6,'Rosita\'s Taco Town',5,'','https://bbe.com/','',12345.8900,0.0000,50000,0,60000.0000,0,0.3,0.27,2000,0,5,1,'Rosita\'s Taco Town',0,2,34,'2013-02-28 08:00:00','2020-06-18 07:00:00',0,0,6,'1238 Elm Street','','Frog Eye','AL','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','','','','','2021-01-21 17:33:49',211,'2020-07-16 08:36:02',195),(7,'Wings \'n Such',5,'','https://bbe.com/','',12345.8900,400000.0000,6500,0,9.0000,1,0.3,0.27,2005,2018,2,0,'Wings \'n Such',0,3,35,'2018-06-20 00:00:00','2020-06-20 00:00:00',0,0,7,'1239 Elm Street','','Nimrod','MN','12345','USA','',25000.0000,'Goober','AK','','','','','','','','','','','','','2021-01-21 02:20:52',203,'2020-07-16 08:36:02',196);
 /*!40000 ALTER TABLE `Property` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -279,6 +283,7 @@ DROP TABLE IF EXISTS `RenewOptions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `RenewOptions` (
   `ROLID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `MPText` varchar(256) NOT NULL DEFAULT '',
   `FLAGS` bigint(20) NOT NULL DEFAULT '0',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `LastModBy` bigint(20) NOT NULL DEFAULT '0',
@@ -294,7 +299,7 @@ CREATE TABLE `RenewOptions` (
 
 LOCK TABLES `RenewOptions` WRITE;
 /*!40000 ALTER TABLE `RenewOptions` DISABLE KEYS */;
-INSERT INTO `RenewOptions` VALUES (1,1,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0),(2,0,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0);
+INSERT INTO `RenewOptions` VALUES (1,'',1,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0),(2,'',0,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0);
 /*!40000 ALTER TABLE `RenewOptions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -339,6 +344,7 @@ DROP TABLE IF EXISTS `RentSteps`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `RentSteps` (
   `RSLID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `MPText` varchar(256) NOT NULL DEFAULT '',
   `FLAGS` bigint(20) NOT NULL DEFAULT '0',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `LastModBy` bigint(20) NOT NULL DEFAULT '0',
@@ -354,7 +360,7 @@ CREATE TABLE `RentSteps` (
 
 LOCK TABLES `RentSteps` WRITE;
 /*!40000 ALTER TABLE `RentSteps` DISABLE KEYS */;
-INSERT INTO `RentSteps` VALUES (1,0,'2020-07-16 08:34:53',0,'2020-07-16 08:34:53',0),(3,1,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0),(4,0,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0);
+INSERT INTO `RentSteps` VALUES (1,'',0,'2020-07-16 08:34:53',0,'2020-07-16 08:34:53',0),(3,'',1,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0),(4,'',0,'2020-07-16 08:36:02',0,'2020-07-16 08:36:02',0);
 /*!40000 ALTER TABLE `RentSteps` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -433,4 +439,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-01-21 10:35:19
+-- Dump completed on 2022-01-19 10:43:42

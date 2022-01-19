@@ -10,11 +10,11 @@ clean:
 	rm -rf dist
 
 db1:
-	cd test/ws; mysql wreis < xh.sql ; cd ../..
+	cd test/ws; mysql --no-defaults wreis < xh.sql ; cd ../..
 
 test:
 	for dir in $(DIRS); do make -C $$dir test;done
-	cd test/ws; mysql wreis < xh.sql ; cd ../..
+	cd test/ws; mysql --no-defaults wreis < xh.sql ; cd ../..
 
 package:
 	for dir in $(DIRS); do make -C $$dir package;done

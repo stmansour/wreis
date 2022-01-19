@@ -91,7 +91,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Property
 	//==========================================
-	flds = "PRID,ROLID,RSLID,FlowState,Name,YearFounded,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildYear,RenovationYear,FLAGS,OwnershipType,TenantTradeName,LeaseGuarantor,LeaseType,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQCity,HQState,Img1,Img2,Img3,Img4,Img5,Img6,Img7,Img8,CreateTime,CreateBy,LastModTime,LastModBy"
+	flds = "PRID,ROLID,RSLID,FlowState,Name,YearFounded,ParentCompany,URL,Symbol,Price,DownPayment,RentableArea,RentableAreaUnits,LotSize,LotSizeUnits,CapRate,AvgCap,BuildYear,RenovationYear,FLAGS,OwnershipType,TenantTradeName,LeaseGuarantor,LeaseType,OriginalLeaseTerm,RentCommencementDt,LeaseExpirationDt,Address,Address2,City,State,PostalCode,Country,LLResponsibilities,NOI,HQCity,HQState,Img1,Img2,Img3,Img4,Img5,Img6,Img7,Img8,Img9,Img10,Img11,Img12,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["Property"] = flds
 	Wdb.Prepstmt.GetProperty, err = Wdb.DB.Prepare("SELECT " + flds + " FROM Property WHERE PRID=?")
 	Errcheck(err)
@@ -121,7 +121,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Rent Steps
 	//==========================================
-	flds = "RSLID,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
+	flds = "RSLID,MPText,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RentSteps"] = flds
 	Wdb.Prepstmt.GetRentSteps, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RentSteps WHERE RSLID=?")
 	Errcheck(err)
@@ -155,7 +155,7 @@ func BuildPreparedStatements() {
 	//==========================================
 	// Renew Options
 	//==========================================
-	flds = "ROLID,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
+	flds = "ROLID,MPText,FLAGS,CreateTime,CreateBy,LastModTime,LastModBy"
 	Wdb.DBFields["RenewOptions"] = flds
 	Wdb.Prepstmt.GetRenewOptions, err = Wdb.DB.Prepare("SELECT " + flds + " FROM RenewOptions WHERE ROLID=?")
 	Errcheck(err)
