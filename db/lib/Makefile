@@ -4,7 +4,7 @@ THISDIR="lib"
 lib: *.go config.json
 	@touch fail
 	@go vet
-	@if [[ `uname` = "Darwin" ]]; then staticcheck; else golint; fi
+	@if [[ -f "${GOPATH}/bin/golint" ]]; then golint; else staticcheck; fi
 	go build
 	# go test
 	go install

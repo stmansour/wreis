@@ -4,7 +4,7 @@ THISDIR="utiltest"
 utiltest: *.go
 	@touch fail
 	go vet
-	if [[ `uname` = "Darwin" ]]; then staticcheck; else golint; fi
+	if [[ -f "${GOPATH}/bin/golint" ]]; then golint; else staticcheck; fi
 	go build
 	@rm -f fail
 	@echo "*** Completed in ${THISDIR} ***"
