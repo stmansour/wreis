@@ -1,4 +1,4 @@
 {
-    "message": "Error: You cannot revert from this state\n",
+    "message": "Error: you cannot revert from this state\n",
     "status": "error"
 }

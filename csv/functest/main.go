@@ -12,7 +12,7 @@ import (
 	db "wreis/db/lib"
 	"wreis/session"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "mysql"
 )
 
 // App is the global application structure

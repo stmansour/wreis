@@ -4,7 +4,7 @@ THISDIR="util/lib"
 lib: *.go
 	@touch fail
 	go vet
-	golint
+	if [[ `uname` = "Darwin" ]]; then staticcheck; else golint; fi
 	go build
 	go install
 	@rm -f fail

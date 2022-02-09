@@ -2,7 +2,7 @@ package ws
 
 import (
 	"fmt"
-	"mojo/util"
+	util "wreis/util/lib"
 	"net/http"
 	db "wreis/db/lib"
 	"wreis/session"
@@ -47,9 +47,8 @@ func SvcHandlerDashboard(w http.ResponseWriter, r *http.Request, d *ServiceData)
 	switch d.wsSearchReq.Cmd {
 	case "get":
 		getDashboard(w, r, d)
-		break
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 		return
 	}

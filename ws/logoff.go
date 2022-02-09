@@ -57,7 +57,7 @@ func SvcLogoff(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//-----------------------------------------------------------------------
 	pbr, err := json.Marshal(&a)
 	if err != nil {
-		e := fmt.Errorf("Error marshaling json data: %s", err.Error())
+		e := fmt.Errorf("error marshaling json data: %s", err.Error())
 		util.Ulog("%s: %s\n", funcname, err.Error())
 		SvcFuncErrorReturn(w, e, funcname)
 		return
@@ -70,6 +70,11 @@ func SvcLogoff(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	url := db.Wdb.Config.AuthNHost + "v1/logoff"
 	util.Console("posting request to: %s\n", url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(pbr))
+	if err != nil {
+		e := fmt.Errorf("%s: failed to execute post request:  %s", funcname, err.Error())
+		SvcFuncErrorReturn(w, e, funcname)
+		return
+	}
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)

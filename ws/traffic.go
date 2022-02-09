@@ -102,7 +102,7 @@ func SvcHandlerTraffic(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	case "delete":
 		deleteTraffic(w, r, d)
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 	}
 }

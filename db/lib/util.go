@@ -12,7 +12,7 @@ import (
 )
 
 // ErrSessionRequired session required error
-var ErrSessionRequired = errors.New("Session Required, Please Login")
+var ErrSessionRequired = errors.New("session required, please login")
 
 // SkipSQLNoRowsError assing nil to original err variable
 // if its kind of no rows in result error from sql package

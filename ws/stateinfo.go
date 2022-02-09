@@ -118,43 +118,33 @@ func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData)
 			SvcSearchStateInfo(w, r, d) // it is a query for the grid.
 		} else {
 			if d.ID < 0 {
-				SvcErrorReturn(w, fmt.Errorf("StateInfoID is required but was not specified"))
+				SvcErrorReturn(w, fmt.Errorf("field StateInfoID is required but was not specified"))
 				return
 			}
 			getStateInfo(w, r, d)
 		}
-		break
 	case "reject":
 		saveStateReject(w, r, d)
-		break
 	case "revert":
 		saveStateRevert(w, r, d)
-		break
 	case "approve":
 		saveStateApprove(w, r, d)
-		break
 	case "ready":
 		saveStateReady(w, r, d)
-		break
 	case "notready":
 		saveStateNotReady(w, r, d)
-		break
 	case "save":
 		saveStateInfo(w, r, d)
-		break
 	case "setowner":
 		saveStateOwner(w, r, d)
-		break
 	case "setapprover":
 		saveStateApprover(w, r, d)
-		break
 	case "terminate":
 		saveStateTerminate(w, r, d)
-		break
 	case "delete":
 		deleteStateInfo(w, r, d)
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -203,11 +193,11 @@ func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (Sa
 	err := json.Unmarshal(data, &foo)
 
 	if err != nil {
-		return foo, si, sess, fmt.Errorf("Error with json.Unmarshal:  %s", err.Error())
+		return foo, si, sess, fmt.Errorf("error with json.Unmarshal:  %s", err.Error())
 	}
 
 	if len(foo.Records) != 1 {
-		return foo, si, sess, fmt.Errorf("Error with json.Unmarshal:  %s", err.Error())
+		return foo, si, sess, fmt.Errorf("error with json.Unmarshal:  %s", err.Error())
 	}
 
 	//---------------------------------------------------------------------
@@ -228,7 +218,7 @@ func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (Sa
 	// make sure we're not working on something that's already completed
 	//---------------------------------------------------------------------
 	if si.FLAGS&0x4 != 0 {
-		return foo, si, sess, fmt.Errorf("This is not the latest state information")
+		return foo, si, sess, fmt.Errorf("this is not the latest state information")
 	}
 
 	return foo, si, sess, nil
@@ -267,7 +257,7 @@ func saveStateTerminate(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 	// before we save it, make sure that there is a reason...
 	//--------------------------------------------------------------------------
 	if len(a.Reason) < 1 {
-		e := fmt.Errorf("%s: You must supply the reason for terminating", funcname)
+		e := fmt.Errorf("%s: you must supply the reason for terminating", funcname)
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -498,7 +488,7 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
 	if si.OwnerUID != sess.UID {
-		e := fmt.Errorf("Only the owner can request approval")
+		e := fmt.Errorf("only the owner can request approval")
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -507,7 +497,7 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// before we save it, make sure that there is an approver
 	//--------------------------------------------------------------------------
 	if si.ApproverUID < 1 {
-		e := fmt.Errorf("An approver must be assigned first")
+		e := fmt.Errorf("an approver must be assigned first")
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -547,7 +537,7 @@ func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	// util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
 	if si.OwnerUID != sess.UID {
-		e := fmt.Errorf("Only the owner can request approval")
+		e := fmt.Errorf("only the owner can request approval")
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -556,7 +546,7 @@ func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// before we save it, make sure that there is an approver
 	//--------------------------------------------------------------------------
 	if si.ApproverUID < 1 {
-		e := fmt.Errorf("An approver must be assigned first")
+		e := fmt.Errorf("an approver must be assigned first")
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -600,7 +590,7 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	}
 
 	if sess.UID != si.ApproverUID {
-		err = fmt.Errorf("You are not the current Approver for this state")
+		err = fmt.Errorf("you are not the current Approver for this state")
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -609,7 +599,7 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// Don't continue if it is not marked as ready-to-be-approved
 	//--------------------------------------------------------------
 	if si.FLAGS&0x2 == 0 {
-		SvcErrorReturn(w, fmt.Errorf("The owner has not requested approval yet"))
+		SvcErrorReturn(w, fmt.Errorf("the owner has not requested approval yet"))
 		return
 	}
 
@@ -705,12 +695,12 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// Don't continue if it is not marked as ready-to-be-approved
 	//--------------------------------------------------------------
 	if si.FLAGS&0x2 == 0 {
-		SvcErrorReturn(w, fmt.Errorf("The owner has not requested approval yet"))
+		SvcErrorReturn(w, fmt.Errorf("the owner has not requested approval yet"))
 		return
 	}
 
 	if sess.UID != si.ApproverUID {
-		err = fmt.Errorf("You are not the current Approver for this state")
+		err = fmt.Errorf("you are not the current Approver for this state")
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -719,7 +709,7 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// before we save it, make sure that there is a reason...
 	//--------------------------------------------------------------------------
 	if len(foo.Records[0].Reason) < 1 {
-		e := fmt.Errorf("%s: You must supply the reason for the reject", funcname)
+		e := fmt.Errorf("%s: you must supply the reason for the reject", funcname)
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -807,7 +797,7 @@ func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// }
 
 	if si.FlowState == 1 {
-		err = fmt.Errorf("You cannot revert from this state")
+		err = fmt.Errorf("you cannot revert from this state")
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -816,7 +806,7 @@ func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	// before we save it, make sure that there is a reason...
 	//--------------------------------------------------------------------------
 	if len(foo.Records[0].Reason) < 1 {
-		e := fmt.Errorf("%s: You must supply the reason", funcname)
+		e := fmt.Errorf("%s: you must supply the reason", funcname)
 		SvcErrorReturn(w, e)
 		return
 	}
@@ -916,7 +906,7 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	err := json.Unmarshal(data, &foo)
 
 	if err != nil {
-		e := fmt.Errorf("%s: Error with json.Unmarshal:  %s", funcname, err.Error())
+		e := fmt.Errorf("%s: error with json.Unmarshal:  %s", funcname, err.Error())
 		SvcErrorReturn(w, e)
 		return
 	}

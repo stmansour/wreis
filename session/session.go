@@ -310,7 +310,7 @@ func getUserInfo(a *ValidateCookieResponse) (DirectoryPerson, error) {
 	var r = UserInfoRequest{Cmd: "get"}
 	b, err := json.Marshal(&r)
 	if err != nil {
-		e := fmt.Errorf("Error marshaling json data: %s", err.Error())
+		e := fmt.Errorf("error marshaling json data: %s", err.Error())
 		util.Ulog("%s: %s\n", funcname, err.Error())
 		return p, e
 	}
@@ -322,6 +322,9 @@ func getUserInfo(a *ValidateCookieResponse) (DirectoryPerson, error) {
 	cookies := fmt.Sprintf("%s=%s", SessionCookieName, a.Token) // we need the cookie so that Phonebook gives us back the info
 	// util.Console("userInfo request: %s\n", url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+	if err != nil {
+		return p, err
+	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("cookie", cookies)
 	client := &http.Client{}
@@ -409,7 +412,7 @@ func ValidateSessionCookie(w http.ResponseWriter, r *http.Request, getData int) 
 
 	pbr, err := json.Marshal(&vc)
 	if err != nil {
-		return vr, fmt.Errorf("Error marshaling json data: %s", err.Error())
+		return vr, fmt.Errorf("error marshaling json data: %s", err.Error())
 	}
 
 	//-----------------------------------------------------------------------
@@ -419,6 +422,9 @@ func ValidateSessionCookie(w http.ResponseWriter, r *http.Request, getData int) 
 	// util.Console("posting request to: %s\n", url)
 	// util.Console("              data: %s\n", string(pbr))
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(pbr))
+	if err != nil {
+		return vr, err
+	}
 	req.Header.Set("Content-Type", "application/json")
 	// util.Console("\n*** req = %#v\n\n", req)
 	client := &http.Client{}
@@ -606,7 +612,7 @@ func sessSvcWrite(w http.ResponseWriter, b []byte) {
 func sessSvcWriteResponse(g interface{}, w http.ResponseWriter) {
 	b, err := json.Marshal(g)
 	if err != nil {
-		e := fmt.Errorf("Error marshaling json data: %s", err.Error())
+		e := fmt.Errorf("error marshaling json data: %s", err.Error())
 		util.Ulog("SvcWriteResponse: %s\n", err.Error())
 		sessSvcErrorReturn(w, e, "sessSvcWriteResponse")
 		return

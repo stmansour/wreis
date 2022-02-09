@@ -71,7 +71,7 @@ func SvcHandlerPropertyPhoto(w http.ResponseWriter, r *http.Request, d *ServiceD
 	case "delete":
 		handlePhotoDelete(w, r, d)
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -271,10 +271,10 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	if !foundReq || !foundImg || req.PRID != d.ID || fname != req.Filename || req.Idx < 1 || req.Idx > MaxPhotoIndex {
 		var reasons string
 		if !foundReq {
-			reasons += fmt.Sprintf("No request was found. ")
+			reasons += "No request was found."
 		}
 		if !foundImg {
-			reasons += fmt.Sprintf("No image was found. ")
+			reasons += "No request was found."
 		}
 		if req.PRID != d.ID {
 			reasons += fmt.Sprintf("PRID in url is %d, but in request it is %d. ", d.ID, req.PRID)
@@ -286,7 +286,7 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			reasons += fmt.Sprintf("idx = %d is out of range. ", req.Idx)
 		}
 
-		e := fmt.Errorf("Command request format is not correct: %s", reasons)
+		e := fmt.Errorf("command request format is not correct: %s", reasons)
 		SvcErrorReturn(w, e)
 		return
 	}

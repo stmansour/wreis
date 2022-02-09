@@ -46,7 +46,7 @@ func ParseInt64(s string, line int, errlist []error) (int64, []error) {
 	}
 	i, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
-		errlist = append(errlist, fmt.Errorf("Line %d: %s", line, err.Error()))
+		errlist = append(errlist, fmt.Errorf("line %d: %s", line, err.Error()))
 	}
 
 	return i, errlist
@@ -63,7 +63,7 @@ func ParseFloat64(s string, line int, errlist []error) (float64, []error) {
 	}
 	i, err := strconv.ParseFloat(s, 64)
 	if err != nil {
-		errlist = append(errlist, fmt.Errorf("Line %d: %s", line, err.Error()))
+		errlist = append(errlist, fmt.Errorf("line %d: %s", line, err.Error()))
 	}
 
 	return i, errlist
@@ -81,7 +81,7 @@ func ParseDate(s string, line int, errlist []error) (time.Time, []error) {
 
 	i, err := util.StringToDate(s)
 	if err != nil {
-		errlist = append(errlist, fmt.Errorf("Line %d: %s", line, err.Error()))
+		errlist = append(errlist, fmt.Errorf("line %d: %s", line, err.Error()))
 	}
 
 	return i, errlist
@@ -105,7 +105,7 @@ func YesNoToInt(si string) (int64, error) {
 	case s == "N" || s == "NO" || s == "0" || s == "F" || s == "FALSE":
 		return 0, nil
 	default:
-		err := fmt.Errorf("Unrecognized yes/no string: %s", si)
+		err := fmt.Errorf("unrecognized yes/no string: %s", si)
 		return 0, err
 	}
 }

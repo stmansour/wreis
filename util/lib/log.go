@@ -16,5 +16,5 @@ func Ulog(format string, a ...interface{}) {
 func LogAndPrintError(f string, err error) {
 	p := fmt.Sprintf("%s: %s", f, err.Error())
 	log.Print(p)
-	fmt.Printf(p)
+	fmt.Print(p)
 }

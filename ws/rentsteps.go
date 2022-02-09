@@ -84,14 +84,12 @@ func SvcHandlerRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData)
 			}
 			getRentSteps(w, r, d)
 		}
-		break
 	case "save":
 		saveRentSteps(w, r, d)
-		break
 	case "delete":
 		deleteRentSteps(w, r, d)
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 		return
 	}

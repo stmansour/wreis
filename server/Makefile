@@ -6,8 +6,8 @@ COUNTOL=${TOP}/tools/bashtools/countol.sh
 server: *.go config.json
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
-	@${COUNTOL} "go vet"
-	@${COUNTOL} golint
+	go vet
+	if [[ `uname` = "Darwin" ]]; then staticcheck; else golint; fi
 	go build
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed ${THISDIR} ***"

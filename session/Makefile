@@ -6,8 +6,8 @@ COUNTOL=${TOP}/tools/bashtools/countol.sh
 lib: *.go
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
-	@${COUNTOL} "go vet"
-	@${COUNTOL} golint
+	go vet
+	# if [[ `uname` = "Darwin" ]]; then staticcheck; else golint; fi
 	go build
 	go install
 	@rm -f fail

@@ -33,7 +33,9 @@ func ReadConfig() error {
 	}
 	// fmt.Printf("Executable folder = %s\n", folderPath)
 	fname := folderPath + "/config.json"
-	err = extres.ReadConfig(fname, &Wdb.Config)
+	if err = extres.ReadConfig(fname, &Wdb.Config); err != nil {
+		return err
+	}
 
 	Wdb.Zone, err = time.LoadLocation(Wdb.Config.Timezone)
 	if err != nil {

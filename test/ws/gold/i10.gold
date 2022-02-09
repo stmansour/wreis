@@ -1,4 +1,4 @@
 {
-    "message": "Error: saveStateRevert: You must supply the reason\n",
+    "message": "Error: saveStateRevert: you must supply the reason\n",
     "status": "error"
 }

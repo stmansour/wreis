@@ -84,14 +84,12 @@ func SvcHandlerRenewOptions(w http.ResponseWriter, r *http.Request, d *ServiceDa
 			}
 			getRenewOptions(w, r, d)
 		}
-		break
 	case "save":
 		saveRenewOptions(w, r, d)
-		break
 	case "delete":
 		deleteRenewOptions(w, r, d)
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 		return
 	}

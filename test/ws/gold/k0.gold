@@ -1,4 +1,4 @@
 {
-    "message": "Error: saveStateTerminate: You must supply the reason for terminating\n",
+    "message": "Error: saveStateTerminate: you must supply the reason for terminating\n",
     "status": "error"
 }

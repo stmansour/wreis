@@ -260,7 +260,7 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 		return RO, errlist
 	}
 	if len(ss)%ntuple != 0 {
-		errlist = append(errlist, fmt.Errorf("Arguments in %q are not a multiple of %d", s, ntuple))
+		errlist = append(errlist, fmt.Errorf("arguments in %q are not a multiple of %d", s, ntuple))
 		return RO, errlist
 	}
 
@@ -297,7 +297,7 @@ func HandleRenewOptions(s string, lineno int, errlist []error) ([]db.RenewOption
 	//--------------------------------------------------------------------------
 	for i := 1; i < len(RO); i++ {
 		if RO[0].FLAGS&0x1 != RO[i].FLAGS&0x1 {
-			errlist = append(errlist, fmt.Errorf("Line %d: inconsistent formats for Renew options, date versus option period", lineno))
+			errlist = append(errlist, fmt.Errorf("line %d: inconsistent formats for Renew options, date versus option period", lineno))
 		}
 	}
 
@@ -337,7 +337,7 @@ func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []er
 		return RS, errlist
 	}
 	if len(ss)%ntuple != 0 {
-		errlist = append(errlist, fmt.Errorf("Arguments in %q are not a multiple of %d", s, ntuple))
+		errlist = append(errlist, fmt.Errorf("arguments in %q are not a multiple of %d", s, ntuple))
 		return RS, errlist
 	}
 
@@ -374,7 +374,7 @@ func HandleRentSteps(s string, lineno int, errlist []error) ([]db.RentStep, []er
 	//--------------------------------------------------------------------------
 	for i := 1; i < len(RS); i++ {
 		if RS[0].FLAGS&0x1 != RS[i].FLAGS&0x1 {
-			errlist = append(errlist, fmt.Errorf("Line %d: inconsistent formats for Renew options, date versus option period", lineno))
+			errlist = append(errlist, fmt.Errorf("line %d: inconsistent formats for Renew options, date versus option period", lineno))
 		}
 	}
 

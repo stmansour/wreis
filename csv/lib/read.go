@@ -164,7 +164,7 @@ func GetContext(dbctx context.Context, fname string, h HandlerFunc) (Context, er
 		// return now with an error.
 		//-------------------------------------------------------------------
 		if ctx.ColumnDefs[i].Required && ctx.ColumnDefs[i].Index < 0 {
-			return ctx, fmt.Errorf("Required column %s was not found", ctx.ColumnDefs[i].Name[0])
+			return ctx, fmt.Errorf("required column %s was not found", ctx.ColumnDefs[i].Name[0])
 		}
 	}
 

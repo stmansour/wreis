@@ -1,4 +1,4 @@
 {
-    "message": "Error: You are not the current Approver for this state\n",
+    "message": "Error: you are not the current Approver for this state\n",
     "status": "error"
 }

@@ -266,19 +266,17 @@ func SvcHandlerProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 			SvcSearchProperty(w, r, d) // it is a query for the grid.
 		} else {
 			if d.ID < 0 {
-				SvcErrorReturn(w, fmt.Errorf("PropertyID is required but was not specified"))
+				SvcErrorReturn(w, fmt.Errorf("field PropertyID is required"))
 				return
 			}
 			getProperty(w, r, d)
 		}
-		break
 	case "save":
 		saveProperty(w, r, d)
-		break
 	case "delete":
 		deleteProperty(w, r, d)
 	default:
-		err := fmt.Errorf("Unhandled command: %s", d.wsSearchReq.Cmd)
+		err := fmt.Errorf("unhandled command: %s", d.wsSearchReq.Cmd)
 		SvcErrorReturn(w, err)
 		return
 	}
@@ -307,7 +305,7 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
-	if strings.Index(d.data, "statefilter") >= 0 {
+	if strings.Contains(d.data, "statefilter") {
 		// util.Console("Unmarshal statefilter:  d.data = %s\n", d.data)
 		err = json.Unmarshal([]byte(d.data), &sf)
 		if err != nil {
@@ -348,10 +346,8 @@ func SvcSearchProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 			switch sf.ShowTerminated {
 			case 0:
 				statefltr += " AND ((Property.FLAGS & 64)=0)"
-				break
 			case 1:
 				statefltr += " AND ((Property.FLAGS & 64)!=0)"
-				break
 			}
 		}
 	}
@@ -614,7 +610,7 @@ func saveProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		}
 	} else {
 		if err = db.UpdateProperty(r.Context(), &p); err != nil {
-			e := fmt.Errorf("%s: Error with db.UpdateProperty:  %s", funcname, err.Error())
+			e := fmt.Errorf("%s: error with db.UpdateProperty:  %s", funcname, err.Error())
 			SvcErrorReturn(w, e)
 			return
 		}
@@ -657,7 +653,7 @@ func getProperty(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		gg.Recid = gg.PRID
 		g.Record = gg
 	} else {
-		err = fmt.Errorf("Could not find property with PRID = %d", d.ID)
+		err = fmt.Errorf("could not find property with PRID = %d", d.ID)
 		SvcErrorReturn(w, err)
 		return
 	}
