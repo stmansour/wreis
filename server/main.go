@@ -16,7 +16,7 @@ import (
 	util "wreis/util/lib"
 	"wreis/ws"
 
-	_ "mysql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // App is the global data structure for this app
