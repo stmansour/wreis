@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"phonebook/lib"
 	"strings"
 	db "wreis/db/lib"
 	"wreis/session"
@@ -74,7 +73,7 @@ func main() {
 	// Open the logfile and begin logging...
 	//==============================================
 	App.LogFile, err = os.OpenFile("wreis.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	lib.Errcheck(err)
+	util.ErrCheck(err)
 	defer App.LogFile.Close()
 	log.SetOutput(App.LogFile)
 	util.Ulog("*** WREIS WERTZ REAL ESTATE INVESTMENT SERVICES ***\n")
