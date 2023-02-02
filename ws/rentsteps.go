@@ -63,13 +63,15 @@ type GetRentSteps struct {
 // with the w2ui Form
 // For this call, we expect the URI to contain the BID and the PID as follows:
 //
-//    /v1/rentsteps/RSLID
+//	/v1/rentsteps/RSLID
 //
 // The server command can be:
-//      get
-//      save
-//      delete
-//------------------------------------------------------------------------------
+//
+//	get
+//	save
+//	delete
+//
+// ------------------------------------------------------------------------------
 func SvcHandlerRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	util.Console("Entered SvcHandlerRentSteps, d.ID = %d\n", d.ID)
 
@@ -96,31 +98,35 @@ func SvcHandlerRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData)
 }
 
 // SvcSearchRentSteps generates a report of all RentSteps defined business d.BID
-// wsdoc {
-//  @Title  Search RentSteps
-//	@URL /v1/RentSteps/[:GID]
-//  @Method  POST
-//	@Synopsis Search RentSteps
-//  @Descr  Search all RentSteps and return those that match the Search Logic.
-//  @Descr  The search criteria includes start and stop dates of interest.
-//	@Input WebGridSearchRequest
-//  @Response RentStepsSearchResponse
+//
+//	wsdoc {
+//	 @Title  Search RentSteps
+//		@URL /v1/RentSteps/[:GID]
+//	 @Method  POST
+//		@Synopsis Search RentSteps
+//	 @Descr  Search all RentSteps and return those that match the Search Logic.
+//	 @Descr  The search criteria includes start and stop dates of interest.
+//		@Input WebGridSearchRequest
+//	 @Response RentStepsSearchResponse
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func SvcSearchRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 }
 
 // deleteRentSteps deletes a payment type from the database
-// wsdoc {
-//  @Title  Delete RentSteps
-//	@URL /v1/RentSteps/PID
-//  @Method  POST
-//	@Synopsis Delete a Payment Type
-//  @Desc  This service deletes a RentSteps.
-//	@Input WebGridDelete
-//  @Response SvcStatusResponse
+//
+//	wsdoc {
+//	 @Title  Delete RentSteps
+//		@URL /v1/RentSteps/PID
+//	 @Method  POST
+//		@Synopsis Delete a Payment Type
+//	 @Desc  This service deletes a RentSteps.
+//		@Input WebGridDelete
+//	 @Response SvcStatusResponse
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func deleteRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "deleteRentSteps"
 	util.Console("Entered %s\n", funcname)
@@ -129,17 +135,19 @@ func deleteRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 }
 
 // SaveRentSteps returns the requested assessment
-// wsdoc {
-//  @Title  Save RentSteps
-//	@URL /v1/RentSteps/RSLID
-//  @Method  GET
-//	@Synopsis Update the information on a RentSteps with the supplied data, create if necessary.
-//  @Description  Create or update a RentStep List
-//  @Description  the information supplied. All fields must be supplied.
-//	@Input RentStepsGridSave
-//  @Response SvcStatusResponse
+//
+//	wsdoc {
+//	 @Title  Save RentSteps
+//		@URL /v1/RentSteps/RSLID
+//	 @Method  GET
+//		@Synopsis Update the information on a RentSteps with the supplied data, create if necessary.
+//	 @Description  Create or update a RentStep List
+//	 @Description  the information supplied. All fields must be supplied.
+//		@Input RentStepsGridSave
+//	 @Response SvcStatusResponse
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveRentSteps"
 	util.Console("Entered %s\n", funcname)
@@ -331,7 +339,7 @@ func saveRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 // RentStepsUpdate updates the supplied RentSteps in the database with the supplied
 // info. It only allows certain fields to be updated.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func RentStepsUpdate(p *RentStep, d *ServiceData) error {
 	util.Console("entered RentStepsUpdate\n")
 	return nil
@@ -340,38 +348,39 @@ func RentStepsUpdate(p *RentStep, d *ServiceData) error {
 // GetRentSteps returns the list of RentStep items associated with the supplied
 // RSLID.
 //
-// wsdoc {
-//  @Title  Get RentSteps
-//	@URL /v1/rentsteps/RSLID
-//  @Method  GET
-//	@Synopsis Get the list of RentSteps
-//  @Description  Return all RentStep items for RSLID
-//	@Input WebGridSearchRequest
-//  @Response GetRentSteps
+//	wsdoc {
+//	 @Title  Get RentSteps
+//		@URL /v1/rentsteps/RSLID
+//	 @Method  GET
+//		@Synopsis Get the list of RentSteps
+//	 @Description  Return all RentStep items for RSLID
+//		@Input WebGridSearchRequest
+//	 @Response GetRentSteps
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func getRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "getRentSteps"
 	util.Console("entered %s\n", funcname)
 	var g GetRentSteps
-	util.Console("%s: A\n", funcname)
+	// util.Console("%s: A\n", funcname)
 	a, err := db.GetRentStepsItems(r.Context(), d.ID)
 	if err != nil {
-		util.Console("%s: B\n", funcname)
+		// util.Console("%s: B\n", funcname)
 		SvcErrorReturn(w, err)
 		return
 	}
-	util.Console("%s: C.  num items = %d\n", funcname, len(a))
+	// util.Console("%s: C.  num items = %d\n", funcname, len(a))
 	for i := 0; i < len(a); i++ {
 		var gg RentStep
-		util.Console("%s: C.1  a[i] = %#v\n", funcname, a[i])
+		// util.Console("%s: C.1  a[i] = %#v\n", funcname, a[i])
 		util.MigrateStructVals(&a[i], &gg)
-		util.Console("%s: C.2  gg = %#v\n", funcname, gg)
+		// util.Console("%s: C.2  gg = %#v\n", funcname, gg)
 		gg.Recid = gg.RSID
 		g.Records = append(g.Records, gg)
-		util.Console("%s: C.3  len(g.Records) = %d\n", funcname, len(g.Records))
+		// util.Console("%s: C.3  len(g.Records) = %d\n", funcname, len(g.Records))
 	}
-	util.Console("%s: D\n", funcname)
+	// util.Console("%s: D\n", funcname)
 	g.Status = "success"
 	SvcWriteResponse(&g, w)
 }
