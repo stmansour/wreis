@@ -1,4 +1,4 @@
 {
-    "message": "Error: this is not the latest state information\n",
-    "status": "error"
+    "status": "error",
+    "message": "Error: this is not the latest state information\n"
 }

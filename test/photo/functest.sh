@@ -91,7 +91,7 @@ if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFI
     if [ "${SINGLETEST}${TFILES}" = "${TFILES}" -o "${SINGLETEST}${TFILES}" = "${TFILES}${TFILES}" ]; then
         CMD="curl -s ${COOKIES} -F request={\"cmd\":\"save\",\"PRID\":1,\"idx\":1,\"filename\":\"roller-32.png\"} -F file=@roller-32.png http://localhost:8276/v1/propertyphoto/1/1"
         echo "CMD = ${CMD}"
-        ${CMD} | tee serverreply | python -m json.tool > "${TFILES}${STEP}" 2>>${LOGFILE}
+        ${CMD} | tee serverreply | python3 -m json.tool > "${TFILES}${STEP}" 2>>${LOGFILE}
         doCheckOnly "${TFILES}${STEP}"
 
         # make sure it's there...

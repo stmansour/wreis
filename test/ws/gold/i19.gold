@@ -1,4 +1,4 @@
 {
-    "message": "Error: the owner has not requested approval yet\n",
-    "status": "error"
+    "status": "error",
+    "message": "Error: the owner has not requested approval yet\n"
 }

@@ -1,56 +1,56 @@
 {
-    "Message": "",
+    "status": "success",
     "records": [
         {
-            "Name": "Maria Aguinaga",
+            "recid": 4,
             "UID": 4,
-            "recid": 4
+            "Name": "Maria Aguinaga"
         },
         {
-            "Name": "Maria0 Aguinaga",
+            "recid": 5,
             "UID": 5,
-            "recid": 5
+            "Name": "Maria0 Aguinaga"
         },
         {
-            "Name": "Maria Archan",
+            "recid": 7,
             "UID": 7,
-            "recid": 7
+            "Name": "Maria Archan"
         },
         {
-            "Name": "Maria Becerra",
+            "recid": 14,
             "UID": 14,
-            "recid": 14
+            "Name": "Maria Becerra"
         },
         {
-            "Name": "Imania Carrington",
+            "recid": 22,
             "UID": 22,
-            "recid": 22
+            "Name": "Imania Carrington"
         },
         {
-            "Name": "Maria Espinoza",
+            "recid": 37,
             "UID": 37,
-            "recid": 37
+            "Name": "Maria Espinoza"
         },
         {
-            "Name": "Maria Consuelo Estrada",
+            "recid": 41,
             "UID": 41,
-            "recid": 41
+            "Name": "Maria Consuelo Estrada"
         },
         {
-            "Name": "Maria Gonzalez",
+            "recid": 52,
             "UID": 52,
-            "recid": 52
+            "Name": "Maria Gonzalez"
         },
         {
-            "Name": "Thomas Halliburton",
+            "recid": 57,
             "UID": 57,
-            "recid": 57
+            "Name": "Thomas Halliburton"
         },
         {
-            "Name": "Mar'Ques Henderson",
+            "recid": 66,
             "UID": 66,
-            "recid": 66
+            "Name": "Mar'Ques Henderson"
         }
     ],
-    "status": "success"
+    "Message": ""
 }

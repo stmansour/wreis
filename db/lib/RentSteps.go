@@ -5,11 +5,12 @@ import (
 	"database/sql"
 	"time"
 	"wreis/session"
+	util "wreis/util/lib"
 )
 
 // RentSteps defines a date and a rent amount for a property. A RentSteps record
 // is part of a group or list. The group is defined by the RSLID
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 type RentSteps struct {
 	RSLID       int64      // id of RentStepsList to which this record belongs
 	MPText      string     // for Marketing Package
@@ -29,7 +30,7 @@ type RentSteps struct {
 //
 // RETURNS
 // Any errors encountered, or nil if no errors
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func DeleteRentSteps(ctx context.Context, id int64) error {
 	var err error
 
@@ -50,7 +51,7 @@ func DeleteRentSteps(ctx context.Context, id int64) error {
 // RETURNS
 // ErrSessionRequired if the session is invalid
 // nil if the session is valid
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func GetRentSteps(ctx context.Context, id int64, members bool) (RentSteps, error) {
 	var a RentSteps
 	var err error
@@ -87,7 +88,7 @@ func GetRentSteps(ctx context.Context, id int64, members bool) (RentSteps, error
 // RETURNS
 // ErrSessionRequired if the session is invalid
 // nil if the session is valid
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func GetRentStepsItems(ctx context.Context, id int64) ([]RentStep, error) {
 	var err error
 	var a []RentStep
@@ -95,14 +96,20 @@ func GetRentStepsItems(ctx context.Context, id int64) ([]RentStep, error) {
 		return a, ErrSessionRequired
 	}
 
+	util.Console("GetRentStepsItems: A\n")
+
 	fields := []interface{}{id}
 	stmt2, rows, err := getRowsFromDB(ctx, Wdb.Prepstmt.GetRentStepsItems, fields)
+	util.Console("GetRentStepsItems: B\n")
 	if err != nil {
+		util.Console("GetRentStepsItems: c\n")
 		return a, err
 	}
+	util.Console("GetRentStepsItems: d\n")
 	if stmt2 != nil {
 		defer stmt2.Close()
 	}
+	util.Console("GetRentStepsItems: e\n")
 	for i := 0; rows.Next(); i++ {
 		var x RentStep
 		if err = ReadRentStepItem(rows, &x); err != nil {
@@ -110,9 +117,11 @@ func GetRentStepsItems(ctx context.Context, id int64) ([]RentStep, error) {
 		}
 		a = append(a, x)
 	}
+	util.Console("GetRentStepsItems: f\n")
 	if err = rows.Err(); err != nil {
 		return a, err
 	}
+	util.Console("GetRentStepsItems: g\n")
 	return a, nil
 }
 
@@ -125,7 +134,7 @@ func GetRentStepsItems(ctx context.Context, id int64) ([]RentStep, error) {
 // RETURNS
 // id of the record just inserted
 // any error encountered or nil if no error
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func InsertRentSteps(ctx context.Context, a *RentSteps) (int64, error) {
 	var err error
 	sess, ok := session.GetSessionFromContext(ctx)
@@ -171,7 +180,7 @@ func insertRentStepsList(ctx context.Context, a *RentSteps) error {
 // RETURNS
 // id of the record just inserted
 // any error encountered or nil if no error
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func InsertRentStepsWithList(ctx context.Context, a *RentSteps) (int64, error) {
 	var id int64
 	var err error
@@ -191,11 +200,11 @@ func InsertRentStepsWithList(ctx context.Context, a *RentSteps) (int64, error) {
 // row - db Row pointer
 // a   - pointer to struct to fill
 //
-// RETURNS
+// # RETURNS
 //
 // ErrSessionRequired if the session is invalid
 // nil if the session is valid
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 	err := row.Scan(
 		&a.RSLID,
@@ -218,7 +227,7 @@ func ReadRentSteps(row *sql.Row, a *RentSteps) error {
 // RETURNS
 // id of the record just inserted
 // any error encountered or nil if no error
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func UpdateRentSteps(ctx context.Context, a *RentSteps) error {
 	var err error
 	sess, ok := session.GetSessionFromContext(ctx)

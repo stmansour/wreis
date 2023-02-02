@@ -1,8 +1,8 @@
 {
-    "Expire": "2020-11-04 21:34:00 UTC",
-    "ImageURL": "https://s3.amazonaws.com/directory-pics/269",
-    "Name": "Billy",
-    "Token": "c3dd272c625621dea22f6b04eeda55d8",
     "status": "success",
-    "uid": 269
+    "uid": 269,
+    "Name": "Billy",
+    "ImageURL": "https://s3.amazonaws.com/directory-pics/269",
+    "Token": "84c14f2dc0c9d3bd4237f73dd324450b",
+    "Expire": "2023-02-02 00:27:00 UTC"
 }

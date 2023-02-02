@@ -1,4 +1,4 @@
 {
-    "message": "Error: session required, please login\n",
-    "status": "error"
+    "status": "error",
+    "message": "Error: session required, please login\n"
 }

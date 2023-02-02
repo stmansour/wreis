@@ -155,6 +155,7 @@ import (
 // 	return q
 // }
 //
+
 // GetRowCount returns the number of database rows in the supplied table with the supplied where clause
 func GetRowCount(table, where string) (int64, error) {
 	count := int64(0)
@@ -236,7 +237,7 @@ func GetSQLWhereClause(fieldMap map[GenSearch][]string, searchLogic string) stri
 // entry with one or more fields where the default fields are used instead of
 // a blank.
 //
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func HandleBlankSearchField(d *ServiceData, dsf []string) {
 	if len(d.wsSearchReq.Search) == 0 {
 		return
@@ -262,9 +263,11 @@ func HandleBlankSearchField(d *ServiceData, dsf []string) {
 // GetSearchAndSortSQL returns where and order by clause
 //
 // INPUTS
-//    d  = service data from request
-//    fieldmap - valid search fields
-//------------------------------------------------------------------------------
+//
+//	d  = service data from request
+//	fieldmap - valid search fields
+//
+// ------------------------------------------------------------------------------
 func GetSearchAndSortSQL(d *ServiceData, fieldMap map[string][]string) (string, string) {
 	// util.Console("Entered GetSearchAndSortSQL\n")
 	var (

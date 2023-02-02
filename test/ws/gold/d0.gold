@@ -1,32 +1,32 @@
 {
+    "status": "success",
     "records": [
         {
-            "Dt": "1/1/2018",
-            "FLAGS": 0,
-            "Opt": "Year 1",
+            "recid": 6,
             "RSID": 6,
             "RSLID": 4,
+            "Dt": "1/1/2018",
+            "Opt": "Year 1",
             "Rent": 3100,
-            "recid": 6
+            "FLAGS": 0
         },
         {
-            "Dt": "1/1/2019",
-            "FLAGS": 0,
-            "Opt": "Year 2",
+            "recid": 7,
             "RSID": 7,
             "RSLID": 4,
+            "Dt": "1/1/2019",
+            "Opt": "Year 2",
             "Rent": 3200,
-            "recid": 7
+            "FLAGS": 0
         },
         {
-            "Dt": "1/1/2020",
-            "FLAGS": 0,
-            "Opt": "Year 3",
+            "recid": 8,
             "RSID": 8,
             "RSLID": 4,
+            "Dt": "1/1/2020",
+            "Opt": "Year 3",
             "Rent": 3300,
-            "recid": 8
+            "FLAGS": 0
         }
-    ],
-    "status": "success"
+    ]
 }

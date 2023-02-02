@@ -1,10 +1,10 @@
 {
+    "status": "success",
     "message": "",
     "record": {
-        "ActiveProperties": 6,
-        "CompletedProperties": 1,
         "PropertyCount": 7,
+        "CompletedProperties": 1,
+        "ActiveProperties": 6,
         "YourQueue": 2
-    },
-    "status": "success"
+    }
 }

@@ -18,7 +18,7 @@ ver.go:
 
 clean:
 	go clean
-	rm -f ver.go tmp *.log *.json
+	rm -f ver.go tmp *.log *.json buildno
 	@echo "*** ${THISDIR}: completed clean ***"
 
 test:

@@ -251,7 +251,7 @@ usage() {
 SYNOPSIS
 	$0 [-a -c -f -m -n -o -p  -r -t]
 
-	Rentroll test script. Compare the output of each step to its associated
+	WREIS test script. Compare the output of each step to its associated
 	.gold known-good output. If they miscompare, fail and stop the script.
 	If they match, keep going until all tasks are completed.
 
@@ -346,7 +346,7 @@ goldpath() {
 #                    for easy reading.
 #############################################################################
 printServerReply() {
-	python -m json.tool serverreply
+	python3 -m json.tool serverreply
 }
 
 #############################################################################
@@ -1012,7 +1012,7 @@ doCheckOnly() {
 #	Parameters:
 # 		$1 = url
 #       $2 = json file
-# 		$3 = base file name
+# 		$3 = response file name
 #		$4 = title
 #       $5 = if present, the name of a property to ignore in the check
 ########################################################################
@@ -1024,7 +1024,7 @@ dojsonPOST () {
 		COOK="${COOKIES}"
 	fi
 	CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-	${CMD} | tee serverreply | python -m json.tool >${3} 2>>${LOGFILE}
+	${CMD} | tee serverreply | python3 -m json.tool >${3} 2>>${LOGFILE}
 
 	incStep
 	checkPause
@@ -1131,7 +1131,7 @@ dobinPOST () {
 		echo ""
 		echo "CMD =  ${CMD}"
 	fi
-	${CMD} | tee serverreply | python -m json.tool >${3} 2>>${LOGFILE}
+	${CMD} | tee serverreply | python3 -m json.tool >${3} 2>>${LOGFILE}
 
 	incStep
 	checkPause
@@ -1224,7 +1224,7 @@ dojsonGET () {
 	fi
 
 	CMD="curl ${COOK} -s ${1}"
-	${CMD} | python -m json.tool >${2} 2>>${LOGFILE}
+	${CMD} | python3 -m json.tool >${2} 2>>${LOGFILE}
 
 	incStep
 	checkPause

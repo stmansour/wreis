@@ -1,21 +1,21 @@
 {
+    "status": "success",
     "records": [
         {
-            "Count": 9999,
-            "Description": "Vehicles per day on Main street",
-            "FLAGS": 0,
-            "PRID": 1,
+            "recid": 1,
             "TID": 1,
-            "recid": 1
+            "PRID": 1,
+            "Description": "Vehicles per day on Main street",
+            "Count": 9999,
+            "FLAGS": 0
         },
         {
-            "Count": 7777,
-            "Description": "Elm Street",
-            "FLAGS": 0,
-            "PRID": 1,
+            "recid": 2,
             "TID": 2,
-            "recid": 2
+            "PRID": 1,
+            "Description": "Elm Street",
+            "Count": 7777,
+            "FLAGS": 0
         }
-    ],
-    "status": "success"
+    ]
 }

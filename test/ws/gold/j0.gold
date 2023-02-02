@@ -1,56 +1,56 @@
 {
-    "Message": "",
+    "status": "success",
     "records": [
         {
-            "Name": "Chase Adams",
+            "recid": 2,
             "UID": 2,
-            "recid": 2
+            "Name": "Chase Adams"
         },
         {
-            "Name": "Maria Aguinaga",
+            "recid": 4,
             "UID": 4,
-            "recid": 4
+            "Name": "Maria Aguinaga"
         },
         {
-            "Name": "Maria0 Aguinaga",
+            "recid": 5,
             "UID": 5,
-            "recid": 5
+            "Name": "Maria0 Aguinaga"
         },
         {
-            "Name": "Maria Archan",
+            "recid": 7,
             "UID": 7,
-            "recid": 7
+            "Name": "Maria Archan"
         },
         {
-            "Name": "Maria Becerra",
+            "recid": 14,
             "UID": 14,
-            "recid": 14
+            "Name": "Maria Becerra"
         },
         {
-            "Name": "Imania Carrington",
+            "recid": 22,
             "UID": 22,
-            "recid": 22
+            "Name": "Imania Carrington"
         },
         {
-            "Name": "Christopher Compton",
+            "recid": 26,
             "UID": 26,
-            "recid": 26
+            "Name": "Christopher Compton"
         },
         {
-            "Name": "Jeremy Davis",
+            "recid": 28,
             "UID": 28,
-            "recid": 28
+            "Name": "Jeremy Davis"
         },
         {
-            "Name": "Jessica Edgmon",
+            "recid": 33,
             "UID": 33,
-            "recid": 33
+            "Name": "Jessica Edgmon"
         },
         {
-            "Name": "Maria Espinoza",
+            "recid": 37,
             "UID": 37,
-            "recid": 37
+            "Name": "Maria Espinoza"
         }
     ],
-    "status": "success"
+    "Message": ""
 }

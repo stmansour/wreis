@@ -28,7 +28,9 @@ func IsSQLNoResultsError(err error) bool {
 }
 
 // Errcheck - saves a bunch of typing, prints error if it exists
-//            and provides a traceback as well
+//
+//	and provides a traceback as well
+//
 // Note that the error is printed only if the environment is NOT production.
 func Errcheck(err error) {
 	if err != nil {
@@ -52,7 +54,7 @@ func Errcheck(err error) {
 // RETURNS
 // true if the session is valid
 // false otherwise
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func ValidateSession(ctx context.Context) bool {
 	if !(Wdb.Config.Env != extres.APPENVPROD) {
 		_, ok := session.GetSessionFromContext(ctx)
@@ -72,7 +74,7 @@ func ValidateSession(ctx context.Context) bool {
 // RETURNS
 // true if the session is valid
 // false otherwise
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func ValidateSessionForDBDelete(ctx context.Context) error {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
 		_, ok := session.GetSessionFromContext(ctx)
@@ -95,7 +97,7 @@ func ValidateSessionForDBDelete(ctx context.Context) error {
 //
 // RETURNS
 // any error encountered, nil otherwise
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func ValidateSessionForDBInsert(ctx context.Context, id1, id2 *int64) error {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
 		sess, ok := session.GetSessionFromContext(ctx)
@@ -120,7 +122,7 @@ func ValidateSessionForDBInsert(ctx context.Context, id1, id2 *int64) error {
 //
 // RETURNS
 // any error encountered, nil otherwise
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func ValidateSessionForDBUpdate(ctx context.Context, id2 *int64) error {
 	if !(Wdb.noAuth && Wdb.Config.Env != extres.APPENVPROD) {
 		sess, ok := session.GetSessionFromContext(ctx)
@@ -137,10 +139,12 @@ func ValidateSessionForDBUpdate(ctx context.Context, id2 *int64) error {
 // the supplied where clause. The where clause can be empty.
 //
 // INPUTS
-//    table - table are we querying
-//    joins - any join info, can be nil or an empty string
-//    where - the where clause, can be nil or an empty string
-//-----------------------------------------------------------------------------
+//
+//	table - table are we querying
+//	joins - any join info, can be nil or an empty string
+//	where - the where clause, can be nil or an empty string
+//
+// -----------------------------------------------------------------------------
 func GetRowCountRaw(table, joins, where string) (int64, error) {
 	count := int64(0)
 	var err error
@@ -187,10 +191,12 @@ func insertError(err error, n string, a interface{}) error {
 //
 // RETURNS
 // *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
-// 				note that the caller needs to defer stmt.Close() when stmt is
-//              not nil.
+//
+//					note that the caller needs to defer stmt.Close() when stmt is
+//	             not nil.
+//
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interface{}) error {
 	var err error
 
@@ -219,7 +225,7 @@ func deleteDBRow(ctx context.Context, s string, stmt *sql.Stmt, fields []interfa
 //
 // RETURNS
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func genericDelete(ctx context.Context, s string, g *sql.Stmt, id int64) error {
 	var err error
 
@@ -245,18 +251,23 @@ func genericDelete(ctx context.Context, s string, g *sql.Stmt, id int64) error {
 //
 // RETURNS
 // *sql.Stmt  - the statement -- THIS NEEDS TO BE NIL UNLESS IT'S A TXN
-//				nil if not in transaction, non-nil otherwise
-// 				note that the caller needs to defer stmt.Close() when stmt is
-//              not nil.
+//
+//					nil if not in transaction, non-nil otherwise
+//					note that the caller needs to defer stmt.Close() when stmt is
+//	             not nil.
+//
 // *sql.Row   - the database row to read
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func getRowFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, *sql.Row) {
 	var row *sql.Row
+	util.Console("getRowFromDB: a")
 	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
+		util.Console("getRowFromDB: b")
 		stmt := tx.Stmt(stmt)
 		row = stmt.QueryRow(fields...)
 		return stmt, row
 	}
+	util.Console("getRowFromDB: c")
 	row = stmt.QueryRow(fields...)
 	return nil, row
 }
@@ -272,11 +283,13 @@ func getRowFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*s
 //
 // RETURNS
 // *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
-// 				Note that the caller needs to defer stmt.Close() when stmt is
-//              not nil.
+//
+//					Note that the caller needs to defer stmt.Close() when stmt is
+//	             not nil.
+//
 // *sql.Row   - the database row to read
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func getRowsFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, *sql.Rows, error) {
 	var rows *sql.Rows
 	var err error
@@ -300,11 +313,13 @@ func getRowsFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*
 //
 // RETURNS
 // *sql.Stmt  - the statement -- nil if not in transaction, non-nil otherwise
-// 				note that the caller needs to defer stmt.Close() when stmt is
-//              not nil.
+//
+//					note that the caller needs to defer stmt.Close() when stmt is
+//	             not nil.
+//
 // sql.Result - the database Result
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func insertRowToDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, sql.Result, error) {
 	var res sql.Result
 	var err error
@@ -329,7 +344,7 @@ func insertRowToDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*
 // upid       - modifier id
 // id         - id of the record inserted
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func genericInsert(ctx context.Context, s string, g *sql.Stmt, fields []interface{}, a interface{}) (int64, int64, int64, error) {
 	var crid, upid, id int64
 	var err error
@@ -357,7 +372,7 @@ func genericInsert(ctx context.Context, s string, g *sql.Stmt, fields []interfac
 //
 // RETURNS
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func updateDBRow(ctx context.Context, stmt *sql.Stmt, fields []interface{}) error {
 	var err error
 
@@ -381,7 +396,7 @@ func updateDBRow(ctx context.Context, stmt *sql.Stmt, fields []interface{}) erro
 // RETURNS
 // id         - LastModBy id
 // error      - any error encountered
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func genericUpdate(ctx context.Context, g *sql.Stmt, fields []interface{}) (int64, error) {
 	var err error
 	var id int64

@@ -354,24 +354,24 @@ func getRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "getRentSteps"
 	util.Console("entered %s\n", funcname)
 	var g GetRentSteps
-	// util.Console("%s: A\n", funcname)
+	util.Console("%s: A\n", funcname)
 	a, err := db.GetRentStepsItems(r.Context(), d.ID)
 	if err != nil {
-		// util.Console("%s: B\n", funcname)
+		util.Console("%s: B\n", funcname)
 		SvcErrorReturn(w, err)
 		return
 	}
-	// util.Console("%s: C.  num items = %d\n", funcname, len(a))
+	util.Console("%s: C.  num items = %d\n", funcname, len(a))
 	for i := 0; i < len(a); i++ {
 		var gg RentStep
-		// util.Console("%s: C.1  a[i] = %#v\n", funcname, a[i])
+		util.Console("%s: C.1  a[i] = %#v\n", funcname, a[i])
 		util.MigrateStructVals(&a[i], &gg)
-		// util.Console("%s: C.2  gg = %#v\n", funcname, gg)
+		util.Console("%s: C.2  gg = %#v\n", funcname, gg)
 		gg.Recid = gg.RSID
 		g.Records = append(g.Records, gg)
-		// util.Console("%s: C.3  len(g.Records) = %d\n", funcname, len(g.Records))
+		util.Console("%s: C.3  len(g.Records) = %d\n", funcname, len(g.Records))
 	}
-	// util.Console("%s: D\n", funcname)
+	util.Console("%s: D\n", funcname)
 	g.Status = "success"
 	SvcWriteResponse(&g, w)
 }

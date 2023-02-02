@@ -1,56 +1,56 @@
 {
-    "Message": "",
+    "status": "success",
     "records": [
         {
-            "Name": "Mia Estella",
+            "recid": 38,
             "UID": 38,
-            "recid": 38
+            "Name": "Mia Estella"
         },
         {
-            "Name": "Stephanie Hart",
+            "recid": 63,
             "UID": 63,
-            "recid": 63
+            "Name": "Stephanie Hart"
         },
         {
-            "Name": "Stephanie Manzano",
+            "recid": 99,
             "UID": 99,
-            "recid": 99
+            "Name": "Stephanie Manzano"
         },
         {
-            "Name": "Steven Parsons",
+            "recid": 130,
             "UID": 130,
-            "recid": 130
+            "Name": "Steven Parsons"
         },
         {
-            "Name": "Stephen Roberts",
+            "recid": 141,
             "UID": 141,
-            "recid": 141
+            "Name": "Stephen Roberts"
         },
         {
-            "Name": "Stephanie Smith",
+            "recid": 156,
             "UID": 156,
-            "recid": 156
+            "Name": "Stephanie Smith"
         },
         {
-            "Name": "Jonathan Steadman",
+            "recid": 163,
             "UID": 163,
-            "recid": 163
+            "Name": "Jonathan Steadman"
         },
         {
-            "Name": "Steven Tierce",
+            "recid": 172,
             "UID": 172,
-            "recid": 172
+            "Name": "Steven Tierce"
         },
         {
-            "Name": "Steve F Mansour",
+            "recid": 211,
             "UID": 211,
-            "recid": 211
+            "Name": "Steve F Mansour"
         },
         {
-            "Name": "Billy J Tester",
+            "recid": 269,
             "UID": 269,
-            "recid": 269
+            "Name": "Billy J Tester"
         }
     ],
-    "status": "success"
+    "Message": ""
 }

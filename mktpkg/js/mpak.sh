@@ -117,7 +117,7 @@ dojsonPOST () {
 		COOK="${COOKIES}"
 	fi
 	CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-	${CMD} | tee serverreply | python -m json.tool > "${3}" 2>>${LOGFILE}
+	${CMD} | tee serverreply | python3 -m json.tool > "${3}" 2>>${LOGFILE}
 }
 
 #-----------------------------------------------------------------------------
