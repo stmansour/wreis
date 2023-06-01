@@ -184,6 +184,7 @@ SaveLoginInfo() {
 username: ${WUNAME}
 password: ${PASSWD}
 FEOF3
+        chmod 600 "${WRCONFIG}"
     fi
 }
 
