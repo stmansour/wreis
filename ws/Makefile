@@ -7,7 +7,7 @@ ws: ver.go *.go
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
 	go vet
-	if [[ -f "${GOPATH}/bin/golint" ]]; then golint; else staticcheck; fi
+	@if [[ -f "${GOPATH}/bin/golint" ]]; then golint; else staticcheck; fi
 	go build
 	go install
 	@rm -f fail

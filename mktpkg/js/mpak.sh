@@ -12,12 +12,15 @@ SKIPIMAGES=0
 CWD=$(pwd)
 SAVECOREFILES=0
 
+WRHOME="${HOME}/.wreis"
+WRCONFIG="${WRHOME}/config"
+
 HOST="http://localhost:8276"
 HOST="https://showponyinvestments.com"
 
 ShowPlan() {
 
-    cat << EOF
+    cat <<EOF
 *************************************************************************
              Server: ${HOST}
                User: ${WUNAME}
@@ -41,15 +44,21 @@ DESCRIPTION
     the marketing package based on the data it downloaded.
 
     In order to log into the server, you will need to provide your username and
-    password.  The script will ask for these values if it needs them.
+    password. The script will ask for these values if it needs them. If you
+    want to have these values saved on your system, you can provide the values
+    when asked and then indicate that you want them saved.  This information
+    will be stored in a special directory in your home directory:
+    
+        ${HOME}/.wreis
+    
+    Do this only if you trust the system you are on.
+
     Alternatively, you can create environment variables for WUNAME and PASSWD
     that the script can use. Here is an example:
 
         bash$ WUNAME="jsmith"
         bash$ PASSWD="mysecretpassword"
         bash$ export WUNAME PASSWD
-
-
 
 USAGE
     mpak.sh [OPTIONS]
@@ -84,20 +93,20 @@ FEOF
 #      nothing, but the encoded string will be in a file named "request"
 #------------------------------------------------------------------------------
 encodeRequest() {
-  local string="${1}"
-  local strlen=${#string}
-  local encoded=""
-  local pos c o
+    local string="${1}"
+    local strlen=${#string}
+    local encoded=""
+    local pos c o
 
-  for (( pos=0 ; pos<strlen ; pos++ )); do
-     c=${string:$pos:1}
-     case "$c" in
-        [-_.~a-zA-Z0-9] ) o="${c}" ;;
-        * )               printf -v o '%%%02x' "'$c"
-     esac
-     encoded+="${o}"
-  done
-  echo "${encoded}" > request
+    for ((pos = 0; pos < strlen; pos++)); do
+        c=${string:$pos:1}
+        case "$c" in
+        [-_.~a-zA-Z0-9]) o="${c}" ;;
+        *) printf -v o '%%%02x' "'$c" ;;
+        esac
+        encoded+="${o}"
+    done
+    echo "${encoded}" >request
 }
 
 ########################################################################
@@ -110,14 +119,14 @@ encodeRequest() {
 #       $2 = json file
 # 		$3 = base file name
 ########################################################################
-dojsonPOST () {
-	((REQCOUNT++))
-	COOK=""
-	if [ "${COOKIES}x" != "x" ]; then
-		COOK="${COOKIES}"
-	fi
-	CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-	${CMD} | tee serverreply | python3 -m json.tool > "${3}" 2>>${LOGFILE}
+dojsonPOST() {
+    ((REQCOUNT++))
+    COOK=""
+    if [ "${COOKIES}x" != "x" ]; then
+        COOK="${COOKIES}"
+    fi
+    CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
+    ${CMD} | tee serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
 }
 
 #-----------------------------------------------------------------------------
@@ -131,10 +140,9 @@ Clean() {
 }
 
 #-----------------------------------------------------------------------------
-# Login...
+# GetCreds - get the users credentials for login
 #-----------------------------------------------------------------------------
-LIReq() {
-    DONE=0
+GetCreds() {
     if [ "${WUNAME}x" = "x" ]; then
         echo "Your username is required to access the WREIS server."
         echo "You can enter it at the prompt, or to avoid having to enter it"
@@ -144,9 +152,9 @@ LIReq() {
     else
         DONE=1
     fi
-    while (( DONE == 0 )); do
+    while ((DONE == 0)); do
         read -rp 'username: ' WUNAME
-        if (( ${#WUNAME} < 1 )); then
+        if ((${#WUNAME} < 1)); then
             echo "come on now, you gotta give me something..."
         else
             DONE=1
@@ -164,17 +172,53 @@ LIReq() {
         echo "got it."
     fi
 
+}
+
+#-----------------------------------------------------------------------------
+# SaveLoginInfo - saves login info to ${WRCONFIG}
+#-----------------------------------------------------------------------------
+SaveLoginInfo() {
+    mkdir -p "${WRHOME}"
+    if [ ! -f "${WRCONFIG}" ]; then
+        cat >"${WRCONFIG}" <<FEOF3
+username: ${WUNAME}
+password: ${PASSWD}
+FEOF3
+    fi
+}
+
+#-----------------------------------------------------------------------------
+# Login...
+#-----------------------------------------------------------------------------
+LIReq() {
+
+    #------------------------------------------
+    # Read the user login info if we have it
+    #------------------------------------------
+    if [ -f "${WRCONFIG}" ]; then
+        while IFS= read -r line; do
+            if [[ $line == username:* ]]; then
+                WUNAME="${line#username: }"
+            elif [[ $line == password:* ]]; then
+                export PASSWD="${line#password: }"
+            fi
+        done <"${WRCONFIG}"
+    else
+        GetCreds
+    fi
+
     DONE=0
-    if (( PRID == 0 )); then
+    if ((PRID == 0)); then
         echo "You must supply a Property ID (PRID) greater than 0"
     else
         DONE=1
     fi
+
     while [ ${DONE} -eq 0 ]; do
         if [ ${PRID} -eq 0 ]; then
             read -p 'PRID: ' ptmp
             if [[ ${ptmp} =~ ^[0-9]+$ ]]; then
-                if (( ptmp < 1)); then
+                if ((ptmp < 1)); then
                     echo "the PRID must be greater than 0"
                 else
                     PRID=${ptmp}
@@ -187,8 +231,8 @@ LIReq() {
     done
 
     echo -n "Logging into server... "
-    encodeRequest "{\"user\":\"${WUNAME}\",\"pass\":\"${PASSWD}\"}"   # puts encoded request in file named "request"
-    dojsonPOST "${HOST}/v1/authn/" "request" "response"  # URL, JSONfname, serverresponse
+    encodeRequest "{\"user\":\"${WUNAME}\",\"pass\":\"${PASSWD}\"}" # puts encoded request in file named "request"
+    dojsonPOST "${HOST}/v1/authn/" "request" "response"             # URL, JSONfname, serverresponse
 
     #-----------------------------------------------------------------------------
     # Now we need to add the token to the curl command for future calls to
@@ -201,23 +245,43 @@ LIReq() {
         echo "Login failed. Check your username and password and try again."
         exit 1
     fi
-    COOKIES="-b air=${TOKEN}"   # COOKIES is used by dojsonPOST()
+
+    #-------------------------------------
+    # Offer to save login info...
+    #-------------------------------------
+    if [ ! -f "${WRCONFIG}" ]; then
+        while true; do
+            read -p "Save login information? " answer
+            answer=$(echo $answer | tr '[:upper:]' '[:lower:]')
+            case $answer in
+            "yes" | "y")
+                SaveLoginInfo
+                echo "Saved"
+                break
+                ;;
+            "no" | "n") break ;;
+            *) echo "Please enter yes or no." ;;
+            esac
+        done
+    fi
+
+    COOKIES="-b air=${TOKEN}" # COOKIES is used by dojsonPOST()
     echo "successfully logged in"
 }
 
 #-----------------------------------------------------------------------------
 # Read property PRID
 #-----------------------------------------------------------------------------
-GetProperty () {
+GetProperty() {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
-    dojsonPOST "${HOST}/v1/property/${PRID}" "request" "response"  # URL, JSONfname, serverresponse
-    ERR=$(grep "status" < response | grep -c "error")
-    if (( ERR == 1 )); then
+    dojsonPOST "${HOST}/v1/property/${PRID}" "request" "response" # URL, JSONfname, serverresponse
+    ERR=$(grep "status" <response | grep -c "error")
+    if ((ERR == 1)); then
         echo "*** SERVER REPLIED WITH AN ERROR ***"
         grep "message" <response | sed 's/"//g' | sed 's/  *message: //' | sed 's/\\n,//'
         exit 1
     fi
-    sed 's/^[{}]$//' <response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/},/};/' > "${PROPJSON}"
+    sed 's/^[{}]$//' <response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/},/};/' >"${PROPJSON}"
 
     GetImages
 
@@ -229,9 +293,9 @@ GetProperty () {
 #-----------------------------------------------------------------------------
 # GetImages
 #-----------------------------------------------------------------------------
-GetImages () {
+GetImages() {
     if [ ${SKIPIMAGES} -eq 0 ]; then
-        for (( i = 1; i < 9; i++ )); do
+        for ((i = 1; i < 9; i++)); do
             iname=$(echo "Img${i}" | sed 's/ *//g')
             iurl=$(grep "${iname}" ${PROPJSON} | sed 's/^  *"I..[0-9][0-9]*...//' | sed 's/[",]//g')
             if [ "${iurl}x" != "x" ]; then
@@ -248,27 +312,27 @@ GetImages () {
 #-----------------------------------------------------------------------------
 # Read RenewOptions
 #-----------------------------------------------------------------------------
-GetRenewOptions () {
+GetRenewOptions() {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
-    dojsonPOST "${HOST}/v1/renewoptions/${ROLID}" "request" "response"  # URL, JSONfname, serverresponse
-    sed 's/^[{}]$//' < response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"renewOptions\"] = /" > "${ROPTJSON}"
+    dojsonPOST "${HOST}/v1/renewoptions/${ROLID}" "request" "response" # URL, JSONfname, serverresponse
+    sed 's/^[{}]$//' <response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"renewOptions\"] = /" >"${ROPTJSON}"
 }
 
 #-----------------------------------------------------------------------------
 # Read RentSteps
 #-----------------------------------------------------------------------------
-GetRentSteps () {
+GetRentSteps() {
     encodeRequest '{"cmd":"get","selected":[],"limit":100,"offset":0}'
-    dojsonPOST "${HOST}/v1/rentsteps/${RSLID}" "request" "response"  # URL, JSONfname, serverresponse
-    sed 's/^[{}]$//' < response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"rentSteps\"] = /" > "${RENTJSON}"
+    dojsonPOST "${HOST}/v1/rentsteps/${RSLID}" "request" "response" # URL, JSONfname, serverresponse
+    sed 's/^[{}]$//' <response | sed 's/^[     ]*"record":/var property = /' | grep -v '"status":' | sed 's/    ],/    ];/' | sed "s/\"records\":/property[\"rentSteps\"] = /" >"${RENTJSON}"
 }
 
 #-----------------------------------------------------------------------------
 # BuildJS
 #-----------------------------------------------------------------------------
-BuildJS () {
+BuildJS() {
     C="${CWD}"
-    cat > "${OUTFILE}" <<FFEOF
+    cat >"${OUTFILE}" <<FFEOF
 //
 //  jbx.js - the portfolio writer :-)
 //
@@ -311,9 +375,9 @@ var jb = {
     ],
 };
 FFEOF
-    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" res/core.js >> "${OUTFILE}"
+    cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" res/core.js >>"${OUTFILE}"
 
-    if (( SAVECOREFILES != 1 )); then
+    if ((SAVECOREFILES != 1)); then
         echo "REMOVING FILES..."
         rm -rf "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" log request response serverreply
     fi
@@ -324,36 +388,41 @@ FFEOF
 ###############################################################################
 
 while getopts "csp:u" o; do
-	# echo "o = ${o}"
-	case "${o}" in
-	c)	Clean
-		echo "cleaned temporary files"
+    # echo "o = ${o}"
+    case "${o}" in
+    c)
+        Clean
+        echo "cleaned temporary files"
         exit 0
-		;;
-    p)  PRID="${OPTARG}"
+        ;;
+    p)
+        PRID="${OPTARG}"
         echo "PRID set to ${PRID}"
         ;;
-    s)  SKIPIMAGES=1
+    s)
+        SKIPIMAGES=1
         echo "do not load images"
         ;;
-    u)  Usage
+    u)
+        Usage
         exit 0
         ;;
-    *)  echo "Unrecognized option:  ${o}"
+    *)
+        echo "Unrecognized option:  ${o}"
         Usage
         exit 1
         ;;
     esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 if [ "${1}x" != "x" ]; then
     Usage
     exit 1
 fi
 
-Clean       # Remove any old files
-LIReq       # Log in
+Clean # Remove any old files
+LIReq # Log in
 ShowPlan
 GetProperty
 GetRenewOptions
