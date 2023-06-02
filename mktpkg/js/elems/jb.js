@@ -65,7 +65,7 @@ function addSubjectImages() {
 
     for (var j = jb.subjProp; j <= 12; j++) {
         var s = "Img" + j;
-        if (property[s] == "") {
+        if (typeof property[s] == "undefined" || property[s] == "" || property[s].length < 3) {
             continue;
         }
         //-------------------------------------
