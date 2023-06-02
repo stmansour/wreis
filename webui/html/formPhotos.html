@@ -14,12 +14,19 @@
             color: #777777;
             text-align: center;
         }
-
-        #phototable table {}
     </style>
     <script>
         function instMkt() {
             copyStringToClipboard("/bin/bash -c \"$(curl -fs https://showponyinvestments.com/static/instmpak.sh)\"");
+
+            // Get the toast element
+            var toast = document.getElementById("toast");
+
+            // Add the "show" class to DIV
+            toast.className = "show";
+
+            // After 3 seconds, remove the show class from DIV
+            setTimeout(function () { toast.className = toast.className.replace("show", ""); }, 3000);
         }
     </script>
 </head>
@@ -30,29 +37,39 @@
     </div> -->
     <table align="center" class="alpha" id="phototable" cellspacing="10">
         <tr>
-            <td width="190" height="100" valign="top" >
+            <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">1. Cover Photo</span></td>
-                        <td valign="top"><img width="20" id="trash1"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(1);"     /></td>
-                        <td valign="top"><img width="20" id="editPic1" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag1"     alt="open in new window" style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(1);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">1. Cover Photo</span></td>
+                        <td valign="top"><img width="20" id="trash1" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(1);" /></td>
+                        <td valign="top"><img width="20" id="editPic1" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag1" alt="open in new window" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(1);" /></td>
                     </tr>
                 </table>
-                <img id="phototable1" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable1" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath1"></span>
                 <input type="file" id="FileUpload1" style="display: none" />
             </td>
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">2. Aerial Photo</span></td>
-                        <td valign="top"><img width="20" id="trash2"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(2);"     /></td>
-                        <td valign="top"><img width="20" id="editPic2" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag2"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(2);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">2. Aerial Photo</span></td>
+                        <td valign="top"><img width="20" id="trash2" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(2);" /></td>
+                        <td valign="top"><img width="20" id="editPic2" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag2" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(2);" /></td>
                     </tr>
                 </table>
-                <img id="phototable2" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable2" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath2"></span>
                 <input type="file" id="FileUpload2" style="display: none" />
             </td>
@@ -61,26 +78,36 @@
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">3. Area Map</span></td>
-                        <td valign="top"><img width="20" id="trash3"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(3);"     /></td>
-                        <td valign="top"><img width="20" id="editPic3" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag3"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(3);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">3. Area Map</span></td>
+                        <td valign="top"><img width="20" id="trash3" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(3);" /></td>
+                        <td valign="top"><img width="20" id="editPic3" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag3" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(3);" /></td>
                     </tr>
                 </table>
-                <img id="phototable3" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable3" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath3"></span>
                 <input type="file" id="FileUpload3" style="display: none" />
             </td>
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">4. Logo</span></td>
-                        <td valign="top"><img width="20" id="trash4"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(4);"     /></td>
-                        <td valign="top"><img width="20" id="editPic4" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag4"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(4);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">4. Logo</span></td>
+                        <td valign="top"><img width="20" id="trash4" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(4);" /></td>
+                        <td valign="top"><img width="20" id="editPic4" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag4" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(4);" /></td>
                     </tr>
                 </table>
-                <img id="phototable4" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable4" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath4"></span>
                 <input type="file" id="FileUpload4" style="display: none" />
             </td>
@@ -89,26 +116,37 @@
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">5. Location Map</span></td>
-                        <td valign="top"><img width="20" id="trash5"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(5);"     /></td>
-                        <td valign="top"><img width="20" id="editPic5" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag5"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(5);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">5. Location Map</span></td>
+                        <td valign="top"><img width="20" id="trash5" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(5);" /></td>
+                        <td valign="top"><img width="20" id="editPic5" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag5" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(5);" /></td>
                     </tr>
                 </table>
-                <img id="phototable5" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable5" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath5"></span>
                 <input type="file" id="FileUpload5" style="display: none" />
             </td>
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">6. Subject Property</span></td>
-                        <td valign="top"><img width="20" id="trash6"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(6);"     /></td>
-                        <td valign="top"><img width="20" id="editPic6" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag6"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(6);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">6. Subject Property</span>
+                        </td>
+                        <td valign="top"><img width="20" id="trash6" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(6);" /></td>
+                        <td valign="top"><img width="20" id="editPic6" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag6" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(6);" /></td>
                     </tr>
                 </table>
-                <img id="phototable6" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable6" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath6"></span>
                 <input type="file" id="FileUpload6" style="display: none" />
             </td>
@@ -117,38 +155,55 @@
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">7. Subject Property</span></td>
-                        <td valign="top"><img width="20" id="trash7"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(7);"     /></td>
-                        <td valign="top"><img width="20" id="editPic7" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag7"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(7);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">7. Subject Property</span>
+                        </td>
+                        <td valign="top"><img width="20" id="trash7" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(7);" /></td>
+                        <td valign="top"><img width="20" id="editPic7" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag7" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(7);" /></td>
                     </tr>
                 </table>
-                <img id="phototable7" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable7" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath7"></span>
                 <input type="file" id="FileUpload7" style="display: none" />
             </td>
             <td width="190" height="100" valign="top">
                 <table width="100%" border="1">
                     <tr>
-                        <td valign="top" align="left"><span style="color: #000000;font-family: Roboto;font-size: 9pt;">8. Subject Property</span></td>
-                        <td valign="top"><img width="20" id="trash8"   alt="delete"             style="cursor: pointer;" src="/static/html/images/trashcan.gif" onclick="deleteImg(8);"     /></td>
-                        <td valign="top"><img width="20" id="editPic8" alt="change image"       style="cursor: pointer;" src="/static/html/images/edit.png"                                 /></td>
-                        <td valign="top"><img width="20" id="mag8"     alt="view full size"     style="cursor: pointer;" src="/static/html/images/mag.png"      onclick="propImageView(8);" /></td>
+                        <td valign="top" align="left"><span
+                                style="color: #000000;font-family: Roboto;font-size: 9pt;">8. Subject Property</span>
+                        </td>
+                        <td valign="top"><img width="20" id="trash8" alt="delete" style="cursor: pointer;"
+                                src="/static/html/images/trashcan.gif" onclick="deleteImg(8);" /></td>
+                        <td valign="top"><img width="20" id="editPic8" alt="change image" style="cursor: pointer;"
+                                src="/static/html/images/edit.png" /></td>
+                        <td valign="top"><img width="20" id="mag8" alt="view full size" style="cursor: pointer;"
+                                src="/static/html/images/mag.png" onclick="propImageView(8);" /></td>
                     </tr>
                 </table>
-                <img id="phototable8" alt="Select File" title="Select File" src="/static/html/images/spinner.gif" style="cursor: pointer" />
+                <img id="phototable8" alt="Select File" title="Select File" src="/static/html/images/spinner.gif"
+                    style="cursor: pointer" />
                 <span id="spnFilePath8"></span>
                 <input type="file" id="FileUpload8" style="display: none" />
             </td>
         </tr>
-        <tr height="15"><td colspan="2"></td></tr>
+        <tr height="15">
+            <td colspan="2"></td>
+        </tr>
         <tr>
             <td align="left" colspan="2">
-                <div style="color: black;text-align: left;">
+                Copy code
+                <div id="toastParent" style="color: black;text-align: left;">
                     <!-- <pre>/bin/bash -c "$(curl -fs https://showponyinvestments.com/static/mpakinst.sh")</pre> -->
+                   <div id="toast">Copied to clipboard</div>
                     To install the marketing package generator:<br>
                     <ol>
-                        <li>Click the copy button: <a onClick="instMkt();"><i class="fa fa-clone" aria-hidden="true"></i></a></li>
+                        <li>Click the copy button: <a onClick="instMkt();"><i class="fa fa-clone"
+                                    aria-hidden="true"></i></a></li>
                         <li>Open the Terminal app</li>
                         <li>Go to a directory where you want to create the marketing package</li>
                         <li>Paste then pres the Return key</li>
