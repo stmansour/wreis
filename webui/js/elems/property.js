@@ -154,7 +154,7 @@ function buildPropertyUIElements() {
         //======================================================================
         columns: [
             {field: 'recid',                size: '60px', caption: 'recid', sortable: true, hidden: true},
-            {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: true},
+            {field: 'PRID',                 size: '60px', caption: 'PRID', sortable: true, hidden: false},
             {field: 'Name',                 size: '200px', caption: 'Name', sortable: true, hidden: false},
             {field: 'YearFounded',          size: '60px', caption: 'YearFounded', sortable: true, hidden: true},
             {field: 'ParentCompany',        size: '60px', caption: 'ParentCompany', sortable: true, hidden: true},
