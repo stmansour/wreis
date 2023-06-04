@@ -196,14 +196,16 @@
         </tr>
         <tr>
             <td align="left" colspan="2">
-                Copy code
                 <div id="toastParent" style="color: black;text-align: left;">
                     <!-- <pre>/bin/bash -c "$(curl -fs https://showponyinvestments.com/static/mpakinst.sh")</pre> -->
                    <div id="toast">Copied to clipboard</div>
                     To install the marketing package generator:<br>
                     <ol>
-                        <li>Click the copy button: <a onClick="instMkt();"><i class="fa fa-clone"
-                                    aria-hidden="true"></i></a></li>
+                        <li>Click the copy button:
+                            <a onClick="instMkt(); this.children[0].classList.add('flashing');">
+                                <i class="fa fa-clone" aria-hidden="true" onAnimationEnd="this.classList.remove('flashing');"></i>
+                            </a>
+                        </li>
                         <li>Open the Terminal app</li>
                         <li>Go to a directory where you want to create the marketing package</li>
                         <li>Paste then pres the Return key</li>
