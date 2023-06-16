@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 LOGFILE="log"
+LOGALL="logall"
+CRLFMT="crlfmt.txt"
+PERFMON=0
 REQCOUNT=0
 COOKIES=
 PRID=0
@@ -15,7 +18,7 @@ SAVECOREFILES=0
 WRHOME="${HOME}/.wreis"
 WRCONFIG="${WRHOME}/config"
 
-HOST="http://localhost:8276"
+#HOST="http://localhost:8276"
 HOST="https://showponyinvestments.com"
 
 ShowPlan() {
@@ -121,19 +124,53 @@ encodeRequest() {
 ########################################################################
 dojsonPOST() {
     ((REQCOUNT++))
+    PRF=""
     COOK=""
     if [ "${COOKIES}x" != "x" ]; then
         COOK="${COOKIES}"
     fi
-    CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-    ${CMD} | tee serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+    endpoint=${1}  # first script argument
+    json_file=${2} # second script argument
+    if [ ${PERFMON} -eq 1 ]; then
+        PRF="-w @crlfmt.txt"
+    fi
+ 
+    if [ ${PERFMON} -eq 0 ]; then
+        CMD="curl ${COOK} --keepalive-time 2 -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
+        ${CMD} | tee serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+    else
+        CMD="curl ${COOK} -w @${CRLFMT} --keepalive-time 2 -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
+        echo "${CMD}" >> "${LOGALL}"
+        ${CMD} > serverreply
+
+        # python solution
+        # head -1 serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+
+        # Perl solution
+        head -1 serverreply | perl -MJSON -0777 -ne 'print JSON->new->pretty->encode(decode_json($_))' > "${3}" 2>>${LOGFILE}
+
+        # Ruby solution
+        # head -1 serverreply | ruby -rjson -e 'puts JSON.pretty_generate(JSON.parse(ARGF.read))' > "${3}" 2>>${LOGFILE}
+
+
+        # CMD=(curl "${COOK}" -s ${PRF} -X POST "${endpoint}" -H "\"Content-Type: application/json\"" -d "@${json_file}")
+        # "${CMD[@]}" | tee serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+        # C=""
+        # for item in "${CMD[@]}"; do
+        #     echo "$item" >> "${LOGALL}"
+        #     C="${C} ${item}"
+        # done
+        # echo "${C}" >> "${LOGALL}"
+
+        cat serverreply >>"${LOGALL}"
+    fi
 }
 
 #-----------------------------------------------------------------------------
 # Clean - remove old files first...
 #-----------------------------------------------------------------------------
 Clean() {
-    rm -f request response loginrequest log serverreply "${OUTFILE}" property.json portfolio.ai "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}"
+    rm -f request response loginrequest loginresponse log serverreply "${OUTFILE}" property.json portfolio.ai "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}"
     if [ ${SKIPIMAGES} -eq 0 ]; then
         rm -f Img*
     fi
@@ -216,8 +253,8 @@ LIReq() {
     fi
 
     while [ ${DONE} -eq 0 ]; do
-        if [ ${PRID} -eq 0 ]; then
-            read -p 'PRID: ' ptmp
+        if [ "${PRID}" -eq 0 ]; then
+            read -r -p 'PRID: ' ptmp
             if [[ ${ptmp} =~ ^[0-9]+$ ]]; then
                 if ((ptmp < 1)); then
                     echo "the PRID must be greater than 0"
@@ -235,12 +272,16 @@ LIReq() {
     encodeRequest "{\"user\":\"${WUNAME}\",\"pass\":\"${PASSWD}\"}" # puts encoded request in file named "request"
     dojsonPOST "${HOST}/v1/authn/" "request" "response"             # URL, JSONfname, serverresponse
 
+    cat response > loginresponse
+
     #-----------------------------------------------------------------------------
     # Now we need to add the token to the curl command for future calls to
     # the server.  curl -b "air=${TOKEN}"  ...
     # Set the command line for cookies in ${COOKIES} and dojsonPOST will use them.
     #-----------------------------------------------------------------------------
-    TOKEN=$(grep Token "response" | awk '{print $2;}' | sed 's/[",]//g')
+    # TOKEN=$(grep Token "response" | awk '{print $2;}' | sed 's/[",]//g')  # worked for Python formatter
+    TOKEN=$(grep Token "response" | sed -n 's/.*"Token"[ ]*:[ ]*"\(.*\)",/\1/p')  # works with Perl formatter
+
     if [ "${TOKEN}x" == "x" ]; then
         echo
         echo "Login failed. Check your username and password and try again."
@@ -252,8 +293,8 @@ LIReq() {
     #-------------------------------------
     if [ ! -f "${WRCONFIG}" ]; then
         while true; do
-            read -p "Save login information? " answer
-            answer=$(echo $answer | tr '[:upper:]' '[:lower:]')
+            read -r -p "Save login information? " answer
+            answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
             case $answer in
             "yes" | "y")
                 SaveLoginInfo
@@ -303,8 +344,8 @@ GetImages() {
                 echo -n "[img${i}]"
                 fname=$(basename -- "${iurl}")
                 ext="${fname##*.}"
-                url=$(echo "${iurl}" | sed 's/ /%20/g')
-                curl -s "${url}" -o "${iname}.${ext}"
+                url="${iurl// /%20}" # replace spaces with %20
+                curl --keepalive-time 2 -s "${url}" -o "${iname}.${ext}"
             fi
         done
     fi
@@ -332,7 +373,6 @@ GetRentSteps() {
 # BuildJS
 #-----------------------------------------------------------------------------
 BuildJS() {
-    C="${CWD}"
     cat >"${OUTFILE}" <<FFEOF
 //
 //  jbx.js - the portfolio writer :-)
@@ -385,10 +425,28 @@ FFEOF
 
 }
 
+SetupPerfmon() {
+    cat >"${CRLFMT}" <<FEOF
+\n
+    time_namelookup:  %{time_namelookup}\n
+       time_connect:  %{time_connect}\n
+    time_appconnect:  %{time_appconnect}\n
+   time_pretransfer:  %{time_pretransfer}\n
+      time_redirect:  %{time_redirect}\n
+ time_starttransfer:  %{time_starttransfer}\n
+                    ----------\n
+         time_total:  %{time_total}\n
+\n
+FEOF
+    echo "Created ${CRLFMT}"
+    echo "curl Performance Log" >"${LOGALL}"
+    date >>"${LOGALL}"
+}
+
 ###############################################################################
 ###############################################################################
 
-while getopts "csp:u" o; do
+while getopts "cmrsp:u" o; do
     # echo "o = ${o}"
     case "${o}" in
     c)
@@ -396,9 +454,18 @@ while getopts "csp:u" o; do
         echo "cleaned temporary files"
         exit 0
         ;;
+    m)
+        PERFMON=1
+        echo "curl performance monitoring enabled. Filename: ${LOGALL}"
+        SetupPerfmon
+        ;;
     p)
         PRID="${OPTARG}"
         echo "PRID set to ${PRID}"
+        ;;
+    r)  
+        SAVECOREFILES=1
+        echo "SAVECOREFILES = ${SAVECOREFILES}"
         ;;
     s)
         SKIPIMAGES=1
