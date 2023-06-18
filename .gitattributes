@@ -1,2 +1,3 @@
 server/config.json filter=git-crypt diff=git-crypt
+server/confprod.json filter=git-crypt diff=git-crypt
 

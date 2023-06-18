@@ -102,15 +102,17 @@ type GetStateInfo struct {
 // with the w2ui Form
 // For this call, we expect the URI to contain the BID and the PID as follows:
 //
-//    /v1/StateInfo/PRID
+//	/v1/StateInfo/PRID
 //
 // The server command can be:
-//      get
-//      save
-//      delete
-//------------------------------------------------------------------------------
+//
+//	get
+//	save
+//	delete
+//
+// ------------------------------------------------------------------------------
 func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
-	util.Console("Entered SvcHandlerStateInfo, d.ID = %d\n", d.ID)
+	util.Console("Entered SvcHandlerStateInfo, d.ID = %d, d.wsSearchReq.Cmd = %s\n", d.ID, d.wsSearchReq.Cmd)
 
 	switch d.wsSearchReq.Cmd {
 	case "get":
@@ -151,31 +153,35 @@ func SvcHandlerStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData)
 }
 
 // SvcSearchStateInfo generates a report of all StateInfo defined business d.BID
-// wsdoc {
-//  @Title  Search StateInfo
-//	@URL /v1/StateInfo/[:GID]
-//  @Method  POST
-//	@Synopsis Search StateInfo
-//  @Descr  Search all StateInfo and return those that match the Search Logic.
-//  @Descr  The search criteria includes start and stop dates of interest.
-//	@Input WebGridSearchRequest
-//  @Response StateInfoSearchResponse
+//
+//	wsdoc {
+//	 @Title  Search StateInfo
+//		@URL /v1/StateInfo/[:GID]
+//	 @Method  POST
+//		@Synopsis Search StateInfo
+//	 @Descr  Search all StateInfo and return those that match the Search Logic.
+//	 @Descr  The search criteria includes start and stop dates of interest.
+//		@Input WebGridSearchRequest
+//	 @Response StateInfoSearchResponse
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func SvcSearchStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 }
 
 // deleteStateInfo deletes a payment type from the database
-// wsdoc {
-//  @Title  Delete StateInfo
-//	@URL /v1/StateInfo/PID
-//  @Method  POST
-//	@Synopsis Delete a Payment Type
-//  @Desc  This service deletes a StateInfo.
-//	@Input WebGridDelete
-//  @Response SvcStatusResponse
+//
+//	wsdoc {
+//	 @Title  Delete StateInfo
+//		@URL /v1/StateInfo/PID
+//	 @Method  POST
+//		@Synopsis Delete a Payment Type
+//	 @Desc  This service deletes a StateInfo.
+//		@Input WebGridDelete
+//	 @Response SvcStatusResponse
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func deleteStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "deleteStateInfo"
 	util.Console("Entered %s\n", funcname)
@@ -226,16 +232,16 @@ func stateInfoHelper(w http.ResponseWriter, r *http.Request, d *ServiceData) (Sa
 
 // saveStateTerminate sets the terminate bit for this StateInfo and Property
 //
-//  ANYONE CAN TERMINATE:  But the person who made the change will be
-//         kept in the audit trail.
+//	 ANYONE CAN TERMINATE:  But the person who made the change will be
+//	        kept in the audit trail.
 //
-//			Changer will be the UID
-//         of LastModBy on this StateInfo, and creator of the StateInfo
-//         with new owner
+//				Changer will be the UID
+//	        of LastModBy on this StateInfo, and creator of the StateInfo
+//	        with new owner
 //
-//	@URL /v1/StateInfo/PRID
+//		@URL /v1/StateInfo/PRID
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveStateTerminate(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateTerminate"
 	foo, si, _, err := stateInfoHelper(w, r, d)
@@ -311,14 +317,14 @@ func saveStateTerminate(w http.ResponseWriter, r *http.Request, d *ServiceData) 
 // saveStateApprover sets approver of the state.  Anyone can do it. The person making
 // the change will be noted.
 //
-//  ANYONE CAN CHANGE THE APPROVER:  But the person who made the change will be
-//         kept in the audit trail. Changer will be the UID
-//         of LastModBy on this StateInfo, and creator of the StateInfo
-//         with new owner
+//	 ANYONE CAN CHANGE THE APPROVER:  But the person who made the change will be
+//	        kept in the audit trail. Changer will be the UID
+//	        of LastModBy on this StateInfo, and creator of the StateInfo
+//	        with new owner
 //
-//	@URL /v1/StateInfo/PRID
+//		@URL /v1/StateInfo/PRID
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveStateApprover(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	foo, si, _, err := stateInfoHelper(w, r, d)
 	if err != nil {
@@ -391,14 +397,14 @@ func saveStateApprover(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // saveStateOwner sets owner of the state.  Anyone can do it. The person making
 // the change will be noted.
 //
-//  ANYONE CAN CHANGE THE OWNER:  But the person who made the change will be
-//         kept in the audit trail. Changer will be the UID
-//         of LastModBy on this StateInfo, and creator of the StateInfo
-//         with new owner
+//	 ANYONE CAN CHANGE THE OWNER:  But the person who made the change will be
+//	        kept in the audit trail. Changer will be the UID
+//	        of LastModBy on this StateInfo, and creator of the StateInfo
+//	        with new owner
 //
-//	@URL /v1/StateInfo/PRID
+//		@URL /v1/StateInfo/PRID
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveStateOwner(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	foo, si, _, err := stateInfoHelper(w, r, d)
 	if err != nil {
@@ -473,9 +479,10 @@ func saveStateOwner(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // containing precisely one StateInfo struct, the latest one for
 // the state in question.
 //
-//	@URL /v1/StateInfo/PRID
-//        cmd = "ready"
-//-----------------------------------------------------------------------------
+//		@URL /v1/StateInfo/PRID
+//	       cmd = "ready"
+//
+// -----------------------------------------------------------------------------
 func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	foo, si, sess, err := stateInfoHelper(w, r, d)
 	if err != nil {
@@ -522,9 +529,10 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // containing precisely one StateInfo struct, the latest one for
 // the state in question.
 //
-//	@URL /v1/StateInfo/PRID
-//        cmd = "notready"
-//-----------------------------------------------------------------------------
+//		@URL /v1/StateInfo/PRID
+//	       cmd = "notready"
+//
+// -----------------------------------------------------------------------------
 func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	_, si, sess, err := stateInfoHelper(w, r, d)
 	if err != nil {
@@ -578,7 +586,7 @@ func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 //
 //	@URL /v1/StateInfo/PRID
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateApprove"
 	util.Console("Entered %s\n", funcname)
@@ -681,10 +689,10 @@ func saveStateApprove(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 //
 //	@URL /v1/StateInfo/PRID
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateReject"
-
+	util.Console("Entered %s\n", funcname)
 	foo, si, sess, err := stateInfoHelper(w, r, d)
 	if err != nil {
 		SvcErrorReturn(w, err)
@@ -699,6 +707,7 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
+	util.Console("sess.UID = %d, si.ApproverUID = %d\n", sess.UID, si.ApproverUID)
 	if sess.UID != si.ApproverUID {
 		err = fmt.Errorf("you are not the current Approver for this state")
 		SvcErrorReturn(w, err)
@@ -780,7 +789,7 @@ func saveStateReject(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 //
 //	@URL /v1/StateInfo/PRID
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateRevert"
 
@@ -889,13 +898,14 @@ func saveStateRevert(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 }
 
 // saveStateInfo expects as input a full state definition (an array of StateInfo
-//     structs that describes the state of a property).  It will efficiently
-//     add / update / delete StateInfo records so that the database reflects the
-//     array supplied
 //
-//	@URL /v1/StateInfo/PRID
+//	    structs that describes the state of a property).  It will efficiently
+//	    add / update / delete StateInfo records so that the database reflects the
+//	    array supplied
 //
-///-----------------------------------------------------------------------------
+//		@URL /v1/StateInfo/PRID
+//
+// /-----------------------------------------------------------------------------
 func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "saveStateInfo"
 	util.Console("Entered %s\n", funcname)
@@ -1020,7 +1030,7 @@ func saveStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 // StateInfoUpdate updates the supplied StateInfo in the database with the supplied
 // info. It only allows certain fields to be updated.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func StateInfoUpdate(p *StateInfo, d *ServiceData) error {
 	util.Console("entered StateInfoUpdate\n")
 	return nil
@@ -1029,16 +1039,17 @@ func StateInfoUpdate(p *StateInfo, d *ServiceData) error {
 // GetStateInfo returns the list of StateInfo items associated with the supplied
 // PRID.
 //
-// wsdoc {
-//  @Title  Get StateInfo
-//	@URL /v1/StateInfo/PRID
-//  @Method  GET
-//	@Synopsis Get the list of StateInfo
-//  @Description  Return all StateInfo items for PRID
-//	@Input WebGridSearchRequest
-//  @Response GetStateInfo
+//	wsdoc {
+//	 @Title  Get StateInfo
+//		@URL /v1/StateInfo/PRID
+//	 @Method  GET
+//		@Synopsis Get the list of StateInfo
+//	 @Description  Return all StateInfo items for PRID
+//		@Input WebGridSearchRequest
+//	 @Response GetStateInfo
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "getStateInfo"
 	util.Console("entered %s\n", funcname)

@@ -1,8 +1,8 @@
 {
     "status": "success",
-    "uid": 269,
-    "Name": "Billy",
-    "ImageURL": "https://s3.amazonaws.com/directory-pics/269",
-    "Token": "84c14f2dc0c9d3bd4237f73dd324450b",
-    "Expire": "2023-02-02 00:27:00 UTC"
+    "uid": 13,
+    "Name": "Timothy",
+    "ImageURL": "https://s3.us-east-2.amazonaws.com/wreispropertypics/defaultProfileImage.png",
+    "Token": "7996603aced3c1e2f0e876d5f3fa3540",
+    "Expire": "2023-06-17 17:33:00 UTC"
 }

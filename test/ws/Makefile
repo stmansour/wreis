@@ -1,4 +1,5 @@
 THISDIR="ws"
+TOP=../..
 
 all:
 	@echo "*** Completed in ${THISDIR} ***"
@@ -14,8 +15,7 @@ test: config.json
 	@rm -f fail
 
 config.json:
-	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
-	cp confdev.json config.json
+	cp ${TOP}/server/config.json config.json
 
 package:
 	@echo "*** PACKAGE completed in ${THISDIR} ***"

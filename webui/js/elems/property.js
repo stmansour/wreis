@@ -486,10 +486,14 @@ function buildPropertyUIElements() {
         actions: {
             save: function () {
                     if (propData.tabGenDispCount > 0) {
-                        var x=w2ui.propertyForm.validate(true);
-                        if (x.length > 0) {
+                        //temporary fix...
+                        if (w2ui.propertyForm.record.Name == "") {
                             return;
                         }
+                        // var x=w2ui.propertyForm.validate(true);
+                        // if (x.length > 0) {
+                        //     return;
+                        // }
                     }
                     savePropertyParts();
 

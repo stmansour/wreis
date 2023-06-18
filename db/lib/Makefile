@@ -20,8 +20,7 @@ relink:
 	@echo "*** RELINK completed in ${THISDIR} ***"
 
 config.json:
-	@/usr/local/accord/bin/getfile.sh accord/db/confdev.json
-	@cp confdev.json config.json
+	@cp ${TOP}/server/config.json config.json
 
 test:
 	@touch fail

@@ -3,7 +3,7 @@ BINDIR=${TOP}/dist/wreis
 THISDIR="server"
 COUNTOL=${TOP}/tools/bashtools/countol.sh
 
-server: *.go config.json
+server: *.go
 	@find . -name "fail" -exec rm -r "{}" \;
 	@touch fail
 	go vet
@@ -12,22 +12,10 @@ server: *.go config.json
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed ${THISDIR} ***"
 
-# you can update the config files as follows:
-# $ jfrog rt u[pload] configwreisdev.json accord/misc/
-# $ deployfile.sh configwreisdev.json accord/db/
-
-config.json:
-	/usr/local/accord/bin/getfile.sh accord/db/configwreisdev.json
-	cp configwreisdev.json config.json
-
-pushconf:
-	jfrog rt u configwreisdev.json accord/misc/
-	/usr/local/accord/bin/deployfile.sh configwreisdev.json accord/db/
-
 package: server
 	mkdir -p ${BINDIR}
 	cp server ${BINDIR}/wreis
-	cp configwreisdev.json ${BINDIR}/config.json
+	cp config.json ${BINDIR}/
 
 build: server package
 
@@ -36,7 +24,7 @@ ver.go:
 
 clean:
 	go clean
-	rm -f ver.go tmp *.log *.json
+	rm -f ver.go tmp *.log
 	@echo "*** ${THISDIR}: completed clean ***"
 
 test:

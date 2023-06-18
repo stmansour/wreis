@@ -260,14 +260,11 @@ func genericDelete(ctx context.Context, s string, g *sql.Stmt, id int64) error {
 // -----------------------------------------------------------------------------
 func getRowFromDB(ctx context.Context, stmt *sql.Stmt, fields []interface{}) (*sql.Stmt, *sql.Row) {
 	var row *sql.Row
-	util.Console("getRowFromDB: a")
 	if tx, ok := TxFromContext(ctx); ok { // if transaction is supplied
-		util.Console("getRowFromDB: b")
 		stmt := tx.Stmt(stmt)
 		row = stmt.QueryRow(fields...)
 		return stmt, row
 	}
-	util.Console("getRowFromDB: c")
 	row = stmt.QueryRow(fields...)
 	return nil, row
 }

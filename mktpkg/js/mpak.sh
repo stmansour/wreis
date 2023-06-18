@@ -73,6 +73,8 @@ USAGE
     -p  PRID
         PRID specifies the Property ID for which the marketing package will
         be created.  It must be a number greater than 0.
+        
+    -r  Enables curl performance monitoring.
 
     -s  Causes the images to NOT be downloaded. Only use this option if you
         really know what you are doing.
@@ -131,9 +133,6 @@ dojsonPOST() {
     fi
     endpoint=${1}  # first script argument
     json_file=${2} # second script argument
-    if [ ${PERFMON} -eq 1 ]; then
-        PRF="-w @crlfmt.txt"
-    fi
  
     if [ ${PERFMON} -eq 0 ]; then
         CMD="curl ${COOK} --keepalive-time 2 -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
@@ -454,7 +453,7 @@ while getopts "cmrsp:u" o; do
         echo "cleaned temporary files"
         exit 0
         ;;
-    m)
+    r)
         PERFMON=1
         echo "curl performance monitoring enabled. Filename: ${LOGALL}"
         SetupPerfmon

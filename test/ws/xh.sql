@@ -1,13 +1,13 @@
--- MySQL dump 10.13  Distrib 5.7.22, for osx10.12 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.30, for macos12 (arm64)
 --
 -- Host: localhost    Database: wreis
 -- ------------------------------------------------------
--- Server version	5.7.22
+-- Server version	8.0.30
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -21,16 +21,16 @@
 
 DROP TABLE IF EXISTS `DataUpdate`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `DataUpdate` (
-  `DUID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `GID` bigint(20) NOT NULL DEFAULT '0',
+  `DUID` bigint NOT NULL AUTO_INCREMENT,
+  `GID` bigint NOT NULL DEFAULT '0',
   `DtStart` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `DtStop` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`DUID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,17 +48,17 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `EGroup`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `EGroup` (
-  `GID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `GID` bigint NOT NULL AUTO_INCREMENT,
   `GroupName` varchar(50) NOT NULL DEFAULT '',
   `GroupDescription` varchar(1000) NOT NULL DEFAULT '',
   `DtStart` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `DtStop` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`GID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -72,39 +72,14 @@ INSERT INTO `EGroup` VALUES (1,'smanmusic','','2020-08-26 06:58:12','2020-08-26 
 UNLOCK TABLES;
 
 --
--- Table structure for table `PGroup`
---
-
-DROP TABLE IF EXISTS `PGroup`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `PGroup` (
-  `PID` bigint(20) NOT NULL DEFAULT '0',
-  `GID` bigint(20) NOT NULL DEFAULT '0',
-  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `PGroup`
---
-
-LOCK TABLES `PGroup` WRITE;
-/*!40000 ALTER TABLE `PGroup` DISABLE KEYS */;
-INSERT INTO `PGroup` VALUES (1,1,'2020-07-05 18:29:18',0),(2,1,'2020-07-05 18:29:18',0);
-/*!40000 ALTER TABLE `PGroup` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `People`
 --
 
 DROP TABLE IF EXISTS `People`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `People` (
-  `PID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `PID` bigint NOT NULL AUTO_INCREMENT,
   `FirstName` varchar(100) DEFAULT '',
   `MiddleName` varchar(100) DEFAULT '',
   `LastName` varchar(100) DEFAULT '',
@@ -122,12 +97,12 @@ CREATE TABLE `People` (
   `MailCountry` varchar(50) DEFAULT '',
   `RoomNumber` varchar(50) DEFAULT '',
   `MailStop` varchar(100) DEFAULT '',
-  `Status` smallint(6) DEFAULT '0',
+  `Status` smallint DEFAULT '0',
   `OptOutDate` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`PID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,40 +116,88 @@ INSERT INTO `People` VALUES (1,'Shannon','CornDog','Kodiak','','','','','shannon
 UNLOCK TABLES;
 
 --
+-- Table structure for table `PGroup`
+--
+
+DROP TABLE IF EXISTS `PGroup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `PGroup` (
+  `PID` bigint NOT NULL DEFAULT '0',
+  `GID` bigint NOT NULL DEFAULT '0',
+  `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `LastModBy` bigint NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `PGroup`
+--
+
+LOCK TABLES `PGroup` WRITE;
+/*!40000 ALTER TABLE `PGroup` DISABLE KEYS */;
+INSERT INTO `PGroup` VALUES (1,1,'2020-07-05 18:29:18',0),(2,1,'2020-07-05 18:29:18',0);
+/*!40000 ALTER TABLE `PGroup` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `PropBrokers`
+--
+
+DROP TABLE IF EXISTS `PropBrokers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `PropBrokers` (
+  `PRID` bigint NOT NULL DEFAULT '0',
+  `UID` bigint NOT NULL DEFAULT '0',
+  `COID` bigint NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `PropBrokers`
+--
+
+LOCK TABLES `PropBrokers` WRITE;
+/*!40000 ALTER TABLE `PropBrokers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `PropBrokers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Property`
 --
 
 DROP TABLE IF EXISTS `Property`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Property` (
-  `PRID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `PRID` bigint NOT NULL AUTO_INCREMENT,
   `Name` varchar(256) NOT NULL DEFAULT '',
-  `YearFounded` smallint(6) NOT NULL DEFAULT '0',
+  `YearFounded` smallint NOT NULL DEFAULT '0',
   `ParentCompany` varchar(256) NOT NULL DEFAULT '',
   `URL` varchar(1028) NOT NULL DEFAULT '',
   `Symbol` varchar(128) NOT NULL DEFAULT '',
   `Price` decimal(19,4) NOT NULL DEFAULT '0.0000',
   `DownPayment` decimal(19,4) NOT NULL DEFAULT '0.0000',
-  `RentableArea` bigint(20) NOT NULL DEFAULT '0',
-  `RentableAreaUnits` smallint(6) NOT NULL DEFAULT '0',
+  `RentableArea` bigint NOT NULL DEFAULT '0',
+  `RentableAreaUnits` smallint NOT NULL DEFAULT '0',
   `LotSize` decimal(19,4) NOT NULL DEFAULT '0.0000',
-  `LotSizeUnits` smallint(6) NOT NULL DEFAULT '0',
+  `LotSizeUnits` smallint NOT NULL DEFAULT '0',
   `CapRate` float NOT NULL DEFAULT '0',
   `AvgCap` float NOT NULL DEFAULT '0',
-  `BuildYear` smallint(6) NOT NULL DEFAULT '0',
-  `RenovationYear` smallint(6) NOT NULL DEFAULT '0',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
-  `OwnershipType` smallint(6) NOT NULL DEFAULT '0',
+  `BuildYear` smallint NOT NULL DEFAULT '0',
+  `RenovationYear` smallint NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
+  `OwnershipType` smallint NOT NULL DEFAULT '0',
   `TenantTradeName` varchar(256) NOT NULL DEFAULT '',
-  `LeaseGuarantor` smallint(6) NOT NULL DEFAULT '0',
-  `LeaseType` smallint(6) NOT NULL DEFAULT '0',
-  `OriginalLeaseTerm` bigint(20) NOT NULL DEFAULT '0',
+  `LeaseGuarantor` smallint NOT NULL DEFAULT '0',
+  `LeaseType` smallint NOT NULL DEFAULT '0',
+  `OriginalLeaseTerm` bigint NOT NULL DEFAULT '0',
   `RentCommencementDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
   `LeaseExpirationDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
-  `ROLID` bigint(20) NOT NULL DEFAULT '0',
-  `RSLID` bigint(20) NOT NULL DEFAULT '0',
-  `FlowState` bigint(20) NOT NULL DEFAULT '0',
+  `ROLID` bigint NOT NULL DEFAULT '0',
+  `RSLID` bigint NOT NULL DEFAULT '0',
+  `FlowState` bigint NOT NULL DEFAULT '0',
   `Address` varchar(100) NOT NULL DEFAULT '',
   `Address2` varchar(100) NOT NULL DEFAULT '',
   `City` varchar(100) NOT NULL DEFAULT '',
@@ -198,11 +221,11 @@ CREATE TABLE `Property` (
   `Img11` varchar(2048) NOT NULL DEFAULT '',
   `Img12` varchar(2048) NOT NULL DEFAULT '',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`PRID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -221,16 +244,16 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Query`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Query` (
-  `QID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `QID` bigint NOT NULL AUTO_INCREMENT,
   `QueryName` varchar(50) DEFAULT '',
   `QueryDescr` varchar(1000) DEFAULT '',
   `QueryJSON` varchar(3000) DEFAULT '',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`QID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,20 +271,20 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `RenewOption`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RenewOption` (
-  `ROID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `ROLID` bigint(20) NOT NULL DEFAULT '0',
+  `ROID` bigint NOT NULL AUTO_INCREMENT,
+  `ROLID` bigint NOT NULL DEFAULT '0',
   `Dt` date NOT NULL DEFAULT '1970-01-01',
   `Opt` varchar(100) NOT NULL DEFAULT '',
   `Rent` decimal(19,4) NOT NULL DEFAULT '0.0000',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`ROID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -280,17 +303,17 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `RenewOptions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RenewOptions` (
-  `ROLID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `ROLID` bigint NOT NULL AUTO_INCREMENT,
   `MPText` varchar(256) NOT NULL DEFAULT '',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`ROLID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -309,20 +332,20 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `RentStep`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RentStep` (
-  `RSID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `RSLID` bigint(20) NOT NULL DEFAULT '0',
+  `RSID` bigint NOT NULL AUTO_INCREMENT,
+  `RSLID` bigint NOT NULL DEFAULT '0',
   `Dt` date NOT NULL DEFAULT '1970-01-01',
   `Opt` varchar(100) NOT NULL DEFAULT '',
   `Rent` decimal(19,4) NOT NULL DEFAULT '0.0000',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`RSID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -341,17 +364,17 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `RentSteps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `RentSteps` (
-  `RSLID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `RSLID` bigint NOT NULL AUTO_INCREMENT,
   `MPText` varchar(256) NOT NULL DEFAULT '',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`RSLID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -370,23 +393,23 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `StateInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `StateInfo` (
-  `SIID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `PRID` bigint(20) NOT NULL DEFAULT '0',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
-  `FlowState` bigint(20) NOT NULL DEFAULT '0',
-  `OwnerUID` bigint(20) NOT NULL DEFAULT '0',
+  `SIID` bigint NOT NULL AUTO_INCREMENT,
+  `PRID` bigint NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
+  `FlowState` bigint NOT NULL DEFAULT '0',
+  `OwnerUID` bigint NOT NULL DEFAULT '0',
   `OwnerDt` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
-  `ApproverUID` bigint(20) NOT NULL DEFAULT '0',
+  `ApproverUID` bigint NOT NULL DEFAULT '0',
   `ApproverDt` date NOT NULL DEFAULT '1970-01-01',
   `Reason` varchar(256) NOT NULL DEFAULT '',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`SIID`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -395,7 +418,7 @@ CREATE TABLE `StateInfo` (
 
 LOCK TABLES `StateInfo` WRITE;
 /*!40000 ALTER TABLE `StateInfo` DISABLE KEYS */;
-INSERT INTO `StateInfo` VALUES (1,1,2,1,211,'2020-10-01 00:00:00',269,'1970-01-01','','2020-11-05 23:17:17',269,'2020-10-01 21:36:47',211),(2,2,4,1,211,'2020-10-01 00:00:00',198,'2020-10-02','','2020-10-31 03:43:06',211,'2020-10-01 21:36:47',211),(3,2,0,2,211,'2020-10-02 00:00:00',198,'1970-01-01','','2020-11-05 23:22:43',198,'2020-10-01 21:36:47',198),(4,3,4,1,16,'2020-09-28 00:00:00',26,'2020-10-01','','2020-10-31 03:43:06',16,'2020-10-13 17:05:17',16),(5,3,4,2,26,'2020-10-02 00:00:00',36,'2020-10-03','','2020-10-31 03:43:06',26,'2020-10-13 17:07:30',26),(6,3,2,3,269,'2020-10-03 00:00:00',80,'1970-01-01','','2020-11-17 07:03:19',42,'2020-10-13 17:09:19',42),(7,4,4,1,67,'2020-09-28 00:00:00',17,'2020-10-01','','2020-10-31 03:43:06',67,'2020-10-13 17:13:54',67),(8,4,4,2,38,'2020-10-02 00:00:00',54,'2020-10-03','','2020-10-31 03:43:06',38,'2020-10-13 17:13:54',38),(9,4,4,3,47,'2020-10-03 00:00:00',37,'2020-10-04','','2020-10-31 03:43:06',47,'2020-10-13 17:13:54',47),(10,4,2,4,92,'2020-10-04 00:00:00',269,'1970-01-01','','2020-11-17 07:06:49',92,'2020-10-13 17:13:54',92),(11,5,4,1,53,'2020-09-28 00:00:00',64,'2020-10-02','','2020-10-31 03:43:06',53,'2020-10-13 17:18:55',53),(12,5,4,2,73,'2020-10-02 00:00:00',28,'2020-10-03','','2020-10-31 03:43:06',73,'2020-10-13 17:18:55',73),(13,5,4,3,81,'2020-10-03 00:00:00',28,'2020-10-04','','2020-10-31 03:43:06',81,'2020-10-13 17:18:55',81),(14,5,4,4,91,'2020-10-04 00:00:00',94,'2020-10-05','','2020-10-31 03:43:06',91,'2020-10-13 17:18:55',91),(15,5,0,5,107,'2020-10-05 00:00:00',0,'1970-01-01','','2020-10-13 17:20:49',107,'2020-10-13 17:18:55',107),(16,6,4,1,34,'2020-09-28 00:00:00',67,'2020-10-02','','2020-10-31 03:43:06',34,'2020-10-13 17:25:36',34),(17,6,4,2,56,'2020-10-02 00:00:00',84,'2020-10-03','','2020-10-31 03:43:06',56,'2020-10-13 17:25:36',56),(18,6,4,3,73,'2020-10-03 00:00:00',94,'2020-10-04','','2020-10-31 03:43:06',73,'2020-10-13 17:25:36',73),(19,6,4,4,37,'2020-10-04 00:00:00',32,'2020-10-05','','2020-10-31 03:43:06',37,'2020-10-13 17:25:36',37),(20,6,4,5,37,'2020-10-05 00:00:00',68,'2020-10-06','','2020-10-31 03:43:06',37,'2020-10-13 17:25:36',37),(21,6,0,6,72,'2020-10-06 00:00:00',0,'1970-01-01','','2020-10-13 17:25:36',72,'2020-10-13 17:25:36',72),(22,7,4,1,35,'2020-10-01 00:00:00',103,'2020-10-02','','2020-10-31 03:43:06',35,'2020-10-13 17:27:11',35),(23,7,4,2,37,'2020-10-02 00:00:00',104,'2020-10-03','','2020-10-31 03:43:06',37,'2020-10-13 17:27:11',37),(24,7,4,3,38,'2020-10-03 00:00:00',105,'2020-10-04','','2020-10-31 03:43:06',38,'2020-10-13 17:27:11',38),(25,7,4,4,39,'2020-10-04 00:00:00',160,'2020-10-05','','2020-10-31 03:43:06',39,'2020-10-13 17:27:11',39),(26,7,4,5,40,'2020-10-05 00:00:00',107,'2020-10-06','','2020-10-31 03:43:06',40,'2020-10-13 17:27:11',40),(27,7,4,6,41,'2020-10-06 00:00:00',108,'2020-10-07','','2020-10-31 03:43:06',41,'2020-10-13 17:27:11',41),(28,7,0,7,42,'2020-10-07 00:00:00',0,'1970-01-01','','2020-10-13 17:37:20',42,'2020-10-13 17:27:11',42);
+INSERT INTO `StateInfo` VALUES (1,1,2,1,1,'2020-10-01 00:00:00',2,'1970-01-01','','2023-06-18 17:55:02',2,'2020-10-01 21:36:47',1),(2,2,4,1,1,'2020-10-01 00:00:00',3,'2020-10-02','','2023-06-18 20:12:51',1,'2020-10-01 21:36:47',1),(3,2,0,2,1,'2020-10-02 00:00:00',2,'1970-01-01','','2023-06-18 19:41:34',1,'2020-10-01 21:36:47',2),(4,3,4,1,2,'2020-09-28 00:00:00',13,'2020-10-01','','2023-06-18 20:14:58',2,'2020-10-13 17:05:17',2),(5,3,4,2,2,'2020-10-02 00:00:00',3,'2020-10-03','','2023-06-18 20:12:51',2,'2020-10-13 17:07:30',2),(6,3,2,3,2,'2020-10-03 00:00:00',3,'1970-01-01','','2023-06-18 20:12:51',3,'2020-10-13 17:09:19',3),(7,4,4,1,3,'2020-09-28 00:00:00',2,'2020-10-01','','2023-06-18 18:08:48',3,'2020-10-13 17:13:54',3),(8,4,4,2,3,'2020-10-02 00:00:00',3,'2020-10-03','','2023-06-18 20:12:51',2,'2020-10-13 17:13:54',3),(9,4,4,3,3,'2020-10-03 00:00:00',3,'2020-10-04','','2023-06-18 20:26:57',4,'2020-10-13 17:13:54',4),(10,4,2,4,1,'2020-10-04 00:00:00',13,'1970-01-01','','2023-06-18 20:26:57',92,'2020-10-13 17:13:54',2),(11,5,4,1,53,'2020-09-28 00:00:00',64,'2020-10-02','','2020-10-31 03:43:06',53,'2020-10-13 17:18:55',53),(12,5,4,2,73,'2020-10-02 00:00:00',28,'2020-10-03','','2020-10-31 03:43:06',73,'2020-10-13 17:18:55',73),(13,5,4,3,81,'2020-10-03 00:00:00',28,'2020-10-04','','2020-10-31 03:43:06',81,'2020-10-13 17:18:55',81),(14,5,4,4,91,'2020-10-04 00:00:00',94,'2020-10-05','','2020-10-31 03:43:06',91,'2020-10-13 17:18:55',91),(15,5,0,5,107,'2020-10-05 00:00:00',0,'1970-01-01','','2020-10-13 17:20:49',107,'2020-10-13 17:18:55',107),(16,6,4,1,34,'2020-09-28 00:00:00',67,'2020-10-02','','2020-10-31 03:43:06',34,'2020-10-13 17:25:36',34),(17,6,4,2,56,'2020-10-02 00:00:00',84,'2020-10-03','','2020-10-31 03:43:06',56,'2020-10-13 17:25:36',56),(18,6,4,3,73,'2020-10-03 00:00:00',94,'2020-10-04','','2020-10-31 03:43:06',73,'2020-10-13 17:25:36',73),(19,6,4,4,37,'2020-10-04 00:00:00',32,'2020-10-05','','2020-10-31 03:43:06',37,'2020-10-13 17:25:36',37),(20,6,4,5,37,'2020-10-05 00:00:00',68,'2020-10-06','','2020-10-31 03:43:06',37,'2020-10-13 17:25:36',37),(21,6,0,6,72,'2020-10-06 00:00:00',0,'1970-01-01','','2020-10-13 17:25:36',72,'2020-10-13 17:25:36',72),(22,7,4,1,35,'2020-10-01 00:00:00',103,'2020-10-02','','2020-10-31 03:43:06',35,'2020-10-13 17:27:11',35),(23,7,4,2,37,'2020-10-02 00:00:00',104,'2020-10-03','','2020-10-31 03:43:06',37,'2020-10-13 17:27:11',37),(24,7,4,3,38,'2020-10-03 00:00:00',105,'2020-10-04','','2020-10-31 03:43:06',38,'2020-10-13 17:27:11',38),(25,7,4,4,39,'2020-10-04 00:00:00',160,'2020-10-05','','2020-10-31 03:43:06',39,'2020-10-13 17:27:11',39),(26,7,4,5,40,'2020-10-05 00:00:00',107,'2020-10-06','','2020-10-31 03:43:06',40,'2020-10-13 17:27:11',40),(27,7,4,6,41,'2020-10-06 00:00:00',108,'2020-10-07','','2020-10-31 03:43:06',41,'2020-10-13 17:27:11',41),(28,7,0,7,42,'2020-10-07 00:00:00',0,'1970-01-01','','2020-10-13 17:37:20',42,'2020-10-13 17:27:11',42);
 /*!40000 ALTER TABLE `StateInfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -405,19 +428,19 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `Traffic`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Traffic` (
-  `TID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `PRID` bigint(20) NOT NULL DEFAULT '0',
-  `FLAGS` bigint(20) NOT NULL DEFAULT '0',
-  `Count` bigint(20) NOT NULL DEFAULT '0',
+  `TID` bigint NOT NULL AUTO_INCREMENT,
+  `PRID` bigint NOT NULL DEFAULT '0',
+  `FLAGS` bigint NOT NULL DEFAULT '0',
+  `Count` bigint NOT NULL DEFAULT '0',
   `Description` varchar(128) NOT NULL DEFAULT '',
   `LastModTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `LastModBy` bigint(20) NOT NULL DEFAULT '0',
+  `LastModBy` bigint NOT NULL DEFAULT '0',
   `CreateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `CreateBy` bigint(20) NOT NULL DEFAULT '0',
+  `CreateBy` bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (`TID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -439,4 +462,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-01-19 10:43:42
+-- Dump completed on 2023-06-18 13:27:06

@@ -18,6 +18,8 @@ SECONDS=0
 ERRFILE="err.txt"
 UNAME=$(uname)
 LOGFILE="log"
+LOGALL="curlperf"
+PERFMON=0
 MYSQLOPTS=""
 MYSQL=$(which mysql)
 TESTCOUNT=0           ## this is an internal counter, your external script should not touch it
@@ -104,6 +106,29 @@ if [ "x" == "x${CSVDATERANGE}" ]; then
 	echo "CSVDATERANGE not set.  Setting to default = -g 1/1/16,2/1/16"
 	CSVDATERANGE="-G ${BUD} -g 1/1/16,2/1/16"
 fi
+
+#------------------------------------------------------------------------------
+#  SetupPerfmon creates the curl format file that instructs curl on what
+#               timing information to log
+#------------------------------------------------------------------------------
+SetupPerfmon() {
+    cat >"${CRLFMT}" <<FEOF
+\n
+    time_namelookup:  %{time_namelookup}\n
+       time_connect:  %{time_connect}\n
+    time_appconnect:  %{time_appconnect}\n
+   time_pretransfer:  %{time_pretransfer}\n
+      time_redirect:  %{time_redirect}\n
+ time_starttransfer:  %{time_starttransfer}\n
+                    ----------\n
+         time_total:  %{time_total}\n
+\n
+FEOF
+    echo "Created ${CRLFMT}"
+	echo "---------------------------------------------------------------------------" >> "${LOGALL}"
+    echo "curl Performance Log" >>"${LOGALL}"
+    date >>"${LOGALL}"
+}
 
 
 #------------------------------------------------------------------------------
@@ -280,6 +305,8 @@ OPTIONS
 	-p  Causes execution to pause between tests so that you can perform
 	    checks in the database, or in logfiles, or any other output that
 	    the tests cause.
+
+	-r  Enables curl performance monitoring
 
 	-t  Sets the environment variable RUNSINGLETEST to the supplied value. By
 	    default, "${RUNSINGLETEST}x" == "x" and this should cause all of the
@@ -914,12 +941,14 @@ stopRentRollServer() {
 #########################################################
 startWsrv() {
 	if [ ${MANAGESERVER} -eq 1 ]; then
+		echo "CALLING STOPWSRV..."
 		stopWsrv
 		cmd="${WSRV} > ${WSRVBIN}/wreislog 2>&1 &"
 		echo "${cmd}"
 		${WSRV} > ${WSRVBIN}/wreislog 2>&1 &
 		sleep 1
-		rm -f wreislog
+		echo "WREIS SERVER STARTED"
+		rm -f wreislog slog
 		ln -s ${WSRVBIN}/wreislog slog
 	fi
 }
@@ -957,10 +986,10 @@ doCheckOnly() {
 	# data.
 	#--------------------------------------------------------------------
 	declare -a out_filters=(
-		's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
-		's/(^[ \t]+"CreateTime":).*/$1 TIMESTAMP/'
-		's/(^[ \t]+"Token":).*/$1 TOKEN/'
-		's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
+		's/(^[ \t]*"LastModTime" *:).*/$1 TIMESTAMP/'
+		's/(^[ \t]*"CreateTime" *:).*/$1 TIMESTAMP/'
+		's/(^[ \t]*"Token" *:).*/$1 TOKEN/'
+		's/(^[ \t]*"Expire" *:).*/$1 TIMESTAMP/'
 	)
 	cp gold/${1}.gold qqx
 	cp ${1} qqy
@@ -1023,12 +1052,29 @@ dojsonPOST () {
 	if [ "${COOKIES}x" != "x" ]; then
 		COOK="${COOKIES}"
 	fi
-	CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-	${CMD} | tee serverreply | python3 -m json.tool >${3} 2>>${LOGFILE}
+
+
+	if [ ${PERFMON} -eq 0 ]; then
+		CMD="curl ${COOK} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
+		${CMD} | tee serverreply | python3 -m json.tool >${3} 2>>${LOGFILE}
+	else
+		CMD="curl ${COOK} -w @${CRLFMT} -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
+        echo "${CMD}" >> "${LOGALL}"
+        ${CMD} > serverreply
+        # python solution
+        # head -1 serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+        # Ruby solution
+        # head -1 serverreply | ruby -rjson -e 'puts JSON.pretty_generate(JSON.parse(ARGF.read))' > "${3}" 2>>${LOGFILE}
+
+        # Perl solution
+        head -1 serverreply | perl -MJSON -0777 -ne 'print JSON->new->pretty->encode(decode_json($_))' > "${3}" 2>>${LOGFILE}
+
+        cat serverreply >>"${LOGALL}"
+	fi
 
 	incStep
 	checkPause
-
+	
 	if [ "${FORCEGOOD}" = "1" ]; then
 		goldpath
 		cp ${3} ${GOLD}/${3}.gold
@@ -1047,12 +1093,12 @@ dojsonPOST () {
 		# data.
 		#--------------------------------------------------------------------
 		declare -a out_filters=(
-			's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"CreateTime":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"ApproverDt":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"OwnerDt":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"Token":).*/$1 TOKEN/'
-			's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"LastModTime" *:).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"CreateTime" *:).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"ApproverDt" *:).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"OwnerDt" *:).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"Token" *:).*/$1 TOKEN/'
+			's/(^[ \t]*"Expire" *:).*/$1 TIMESTAMP/'
 		)
 		cp gold/${3}.gold qqx
 		cp ${3} qqy
@@ -1060,6 +1106,9 @@ dojsonPOST () {
 		do
 			perl -pe "$f" qqx > qqx1; mv qqx1 qqx
 			perl -pe "$f" qqy > qqy1; mv qqy1 qqy
+			# echo "replace filter = ${f}"
+			# cat qqy
+			# echo "-------------------------------------------"
 		done
 
 		if [ "x${5}" != "x" ]; then
@@ -1154,10 +1203,10 @@ dobinPOST () {
 		# data.
 		#--------------------------------------------------------------------
 		declare -a out_filters=(
-			's/(^[ \t]+"LastModTime":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"CreateTime":).*/$1 TIMESTAMP/'
-			's/(^[ \t]+"Token":).*/$1 TOKEN/'
-			's/(^[ \t]+"Expire":).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"LastModTime *":).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"CreateTime *":).*/$1 TIMESTAMP/'
+			's/(^[ \t]*"Token *":).*/$1 TOKEN/'
+			's/(^[ \t]*"Expire *":).*/$1 TIMESTAMP/'
 		)
 		cp gold/${3}.gold qqx
 		cp ${3} qqy
@@ -1436,133 +1485,6 @@ doPlainGET () {
 	rm -f qqx qqy
 }
 
-##############################################################################################
-# doCypressUITest()
-#	UI automation testing in headless mode with cypress.io tool
-#
-#	Parameters:
-# 		$1 = base file name
-#		$2 = javascript file from which UI automated testing should be performed with options
-# 		$3 = title for reporting. No spaces
-##############################################################################################
-doCypressUITest () {
-	n=$((TESTCOUNT + 1))  ## we count the number of tests below
-	printf "PHASE %2s  %3s  %s... " ${n} $1 $3
-
-	echo "STARTING PHONEBOOK SERVER for cypress UI automated testing..."
-	pushd ../../../phonebook/
-	$STARTPHONEBOOKCMD
-	popd
-
-	echo "STARTING RENTROLL SERVER for cypress UI automated testing..."
-	startRentRollServer
-
-	if [ "x${2}" != "x" ]; then
-		echo "${CYPRESSTEST} ${2} >${1} 2>&1"
-		${CYPRESSTEST} ${2} 2>&1 | tee ${1}
-	fi
-
-	incStep
-	checkPause
-
-	#-----------------------------------------------------
-	#  Read the number of tests from the output file
-	#-----------------------------------------------------
-	TOTALTESTCOUNT=0
-	EACHTESTCOUNT=$(grep "Tests:" ${1} | awk '{print $3}')
-	for line in $EACHTESTCOUNT; do
-		if [ "$line" -gt "0" ]; then
-			TOTALTESTCOUNT=$(( TOTALTESTCOUNT + $line ))
-		fi
-	done
-	TESTCOUNT=$(( TESTCOUNT + ${TOTALTESTCOUNT} ))
-
-	if [ "${FORCEGOOD}" = "1" ]; then
-		goldpath
-		cp ${1} ${GOLD}/${1}.gold
-		echo "DONE"
-	elif [ "${SKIPCOMPARE}" = "0" ]; then
-		if [ ! -f ${GOLD}/${1}.gold ]; then
-			echo "UNSET CONTENT" > ${GOLD}/${1}.gold
-			echo "Created a default ${GOLD}/$1.gold for you. Update this file with known-good output."
-		fi
-		# declare -a out_filters=(
-		# 	's/([0-9]*ms)/{TestExecutedTime}/g'
-		# 	's/Duration:\s+[0-9]*\sseconds*/{durationSec}/g'
-		# 	's/[0-9]* passing \([0-9]*s\)/{passingSec}/g'
-		# 	's/Video Recorded:.*/{videoRecordOnOff}/g'
-		# )
-		# cp ${GOLD}/${1}.gold ${GOLD}/${1}.g
-		# cp ${1} ${1}.g
-
-		# # only extract lines between matched pattern: (Test Starting to Cypress Version:)
-		# # overwrite it in .g temp files
-		# sed '/(Tests Starting/,/Cypress Version:/!d' -i ${GOLD}/${1}.g
-		# sed '/(Tests Starting/,/Cypress Version:/!d' -i ${1}.g
-
-		# for f in "${out_filters[@]}"
-		# do
-		# 	perl -pe "$f" ${GOLD}/${1}.g > ${GOLD}/${1}.t; mv ${GOLD}/${1}.t ${GOLD}/${1}.g
-		# 	perl -pe "$f" ${1}.g > ${1}.t; mv ${1}.t ${1}.g
-		# done
-		# UDIFFS=$(diff ${1}.g ${GOLD}/${1}.g | wc -l)
-		# if [ ${UDIFFS} -eq 0 ]; then
-		# 	if [ ${SHOWCOMMAND} -eq 1 ]; then
-		# 		echo "PASSED	cmd: ${CYPRESSTEST} ${2}"
-		# 	else
-		# 		echo "PASSED"
-		# 	fi
-		# 	rm -f ${1}.g ${GOLD}/${1}.g
-		# else
-		# 	echo "FAILED...   if correct:  mv ${1} ${GOLD}/${1}.gold" >> ${ERRFILE}
-		# 	echo "Command to reproduce:  ${CYPRESSTEST} ${2}" >> ${ERRFILE}
-		# 	echo "Differences in ${1} are as follows:" >> ${ERRFILE}
-		# 	diff ${GOLD}/${1}.g ${1}.g >> ${ERRFILE}
-		# 	cat ${ERRFILE}
-		# 	failmsg
-		# 	if [ "${ASKBEFOREEXIT}" = "1" ]; then
-		# 		pause ${1}
-		# 	else
-		# 		echo "Stopping the server as error occurred in cypress UI automated testing!"
-		# 		stopRentRollServer
-		# 		exit 1
-		# 	fi
-		# fi
-		TOTALFAILCOUNT=0
-		EACHFAILURECOUNT=$(grep "Failing:" ${1} | awk '{print $3}')
-		for line in $EACHFAILURECOUNT; do
-			if [ "$line" -gt "0" ]; then
-				TOTALFAILCOUNT=$(( TOTALFAILCOUNT + $line ))
-			fi
-		done
-		if (( ${TOTALFAILCOUNT} > 0 )); then
-			echo "FAILED"
-			echo "FAILURE COUNT = ${TOTALFAILCOUNT}"
-			failmsg
-			# stop rentroll server in case of failure
-			echo "Stopping the RENTROLL server as error occurred in cypress UI automated testing!"
-			stopRentRollServer
-			# stop phonebook server in case of failure
-			echo "Stopping the PHONEBOOK server as error occurred in cypress UI automated testing!"
-			pushd ../../../phonebook/
-			$STOPPHONEBOOKCMD > /dev/null 2>&1
-			popd
-			exit 1
-		fi
-		echo "PASSED"
-		passmsg
-	else
-		echo
-	fi
-
-	echo "STOPPING WREIS SERVER in cypress UI automated testing" # finally
-	stopRentRollServer
-	echo "STOPPING PHONEBOOK SERVER in cypress UI automated testing" # finally
-	pushd ../../../phonebook/
-	$STOPPHONEBOOKCMD > /dev/null 2>&1
-	popd
-}
-
 
 #############################################################################
 # newDB  - I just remember this name better.
@@ -1623,10 +1545,6 @@ while getopts "acfhmoprnt:" o; do
 			usage
 			exit 1
 			;;
-		r | R)
-			doReport
-			exit 0
-			;;
 		p | P)
 			PAUSE=1
 			echo "PAUSE BETWEEN COMMANDS"
@@ -1642,6 +1560,11 @@ while getopts "acfhmoprnt:" o; do
 			;;
 		o)	FORCEGOOD=1
 			echo "OUTPUT OF THIS RUN IS SAVED AS *.GOLD"
+			;;
+		r)
+			PERFMON=1
+			echo "curl performance monitoring enabled. Filename: ${LOGALL}"
+			SetupPerfmon
 			;;
 		t) SINGLETEST="${OPTARG}"
 			echo "SINGLETEST set to ${SINGLETEST}"
