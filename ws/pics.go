@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -50,7 +49,7 @@ type imgSuccess struct {
 
 // The contractors set up extres to not include S3Region.  This turned out to be
 // needed as WREIS was set to a different region.
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func getS3Region() string {
 	rg := S3Region // default
 	if len(db.Wdb.Config.S3Region) > 0 {
@@ -61,7 +60,7 @@ func getS3Region() string {
 
 // SvcHandlerPropertyPhoto uploads a single file belonging to a property. The
 // URL is of the form:
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func SvcHandlerPropertyPhoto(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	if d.MimeMultipartOnly {
 		handlePhotoSave(w, r, d)
@@ -79,8 +78,9 @@ func SvcHandlerPropertyPhoto(w http.ResponseWriter, r *http.Request, d *ServiceD
 
 // parsePhotoURL
 //
-//   https://s3.amazonaws.com/directory-pics/img-1-1-roller-32.png
-//------------------------------------------------------------------------------
+//	https://s3.amazonaws.com/directory-pics/img-1-1-roller-32.png
+//
+// ------------------------------------------------------------------------------
 func parsePhotoURL(url string) (int64, int64, string) {
 	var fname string
 	var PRID, Idx int64
@@ -96,10 +96,11 @@ func parsePhotoURL(url string) (int64, int64, string) {
 
 // handlePhotoDelete the photo with index idx from PRID
 // URL is of the form:
-//                      d.ID  d.SUBID
-//    /v1/propertyphoto/PRID/idx
 //
-//-----------------------------------------------------------------------------
+//	                  d.ID  d.SUBID
+//	/v1/propertyphoto/PRID/idx
+//
+// -----------------------------------------------------------------------------
 func handlePhotoDelete(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	funcname := "handlePhotoDelete"
 	util.Console("Entered %s\n", funcname)
@@ -189,9 +190,9 @@ func handlePhotoDelete(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // handlePhotoSave uploads a single file belonging to a property. The
 // URL is of the form:
 //
-//    /v1/propertyphoto/PRID/idx
+//	/v1/propertyphoto/PRID/idx
 //
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var req imageFileReq
 	var fname string
@@ -226,7 +227,7 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		}
 		defer part.Close()
 
-		fileBytes, err := ioutil.ReadAll(part)
+		fileBytes, err := io.ReadAll(part)
 		if err != nil {
 			e := fmt.Errorf("%s:  %d", "failed to read content of the part", http.StatusInternalServerError)
 			SvcErrorReturn(w, e)
@@ -339,14 +340,14 @@ func handlePhotoSave(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 }
 
 // GeneratePRImageFileName generate file name with PRID
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func GeneratePRImageFileName(filename string, PRID, idx int64) string {
 	return fmt.Sprintf("WR-img-%d-%d-%s", PRID, idx, util.SafeURLFilename(filename))
 }
 
 // GetImageFilenameFromURL returns the image filename from a URL of the form:
 //
-//        https://s3.amazonaws.com/directory-pics/img-4-3-roller-32.png
+//	https://s3.amazonaws.com/directory-pics/img-4-3-roller-32.png
 //
 // It will return "roller-32.png", basically it strips of the image identifier
 // (img), the PRID (4), and the index (3).  Note that any dash embedded in
@@ -354,7 +355,7 @@ func GeneratePRImageFileName(filename string, PRID, idx int64) string {
 //
 // If the supplied filename has less than 3 embedded dashes it will simply
 // return the entire filename portion of the url.
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func GetImageFilenameFromURL(s string) string {
 	_, fname := filepath.Split(s)
 	sa := strings.Split(fname, "-")
@@ -367,12 +368,15 @@ func GetImageFilenameFromURL(s string) string {
 // GetFileContentType uses the http library capability to determine a file's type
 //
 // INPUTS
-//    out  -  os.File to read for the type
+//
+//	out  -  os.File to read for the type
 //
 // RETURNS
-//    filetype string
-//    any error encountered
-//------------------------------------------------------------------------------
+//
+//	filetype string
+//	any error encountered
+//
+// ------------------------------------------------------------------------------
 func GetFileContentType(out *os.File) (string, error) {
 
 	// Only the first 512 bytes are used to sniff the content type.
@@ -395,19 +399,22 @@ func GetFileContentType(out *os.File) (string, error) {
 // UploadImageFileToS3 is a convenience function for UploadImageToS3.
 //
 // INPUTS
-//     fileHeader - It contains header information of file. e.g., filename, file type
-//     usrfile    - It contains file data/information
 //
-//     PRID       - PRID of the property
-//     idx        - index number associated with this pic (1 - 6)
+//	fileHeader - It contains header information of file. e.g., filename, file type
+//	usrfile    - It contains file data/information
+//
+//	PRID       - PRID of the property
+//	idx        - index number associated with this pic (1 - 6)
 //
 // RETURNS
-//     filename   - to associate with the contents of usrfile, we don't
-//                  actually use this filename to open a file system file.
-//     imagePath  - of the form pic{{PRID}{{PRIDX}}
-//     imageURL   - URL to access the picture
-//     err        - any error encountered
-//------------------------------------------------------------------------------
+//
+//	filename   - to associate with the contents of usrfile, we don't
+//	             actually use this filename to open a file system file.
+//	imagePath  - of the form pic{{PRID}{{PRIDX}}
+//	imageURL   - URL to access the picture
+//	err        - any error encountered
+//
+// ------------------------------------------------------------------------------
 func UploadImageFileToS3(filename string, usrfile *os.File, PRID, idx int64) (string, string, error) {
 	//-----------------------------------------
 	// get the file size and read
@@ -424,19 +431,22 @@ func UploadImageFileToS3(filename string, usrfile *os.File, PRID, idx int64) (st
 // UploadImageToS3 upload image to AWS S3 bucket
 //
 // INPUTS
-//     fileHeader - It contains header information of file. e.g., filename, file type
-//     buffer     - Contents of the file as bytes
 //
-//     PRID       - PRID of the property
-//     idx        - index number associated with this pic (1 - 6)
+//	fileHeader - It contains header information of file. e.g., filename, file type
+//	buffer     - Contents of the file as bytes
+//
+//	PRID       - PRID of the property
+//	idx        - index number associated with this pic (1 - 6)
 //
 // RETURNS
-//     filename   - to associate with the contents of buffer, we don't
-//                  actually use this filename to open a file system file.
-//     imagePath  - of the form pic{{PRID}{{PRIDX}}
-//     imageURL   - URL to access the picture
-//     err        - any error encountered
-//------------------------------------------------------------------------------
+//
+//	filename   - to associate with the contents of buffer, we don't
+//	             actually use this filename to open a file system file.
+//	imagePath  - of the form pic{{PRID}{{PRIDX}}
+//	imageURL   - URL to access the picture
+//	err        - any error encountered
+//
+// ------------------------------------------------------------------------------
 func UploadImageToS3(filename string, buffer []byte, PRID, idx int64) (string, string, error) {
 
 	//-----------------------------------------
@@ -517,14 +527,17 @@ ACL:                  %s
 // DeleteS3ImageFile  image from AWS S3 bucket
 //
 // INPUTS
-//     filename   - to associate with the contents of usrfile, we don't
-//                  actually use this filename to open a file system file.
-//     PRID       - PRID of the property
-//     idx        - index number associated with this pic (1 - 6)
+//
+//	filename   - to associate with the contents of usrfile, we don't
+//	             actually use this filename to open a file system file.
+//	PRID       - PRID of the property
+//	idx        - index number associated with this pic (1 - 6)
 //
 // RETURNS
-//     err           - any error encountered
-//------------------------------------------------------------------------------
+//
+//	err           - any error encountered
+//
+// ------------------------------------------------------------------------------
 func DeleteS3ImageFile(filename string, PRID, idx int64) error {
 	//----------------------------------------------
 	// reading credential info from the aws config

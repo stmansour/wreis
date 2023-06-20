@@ -4,7 +4,8 @@ THISDIR="lib"
 lib: *.go config.json
 	@touch fail
 	@go vet
-	@if [[ -f "${GOPATH}/bin/golint" ]]; then golint; else staticcheck; fi
+	golint
+	staticcheck
 	go build
 	# go test
 	go install

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	db "wreis/db/lib"
@@ -52,7 +52,7 @@ type UserListInfoResponse struct {
 
 // UserInfoRequest has all the command info needed to make a request for
 // user information to the Directory Service.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 type UserInfoRequest struct {
 	Cmd  string `json:"cmd"` // get, save, delete
 	UIDs []int64
@@ -60,7 +60,7 @@ type UserInfoRequest struct {
 
 // SvcUserTypeDown handles typedown requests for Users.  It returns
 // FirstName, LastName, and TCID
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func SvcUserTypeDown(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	const funcname = "SvcUserTypeDown"
 	var g UserInfoResponseTD
@@ -84,7 +84,7 @@ func SvcUserTypeDown(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	// util.Console("Response status: %s\n", resp.Status)
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		SvcErrorReturn(w, err)
 		return
@@ -143,7 +143,7 @@ func SvcUserTypeDown(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 //
 // 	// util.Console("response Status: %s\n", resp.Status)
 // 	// util.Console("response Headers: %s\n", resp.Header)
-// 	body, _ := ioutil.ReadAll(resp.Body)
+// 	body, _ := io.ReadAll(resp.Body)
 // 	// util.Console("response Body: %s\n", string(body))
 //
 // 	var foo UserInfoResponse
@@ -168,12 +168,15 @@ func SvcUserTypeDown(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // the user with the supplied UID.
 //
 // INPUTS
-//   uids = slice User IDs of persons of interest
+//
+//	uids = slice User IDs of persons of interest
 //
 // RETURNS
-//   Name information about the users in the uid list
-//   any errors encountered
-//-----------------------------------------------------------------------------
+//
+//	Name information about the users in the uid list
+//	any errors encountered
+//
+// -----------------------------------------------------------------------------
 func GetUserListInfo(uids []int64, sess *session.Session) ([]UserInfo, error) {
 	funcname := "ws.getUserInfo"
 	var g []UserInfo
@@ -207,7 +210,7 @@ func GetUserListInfo(uids []int64, sess *session.Session) ([]UserInfo, error) {
 
 	// util.Console("response Status: %s\n", resp.Status)
 	// util.Console("response Headers: %s\n", resp.Header)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	// util.Console("response Body: %s\n", string(body))
 
 	var foo UserListInfoResponse

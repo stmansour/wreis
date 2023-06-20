@@ -490,6 +490,9 @@ func saveStateReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		return
 	}
 
+	util.Console("si.SIID = %d\n", si.SIID)
+	util.Console("foo = %#v\n", foo.Records[0])
+
 	//--------------------------------------------------------------------------
 	// Only the owner can ask for approval
 	//--------------------------------------------------------------------------
@@ -545,7 +548,7 @@ func saveStateNotReady(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	//--------------------------------------------------------------------------
 	// util.Console("sess.UID = %d, OwnerUID = %d\n", sess.UID, foo.Records[0].OwnerUID)
 	if si.OwnerUID != sess.UID {
-		e := fmt.Errorf("only the owner can request approval")
+		e := fmt.Errorf("only the owner can request remove the request for approval")
 		SvcErrorReturn(w, e)
 		return
 	}

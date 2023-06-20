@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 	db "wreis/db/lib"
@@ -24,20 +24,21 @@ type AuthenticateData struct {
 
 // SvcAuthenticate handles authentication requests from clients.
 //
-// wsdoc {
-//  @Title Authenticate
-//  @URL /v1/authn
-//  @Method  POST
-//  @Synopsis Authenticate a user
-//  @Descr It contacts Accord Directory server to authenticate users. If successful,
-//  @Descr it creates a session for the user and sends a response with Status
-//  @Descr set to "success".  If it is not successful, it sends  response
-//  @Descr with Status set to "error" and provides the reason as given by
-//  @Descr the Accord Directory server.
-//  @Input AuthenticateData
-//  @Response SvcStatus
+//	wsdoc {
+//	 @Title Authenticate
+//	 @URL /v1/authn
+//	 @Method  POST
+//	 @Synopsis Authenticate a user
+//	 @Descr It contacts Accord Directory server to authenticate users. If successful,
+//	 @Descr it creates a session for the user and sends a response with Status
+//	 @Descr set to "success".  If it is not successful, it sends  response
+//	 @Descr with Status set to "error" and provides the reason as given by
+//	 @Descr the Accord Directory server.
+//	 @Input AuthenticateData
+//	 @Response SvcStatus
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func SvcAuthenticate(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var funcname = "SvcAuthenticate"
 	var a AuthenticateData
@@ -100,7 +101,7 @@ func SvcAuthenticate(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 
 	// fmt.Println("response Status:", resp.Status)
 	// fmt.Println("response Headers:", resp.Header)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	util.Console("response Body: %s\n", string(body))
 
 	if err := json.Unmarshal([]byte(body), &b); err != nil {

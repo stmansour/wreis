@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"extres"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -16,7 +16,7 @@ import (
 // WSPerson is the person information we pass over the web service call.
 // We can add information as we need it after reviewing the security
 // implications.
-//-------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 type WSPerson struct {
 	UID           int64
 	FirstName     string
@@ -102,12 +102,15 @@ var SessionCookieName = string("air")
 // initializes structures and starts the dispatcher
 //
 // INPUT
-//  timeout - the number of minutes before a session times out
-//  x       - external resources definition
+//
+//	timeout - the number of minutes before a session times out
+//	x       - external resources definition
 //
 // RETURNS
-//  nothing at this time
-//-----------------------------------------------------------------------------
+//
+//	nothing at this time
+//
+// -----------------------------------------------------------------------------
 func Init(timeout int, x extres.ExternalResources) {
 	appConfig = x
 	sessions = make(map[string]*Session)
@@ -121,7 +124,7 @@ func Init(timeout int, x extres.ExternalResources) {
 
 // GetSessionCookieName simply returns a string containing the session
 // cookie name. We want this to be a private / unchangeable name.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func GetSessionCookieName() string {
 	return SessionCookieName
 }
@@ -129,13 +132,13 @@ func GetSessionCookieName() string {
 // GetSessionTable returns a copy of the session table.  This is for use
 // in the administrators command to view the session table of the active
 // server.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func GetSessionTable() map[string]*Session {
 	return sessions
 }
 
 // Dispatcher is a Go routine that controls access to shared memory.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func Dispatcher() {
 	for {
 		select {
@@ -148,7 +151,7 @@ func Dispatcher() {
 
 // Cleanup a Go routine to periodically spin through the session list
 // and remove any sessions which have timed out.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func Cleanup() {
 	for {
 		select {
@@ -178,13 +181,16 @@ func Cleanup() {
 // exists. It may no longer exist because it timed out.
 //
 // INPUT
-//  token -  the index into the session table for this session. This is the
-//           value that is stored in a web session cookie
+//
+//	token -  the index into the session table for this session. This is the
+//	         value that is stored in a web session cookie
 //
 // RETURNS
-//  session - pointer to the session if the bool is true
-//  bool    - true if the session was found, false otherwise
-//-----------------------------------------------------------------------------
+//
+//	session - pointer to the session if the bool is true
+//	bool    - true if the session was found, false otherwise
+//
+// -----------------------------------------------------------------------------
 func Get(token string) (*Session, bool) {
 	s, ok := sessions[token]
 	return s, ok
@@ -193,8 +199,10 @@ func Get(token string) (*Session, bool) {
 // ToString is the stringer for sessions
 //
 // RETURNS
-//  a string representation of the session entry
-//-----------------------------------------------------------------------------
+//
+//	a string representation of the session entry
+//
+// -----------------------------------------------------------------------------
 func (s *Session) ToString() string {
 	if nil == s {
 		return "nil"
@@ -206,8 +214,10 @@ func (s *Session) ToString() string {
 // DumpSessions sends the contents of the session table to the consol.
 //
 // RETURNS
-//  a string representation of the session entry
-//-----------------------------------------------------------------------------
+//
+//	a string representation of the session entry
+//
+// -----------------------------------------------------------------------------
 func DumpSessions() {
 	i := 0
 	for _, v := range sessions {
@@ -219,16 +229,19 @@ func DumpSessions() {
 // New creates a new session and adds it to the session list
 //
 // INPUT
-//  token    - the unique token string. This will be used to index the session
-//             list
-//  username - the username from the authentication service
-//  name     - the name to use in the session
-//  uid      - the userid associated with username. From the auth server.
-//  rid      - security role id
+//
+//	token    - the unique token string. This will be used to index the session
+//	           list
+//	username - the username from the authentication service
+//	name     - the name to use in the session
+//	uid      - the userid associated with username. From the auth server.
+//	rid      - security role id
 //
 // RETURNS
-//  session - pointer to the new session
-//-----------------------------------------------------------------------------
+//
+//	session - pointer to the new session
+//
+// -----------------------------------------------------------------------------
 func New(token, username, name string, uid int64, imgurl string, rid int64, expire *time.Time) *Session {
 	util.Console("New Session:  username = %s, name = %s, UID = %d\n", username, name, uid)
 	s := new(Session)
@@ -254,12 +267,15 @@ func New(token, username, name string, uid int64, imgurl string, rid int64, expi
 // CreateSession creates an HTTP Cookie with the token for this session
 //
 // INPUT
-//  w    - where to write the set cookie
-//  r - the request where w should look for the cookie
+//
+//	w    - where to write the set cookie
+//	r - the request where w should look for the cookie
 //
 // RETURNS
-//  session - pointer to the new session
-//-----------------------------------------------------------------------------
+//
+//	session - pointer to the new session
+//
+// -----------------------------------------------------------------------------
 func CreateSession(ctx context.Context, a *ValidateCookieResponse) (*Session, error) {
 	var err error
 	expiration := time.Time(a.Expire)
@@ -290,7 +306,7 @@ func CreateSession(ctx context.Context, a *ValidateCookieResponse) (*Session, er
 
 // UserInfoRequest has all the command info needed to make a request for
 // user information to the Directory Service.
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 type UserInfoRequest struct {
 	Cmd string `json:"cmd"` // get, save, delete
 }
@@ -298,12 +314,15 @@ type UserInfoRequest struct {
 // getUserInfo creates an HTTP Cookie with the token for this session
 //
 // INPUT
-//  w    - where to write the set cookie
-//  r - the request where w should look for the cookie
+//
+//	w    - where to write the set cookie
+//	r - the request where w should look for the cookie
 //
 // RETURNS
-//  session - pointer to the new session
-//-----------------------------------------------------------------------------
+//
+//	session - pointer to the new session
+//
+// -----------------------------------------------------------------------------
 func getUserInfo(a *ValidateCookieResponse) (DirectoryPerson, error) {
 	funcname := "session.getUserInfo"
 	var p DirectoryPerson
@@ -336,7 +355,7 @@ func getUserInfo(a *ValidateCookieResponse) (DirectoryPerson, error) {
 
 	// util.Console("response Status: %s\n", resp.Status)
 	// util.Console("response Headers: %s\n", resp.Header)
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	// util.Console("response Body: %s\n", string(body))
 
 	var foo UserInfoResponse
@@ -360,12 +379,15 @@ func getUserInfo(a *ValidateCookieResponse) (DirectoryPerson, error) {
 // IsUnrecognizedCookieError returns true if the error is UnrecognizedCookie.
 //
 // INPUT
-//  err - the error to check
+//
+//	err - the error to check
 //
 // RETURNS
-//  bool - true means it is an UnrecognizedCookie error
-//         false means it is not
-//-----------------------------------------------------------------------------
+//
+//	bool - true means it is an UnrecognizedCookie error
+//	       false means it is not
+//
+// -----------------------------------------------------------------------------
 func IsUnrecognizedCookieError(err error) bool {
 	return strings.Contains(err.Error(), UnrecognizedCookie)
 }
@@ -377,18 +399,21 @@ func IsUnrecognizedCookieError(err error) bool {
 // If the cookie token is valid, its expire time will be updated.
 //
 // INPUTS
-//  w  - where responses to this http request will be written - updated cookie
-//       is maintained here.
-//  r  - pointer to the http request, which may be updated after we add the
-//       context value to it.
-//  getData       - 0 means get lots of data, 1 means just validate session
+//
+//	w  - where responses to this http request will be written - updated cookie
+//	     is maintained here.
+//	r  - pointer to the http request, which may be updated after we add the
+//	     context value to it.
+//	getData       - 0 means get lots of data, 1 means just validate session
 //
 // RETURNS
-//  cookie - the http cookie or nil if it doesn't exist
-//  getData - if 0 then only the existence of the cookie is checked
-//            if 1 the all the data associated with the directory service
-//            cookie is returned -- this includes the UID, the expire time, ...
-//-----------------------------------------------------------------------------
+//
+//	cookie - the http cookie or nil if it doesn't exist
+//	getData - if 0 then only the existence of the cookie is checked
+//	          if 1 the all the data associated with the directory service
+//	          cookie is returned -- this includes the UID, the expire time, ...
+//
+// -----------------------------------------------------------------------------
 func ValidateSessionCookie(w http.ResponseWriter, r *http.Request, getData int) (ValidateCookieResponse, error) {
 	funcname := "ValidateSessionCookie"
 	// util.Console("Entered %s\n", funcname)
@@ -437,7 +462,7 @@ func ValidateSessionCookie(w http.ResponseWriter, r *http.Request, getData int) 
 
 	// util.Console("Response status = %s, status code = %d\n", resp.Status, resp.StatusCode)
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	// util.Console("*** Directory Service *** response Body: %s\n", string(body))
 
 	if err := json.Unmarshal([]byte(body), &vr); err != nil {
@@ -455,17 +480,20 @@ func ValidateSessionCookie(w http.ResponseWriter, r *http.Request, getData int) 
 // existing session or create a new session.
 //
 // INPUT
-//  ctx database context
-//  w - http writer to client
-//  r - the request where we look for the cookie
-//  c - pointer to the validate cookie response.  If UID > 0 it means that
-//      the cookie has already been validated and that the other fields are
-//      valid -- we don't need to make another call to the directory server.
+//
+//	ctx database context
+//	w - http writer to client
+//	r - the request where we look for the cookie
+//	c - pointer to the validate cookie response.  If UID > 0 it means that
+//	    the cookie has already been validated and that the other fields are
+//	    valid -- we don't need to make another call to the directory server.
 //
 // RETURNS
-//  session - pointer to the new session
-//  error   - any error encountered
-//-----------------------------------------------------------------------------
+//
+//	session - pointer to the new session
+//	error   - any error encountered
+//
+// -----------------------------------------------------------------------------
 func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *ValidateCookieResponse) (*Session, error) {
 	// funcname := "GetSession"
 	// var b AIRAuthenticateResponse
@@ -518,13 +546,16 @@ func GetSession(ctx context.Context, w http.ResponseWriter, r *http.Request, c *
 // Refresh updates the cookie and Session with a new expire time.
 //
 // INPUT
-//  w - where to write the set cookie
-//  r - the request where w should look for the cookie
+//
+//	w - where to write the set cookie
+//	r - the request where w should look for the cookie
 //
 // RETURNS
-//  0 if session cookie was updated
-//  1 if error or cookie not found
-//-----------------------------------------------------------------------------
+//
+//	0 if session cookie was updated
+//	1 if error or cookie not found
+//
+// -----------------------------------------------------------------------------
 func (s *Session) Refresh(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie(SessionCookieName)
 	if nil != cookie && err == nil {
@@ -546,12 +577,15 @@ func (s *Session) Refresh(w http.ResponseWriter, r *http.Request) int {
 // ExpireCookie expires the cookie associated with this session now
 //
 // INPUT
-//  w - where to write the set cookie
-//  r - the request where w should look for the cookie
+//
+//	w - where to write the set cookie
+//	r - the request where w should look for the cookie
 //
 // RETURNS
-//  nothing at this time
-//-----------------------------------------------------------------------------
+//
+//	nothing at this time
+//
+// -----------------------------------------------------------------------------
 func (s *Session) ExpireCookie(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(SessionCookieName)
 	if nil != cookie && err == nil {
@@ -564,14 +598,17 @@ func (s *Session) ExpireCookie(w http.ResponseWriter, r *http.Request) {
 // Delete removes the supplied Session.
 // if there is a better idiomatic way to do this, please let me know.
 // INPUT
-//  Session  - pointer to the session to tdelete
-//             list
-//  w        - where to write the set cookie
-//  r        - the request where w should look for the cookie
+//
+//	Session  - pointer to the session to tdelete
+//	           list
+//	w        - where to write the set cookie
+//	r        - the request where w should look for the cookie
 //
 // RETURNS
-//  session  - pointer to the new session
-//-----------------------------------------------------------------------------
+//
+//	session  - pointer to the new session
+//
+// -----------------------------------------------------------------------------
 func Delete(s *Session, w http.ResponseWriter, r *http.Request) {
 	if nil == s {
 		util.Console("Delete: supplied session is nil\n")
@@ -642,13 +679,16 @@ func sessSvcSuccessResponse(w http.ResponseWriter) {
 // Check encapsulates 6 lines of code that was repeated in every call
 //
 // INPUTS
-//  ctx  the context, which should have session
+//
+//	ctx  the context, which should have session
 //
 // RETURNS
-//  the session
-//  ok == true - session was required but not found
-//        false - session was found or session not required
-//-----------------------------------------------------------------------------
+//
+//	the session
+//	ok == true - session was required but not found
+//	      false - session was found or session not required
+//
+// -----------------------------------------------------------------------------
 func Check(ctx context.Context) (*Session, bool) {
 	return GetSessionFromContext(ctx)
 }

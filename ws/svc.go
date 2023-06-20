@@ -5,9 +5,10 @@ package ws
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 	db "wreis/db/lib"
@@ -166,21 +167,26 @@ func SvcHandlerPing(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 // V1ServiceHandler is the main dispatch point for WEB SERVICE requests
 //
 // The expected input is of the form:
-//		request=%7B%22cmd%22%3A%22get%22%2C%22selected%22%3A%5B%5D%2C%22limit%22%3A100%2C%22offset%22%3A0%7D
+//
+//	request=%7B%22cmd%22%3A%22get%22%2C%22selected%22%3A%5B%5D%2C%22limit%22%3A100%2C%22offset%22%3A0%7D
+//
 // This is exactly what the w2ui grid sends as a request.
 //
 // Decoded, this message looks something like this:
-//		request={"cmd":"get","selected":[],"limit":100,"offset":0}
+//
+//	request={"cmd":"get","selected":[],"limit":100,"offset":0}
 //
 // The leading "request=" is optional. This routine parses the basic
 // information, then contacts an appropriate handler for more detailed
 // processing.  It will set the Cmd member variable.
 //
 // W2UI sometimes sends requests that look like this:
-//      request=%7B%22search%22%3A%22s%22%2C%22max%22%3A250%7D
+//
+//	request=%7B%22search%22%3A%22s%22%2C%22max%22%3A250%7D
+//
 // using HTTP GET (rather than its more typical POST).  The command decodes to
 // this: request={"search":"s","max":250}
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	funcname := "V1ServiceHandler"
 	svcDebugTxn(funcname, r)
@@ -269,7 +275,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 
 // svcGetPayload simply pulls the common data out of the request and puts it
 // into the expected locations.
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	var err error
 	//-----------------------------------------------------------------------
@@ -312,7 +318,7 @@ func svcGetPayload(w http.ResponseWriter, r *http.Request, d *ServiceData) error
 // If it fails for any reason, it sends writes an error message back
 // to the caller and returns the error.  Otherwise, it returns an
 // int64 and returns nil
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 func SvcGetInt64(s, errmsg string, w http.ResponseWriter) (int64, error) {
 	i, err := util.IntFromString(s, "not an integer number")
 	if err != nil {
@@ -352,12 +358,12 @@ func SvcGetInt64(s, errmsg string, w http.ResponseWriter) (int64, error) {
 // }
 
 // getPostData parses the posted data from the client and stores in d
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	funcname := "getPOSTdata"
 	var err error
 	d.MimeMultipartOnly = false
-	d.b, err = ioutil.ReadAll(r.Body)
+	d.b, err = io.ReadAll(r.Body)
 	if err != nil {
 		e := fmt.Errorf("%s: Error reading message Body: %s", funcname, err.Error())
 		SvcErrorReturn(w, e)
@@ -369,7 +375,7 @@ func getPOSTdata(w http.ResponseWriter, r *http.Request, d *ServiceData) error {
 	if SvcInfo.SaveRequest {
 		fname := "./reqBody-" + time.Now().String()
 		util.Console(">>> WRITING REQUEST BODY TO: %s\n", fname)
-		err = ioutil.WriteFile(fname, d.b, 0644)
+		err = os.WriteFile(fname, d.b, 0644)
 		if err != nil {
 			util.Console("Error with ioutil.WriteFile: %s\n", err.Error())
 		}

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	db "wreis/db/lib"
 	"wreis/session"
@@ -20,15 +20,16 @@ type ValidateCookie struct {
 
 // SvcLogoff handles authentication requests from clients.
 //
-//  @Title Logoff
-//  @URL /v1/logoff
-//  @Method  POST
-//  @Synopsis Logoff a user
-//  @Descr It removes the user's session from the session table if it exists
-//  @Input n/a
-//  @Response SvcStatus
+//	@Title Logoff
+//	@URL /v1/logoff
+//	@Method  POST
+//	@Synopsis Logoff a user
+//	@Descr It removes the user's session from the session table if it exists
+//	@Input n/a
+//	@Response SvcStatus
+//
 // wsdoc }
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 func SvcLogoff(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	var funcname = "SvcLogoff"
 	util.Console("Entered %s\n", funcname)
@@ -85,7 +86,7 @@ func SvcLogoff(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 	}
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 	util.Console("response Body: %s\n", string(body))
 
 	var b SvcStatus

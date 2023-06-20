@@ -4,7 +4,8 @@ THISDIR="dbtest"
 dbtest: *.go config.json
 	@touch fail
 	@go vet
-	@if [[ -f "${GOPATH}/bin/golint" ]]; then golint; else staticcheck; fi
+	golint
+	staticcheck
 	go build
 	@rm -f fail
 	@echo "*** Completed in ${THISDIR} ***"
