@@ -21,7 +21,7 @@ relink:
 	go build
 	@echo "*** RELINK completed in ${THISDIR} ***"
 
-test: dbtest
+test: config.json dbtest
 	@touch fail
 	mysql --no-defaults wreis < ../schema/db.sql
 	./dbtest
