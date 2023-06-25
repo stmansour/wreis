@@ -15,8 +15,7 @@ clean:
 	@echo "*** CLEAN completed in ${THISDIR} ***"
 
 config.json:
-	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
-	cp confdev.json config.json
+	cp ../../server/config.json .
 
 relink:
 	go build

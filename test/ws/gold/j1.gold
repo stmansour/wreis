@@ -2,54 +2,9 @@
     "status": "success",
     "records": [
         {
-            "recid": 4,
-            "UID": 4,
-            "Name": "Maria Aguinaga"
-        },
-        {
-            "recid": 5,
-            "UID": 5,
-            "Name": "Maria0 Aguinaga"
-        },
-        {
-            "recid": 7,
-            "UID": 7,
-            "Name": "Maria Archan"
-        },
-        {
-            "recid": 14,
-            "UID": 14,
-            "Name": "Maria Becerra"
-        },
-        {
-            "recid": 22,
-            "UID": 22,
-            "Name": "Imania Carrington"
-        },
-        {
-            "recid": 37,
-            "UID": 37,
-            "Name": "Maria Espinoza"
-        },
-        {
-            "recid": 41,
-            "UID": 41,
-            "Name": "Maria Consuelo Estrada"
-        },
-        {
-            "recid": 52,
-            "UID": 52,
-            "Name": "Maria Gonzalez"
-        },
-        {
-            "recid": 57,
-            "UID": 57,
-            "Name": "Thomas Halliburton"
-        },
-        {
-            "recid": 66,
-            "UID": 66,
-            "Name": "Mar'Ques Henderson"
+            "recid": 1,
+            "UID": 1,
+            "Name": "Steve Mansour"
         }
     ],
     "Message": ""

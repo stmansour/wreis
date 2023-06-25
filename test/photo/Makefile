@@ -14,8 +14,7 @@ test: config.json
 	@rm -f fail
 
 config.json:
-	/usr/local/accord/bin/getfile.sh accord/db/confdev.json
-	cp confdev.json config.json
+	cp ../../server/config.json .
 
 package:
 	@echo "*** PACKAGE completed in ${THISDIR} ***"
