@@ -47,6 +47,18 @@ function buildRentStepsUIElements() {
             toolbarReload   : false,
             toolbarColumns  : false,
         },
+        toolbar: {
+            items: [
+                { id: 'btnNotes', type: 'button', icon: 'fa fa-sticky-note-o' },
+                { id: 'bt3', type: 'spacer' },
+                { id: 'btnClose', type: 'button', icon: 'fa fa-times' },
+            ],
+            onClick: function (event) {
+                if (event.target == 'btnClose') {
+                    closeRentStepForm();
+                }
+            },
+        },
         //======================================================================
         // FLAGS
         //     1<<0  Drive Through?  0 = no, 1 = yes
@@ -111,6 +123,26 @@ function buildRentStepsUIElements() {
         }
     });
 
+    // function finishRentStepsGridToolbar() {
+    //     var t = w2ui.propertyRentStepsGrid.toolbar;
+    //     t.add([
+    //         { id: 'bt3', type: 'spacer' },
+    //         { id: 'rsListType', type: 'menu-radio', icon: 'fa fa-star',
+    //             text: function (item) {
+    //                 var text = item.selected;
+    //                 var el   = this.get('rsListType:' + item.selected);
+    //                 return 'Step Type: ' + el.text;
+    //             },
+    //             selected: 'rsListOpt',
+    //             items: [
+    //                 { id: 'rsListOpt',  text: 'Period', icon: 'fa fa-tachometer' },
+    //                 { id: 'rsListDate', text: 'Date',   icon: 'fa fa-tachometer' },
+    //             ]
+    //         },
+    //     ]);
+    //     t.on('*', RentStepTypeChange);
+    // }
+    
     $().w2form({
         name: 'propertyRentStepForm',
         style: 'border: 0px; background-color: transparent;',
@@ -166,26 +198,6 @@ function buildRentStepsUIElements() {
             { type: 'right',   size: 0,     hidden: true,  content: 'right' }
         ],
     });
-}
-
-function finishRentStepsGridToolbar() {
-    var t = w2ui.propertyRentStepsGrid.toolbar;
-    t.add([
-        { id: 'bt3', type: 'spacer' },
-        { id: 'rsListType', type: 'menu-radio', icon: 'fa fa-star',
-            text: function (item) {
-                var text = item.selected;
-                var el   = this.get('rsListType:' + item.selected);
-                return 'Step Type: ' + el.text;
-            },
-            selected: 'rsListOpt',
-            items: [
-                { id: 'rsListOpt',  text: 'Period', icon: 'fa fa-tachometer' },
-                { id: 'rsListDate', text: 'Date',   icon: 'fa fa-tachometer' },
-            ]
-        },
-    ]);
-    t.on('*', RentStepTypeChange);
 }
 
 //=========================

@@ -20,10 +20,10 @@ var loginSessionChecker = {};
 window.getCookieValue = function (name) {
     var nameEQ = name + "=";
     var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
+    for (var i = 0; i < ca.length; i++) {
         var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
 };
@@ -36,40 +36,27 @@ window.getCookieValue = function (name) {
 // @returns nothing at this time
 //---------------------------------------------------------------------------------
 window.deleteCookie = function (name) {
-  document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
-var loginPopupOptions = {
-    body: '<div id="loginPopupForm" style="width: 100%; height: 100%;"></div>',
-    style: 'padding: 4px 0px 0px 0px; overflow: auto;',
-    width: 425,
-    height: 525,
-    showMax: true,
-    modal: true,
-    onOpen: function (event) {
-        event.onComplete = function () {
-            $('#w2ui-popup #loginPopupForm').w2render('passwordform');
-        };
-    },
-};
 
-window.userProfileToUI = function() {
+window.userProfileToUI = function () {
     var name = app.name;
-    if (name.length === 0 || app.uid === 0) { name = "?";}
+    if (name.length === 0 || app.uid === 0) { name = "?"; }
     $("#user_menu_container").find("#username").text(name);
     // $("#user_menu_container").find("img").attr("src", app.imageurl);
     // w2ui.mainlayout.refresh();
 };
 
-window.buildLoginForm = function() {
+window.buildLoginForm = function () {
     var loginTmplURL = loginURL;
     $().w2form({
         name: 'passwordform',
         formURL: loginTmplURL,
         style: 'border: 0px; background-color: transparent;',
-        fields: [{field: 'user', type: 'text',     required: false, html: {caption: 'User Name' /*, attr: 'readonly'*/} },
-                 {field: 'pass', type: 'password', required: false, html: {caption: 'Password'} },
-                ],
+        fields: [{ field: 'user', type: 'text', required: false, html: { caption: 'User Name' /*, attr: 'readonly'*/ } },
+        { field: 'pass', type: 'password', required: false, html: { caption: 'Password' } },
+        ],
         actions: {
             login: function (/*event*/) {
                 var f = this;
@@ -79,67 +66,67 @@ window.buildLoginForm = function() {
                 // request login only username, password entered
                 if (!(app.username && w2ui.passwordform.record.pass)) {
                     console.log("Both Username and Password must be supplied");
-                        $(f.box).find("#LoginMessage").find(".errors").empty();
-                        var message = "Both Username and Password must be supplied";
-                        $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
-                        $(f.box).find("#LoginMessage").removeClass("hidden");
-                        // w2ui.passwordform.error(w2utils.lang(data.message));
+                    $(f.box).find("#LoginMessage").find(".errors").empty();
+                    var message = "Both Username and Password must be supplied";
+                    $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
+                    $(f.box).find("#LoginMessage").removeClass("hidden");
+                    // w2ui.passwordform.error(w2utils.lang(data.message));
                     return;
                 }
 
-                var params = {user: app.username, pass: w2ui.passwordform.record.pass };
+                var params = { user: app.username, pass: w2ui.passwordform.record.pass };
                 var dat = JSON.stringify(params);
                 $.post('/v1/authn/', dat, null, "json")
-                .done(function(data) {
-                    if (data.status === "error") {
-                        $(f.box).find("#LoginMessage").find(".errors").empty();
-                        // var message = "Unrecognized Username or Password";
-                        $(f.box).find("#LoginMessage").find(".errors").append("<p>" + data.message + "</p>");
-                        $(f.box).find("#LoginMessage").removeClass("hidden");
-                        // w2ui.passwordform.error(w2utils.lang(data.message));
-                    }
-                    else if (data.status === "success") {
-                        app.uid = data.uid;
-                        app.name = data.Name;
-                        app.imageurl = data.ImageURL;
-                        $(f.box).find("#LoginMessage").addClass("hidden");
-                        w2popup.close();
-                        w2ui.passwordform.record.pass = ""; // after closing dialog, remove password information.
-                        userProfileToUI();
+                    .done(function (data) {
+                        if (data.status === "error") {
+                            $(f.box).find("#LoginMessage").find(".errors").empty();
+                            // var message = "Unrecognized Username or Password";
+                            $(f.box).find("#LoginMessage").find(".errors").append("<p>" + data.message + "</p>");
+                            $(f.box).find("#LoginMessage").removeClass("hidden");
+                            // w2ui.passwordform.error(w2utils.lang(data.message));
+                        }
+                        else if (data.status === "success") {
+                            app.uid = data.uid;
+                            app.name = data.Name;
+                            app.imageurl = data.ImageURL;
+                            $(f.box).find("#LoginMessage").addClass("hidden");
+                            w2popup.close();
+                            w2ui.passwordform.record.pass = ""; // after closing dialog, remove password information.
+                            userProfileToUI();
 
-                        // remove blank screen if login successfully
-                        handleBlankScreen(true);
-                    } else {
-                        console.log("Login service returned unexpected status: " + data.status);
-                    }
-                    return;
-                })
-                .fail(function(/*data*/){
-                    w2ui.passwordform.error("Login failed");
-                    return;
-                });
+                            // remove blank screen if login successfully
+                            handleBlankScreen(true);
+                        } else {
+                            console.log("Login service returned unexpected status: " + data.status);
+                        }
+                        return;
+                    })
+                    .fail(function (/*data*/) {
+                        w2ui.passwordform.error("Login failed");
+                        return;
+                    });
             },
             cancel: function (/*event*/) {
                 // w2popup.close();
                 return;
             }
         },
-        onRefresh: function(event) {
+        onRefresh: function (event) {
             var f = this;
-            event.onComplete = function() {
+            event.onComplete = function () {
 
                 // handle enter key press event
-                $(f.box).keypress(function(keypressEvent) {
+                $(f.box).keypress(function (keypressEvent) {
                     if (keypressEvent.which === 13) {
                         // need to give time so that w2ui form have data in it's record object
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $(f.box).find("button[name=login]").click();
                         }, 100);
                     }
                 });
 
                 // TODO: handle forgot password link
-                $(f.box).find("forgot_pass_link").click(function() {
+                $(f.box).find("forgot_pass_link").click(function () {
                     console.log("forgot password link clicked!");
                 });
             };
@@ -168,35 +155,35 @@ window.startNewSession = function () {
 //---------------------------------------------------------------------------------
 window.getUserInfo = function () {
     $.get('/v1/userprofile/')
-    .done(function(data, textStatus, jqXHR) {
-        if (typeof data === "string") {
-            var x = JSON.parse(data);
-            data = x;
-        }
-        switch (data.status){
-        case "success":
-            app.uid = data.uid;
-            app.username = data.username;
-            app.name = data.Name;
-            app.imageurl = data.ImageURL;
-            userProfileToUI();
-            break;
-        case "error":
-            // something bad happened.  delete the cookie and make them log in again...
-            deleteCookie("air");
-            $("#blank_screen").hide();
-            w2popup.close();
-            console.log('Error on /v1/userprofile: ' + data.message);
-            ensureSession();
-            break;
-        default:
-            console.log('Unrecognized status from /v1/userprofile: ' + data.status);
-            break;
-        }
-    })
-    .fail( function() {
-        console.log('Error getting /v1/userprofile');
-    });
+        .done(function (data, textStatus, jqXHR) {
+            if (typeof data === "string") {
+                var x = JSON.parse(data);
+                data = x;
+            }
+            switch (data.status) {
+                case "success":
+                    app.uid = data.uid;
+                    app.username = data.username;
+                    app.name = data.Name;
+                    app.imageurl = data.ImageURL;
+                    userProfileToUI();
+                    break;
+                case "error":
+                    // something bad happened.  delete the cookie and make them log in again...
+                    deleteCookie("air");
+                    $("#blank_screen").hide();
+                    w2popup.close();
+                    console.log('Error on /v1/userprofile: ' + data.message);
+                    ensureSession();
+                    break;
+                default:
+                    console.log('Unrecognized status from /v1/userprofile: ' + data.status);
+                    break;
+            }
+        })
+        .fail(function () {
+            console.log('Error getting /v1/userprofile');
+        });
 };
 //---------------------------------------------------------------------------------
 // launchSession - if a valid sessionid exists, use it and get user profile info
@@ -224,9 +211,9 @@ window.launchSession = function () {
 //---------------------------------------------------------------------------------
 window.startSessionChecker = function () {
     loginSessionChecker = setInterval(
-    function() {
-        ensureSession();
-    }, 5000); // watch out for session expiring
+        function () {
+            ensureSession();
+        }, 5000); // watch out for session expiring
 };
 
 //---------------------------------------------------------------------------------
@@ -245,15 +232,176 @@ window.handleBlankScreen = function (isLoggedIn) {
     }
 };
 
+
+
+// var loginPopupOptions = {
+//     body: '<div id="loginPopupForm" style="width: 100%; height: 100%;"></div>',
+//     style: 'padding: 4px 0px 0px 0px; overflow: auto;',
+//     width: 425,
+//     height: 525,
+//     showMax: true,
+//     modal: true,
+//     onOpen: function (event) {
+//         event.onComplete = function () {
+//             $('#w2ui-popup #loginPopupForm').w2render('passwordform');
+//         };
+//     },
+// };
+
+
 window.popupLoginDialogBox = function () {
-    $().w2popup('open', loginPopupOptions);
-    var f = w2ui.passwordform;
-    if (f) {
-        $(f.box).find("#LoginMessage").find(".errors").empty();
-        var message = "Your session hass expired. Please login again.";
-        $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
-        $(f.box).find("#LoginMessage").removeClass("hidden");
+    var loginTmplURL = loginURL;
+    let config = {
+        loginLayout: {
+            name: 'loginLayout',
+            padding: 4,
+            panels: [
+                { type: 'main', minSize: 300, style: 'overflow: hidden' }
+            ]
+        },
+
+        loginForm: {
+            header: 'Edit Record',
+            name: 'form',
+            style: 'border: 1px solid #efefef',
+            fields: [
+                { field: 'recid', type: 'text', html: { label: 'ID', attr: 'size="10" readonly' } },
+                { field: 'fname', type: 'text', required: true, html: { label: 'First Name', attr: 'size="40" maxlength="40"' } },
+                { field: 'lname', type: 'text', required: true, html: { label: 'Last Name', attr: 'size="40" maxlength="40"' } },
+                { field: 'email', type: 'email', html: { label: 'Email', attr: 'size="30"' } },
+                { field: 'sdate', type: 'date', html: { label: 'Date', attr: 'size="10"' } }
+            ],
+            actions: {
+                Reset() {
+                    this.clear()
+                },
+                Save() {
+                    let errors = this.validate()
+                    if (errors.length > 0) return
+                    if (this.recid == 0) {
+                        grid.add(w2utils.extend({ recid: grid.records.length + 1 }, this.record))
+                        grid.selectNone()
+                        this.clear()
+                    } else {
+                        grid.set(this.recid, this.record)
+                        grid.selectNone()
+                        this.clear()
+                    }
+                }
+            }
+        },
+        passwordform: {
+            header: 'Login',
+            name: 'passwordform',
+            formURL: loginTmplURL,
+            style: 'border: 0px; background-color: transparent;',
+            fields: [{ field: 'user', type: 'text', required: false, html: { caption: 'User Name' /*, attr: 'readonly'*/ } },
+            { field: 'pass', type: 'password', required: false, html: { caption: 'Password' } },
+            ],
+            actions: {
+                login: function (/*event*/) {
+                    var f = this;
+                    console.log('User Name = ' + w2ui.passwordform.record.user);
+                    app.username = w2ui.passwordform.record.user;
+
+                    // request login only username, password entered
+                    if (!(app.username && w2ui.passwordform.record.pass)) {
+                        console.log("Both Username and Password must be supplied");
+                        $(f.box).find("#LoginMessage").find(".errors").empty();
+                        var message = "Both Username and Password must be supplied";
+                        $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
+                        $(f.box).find("#LoginMessage").removeClass("hidden");
+                        // w2ui.passwordform.error(w2utils.lang(data.message));
+                        return;
+                    }
+
+                    var params = { user: app.username, pass: w2ui.passwordform.record.pass };
+                    var dat = JSON.stringify(params);
+                    $.post('/v1/authn/', dat, null, "json")
+                        .done(function (data) {
+                            if (data.status === "error") {
+                                $(f.box).find("#LoginMessage").find(".errors").empty();
+                                // var message = "Unrecognized Username or Password";
+                                $(f.box).find("#LoginMessage").find(".errors").append("<p>" + data.message + "</p>");
+                                $(f.box).find("#LoginMessage").removeClass("hidden");
+                                // w2ui.passwordform.error(w2utils.lang(data.message));
+                            }
+                            else if (data.status === "success") {
+                                app.uid = data.uid;
+                                app.name = data.Name;
+                                app.imageurl = data.ImageURL;
+                                $(f.box).find("#LoginMessage").addClass("hidden");
+                                w2popup.close();
+                                w2ui.passwordform.record.pass = ""; // after closing dialog, remove password information.
+                                userProfileToUI();
+
+                                // remove blank screen if login successfully
+                                handleBlankScreen(true);
+                            } else {
+                                console.log("Login service returned unexpected status: " + data.status);
+                            }
+                            return;
+                        })
+                        .fail(function (/*data*/) {
+                            w2ui.passwordform.error("Login failed");
+                            return;
+                        });
+                },
+                cancel: function (/*event*/) {
+                    // w2popup.close();
+                    return;
+                }
+            },
+            onRefresh: function (event) {
+                var f = this;
+                event.onComplete = function () {
+
+                    // handle enter key press event
+                    $(f.box).keypress(function (keypressEvent) {
+                        if (keypressEvent.which === 13) {
+                            // need to give time so that w2ui form have data in it's record object
+                            setTimeout(function () {
+                                $(f.box).find("button[name=login]").click();
+                            }, 100);
+                        }
+                    });
+
+                    // TODO: handle forgot password link
+                    $(f.box).find("forgot_pass_link").click(function () {
+                        console.log("forgot password link clicked!");
+                    });
+                };
+            }
+
+        }
     }
+
+    let layout = new w2layout(config.loginLayout)
+    let form = new w2form(config.passwordform)
+
+    w2popup.open({
+        // title: 'Popup',
+        body: '<div id="loginPopupForm" style="width: 100%; height: 100%;"></div>',
+        style: 'padding: 4px 0px 0px 0px; overflow: auto;',
+        width: 425,
+        height: 525,
+        showMax: true,
+        // modal: true,
+    })
+        .then(e => {
+            // layout.render('#w2ui-popup #main')
+            layout.render('#w2ui-popup #loginPopupForm')
+            layout.html('main', form)
+        })
+
+    // $().w2popup('open', loginPopupOptions);
+    // var f = w2ui.passwordform;
+    // if (f) {
+    //     $(f.box).find("#LoginMessage").find(".errors").empty();
+    //     var message = "Your session hass expired. Please login again.";
+    //     $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
+    //     $(f.box).find("#LoginMessage").removeClass("hidden");
+    // }
 };
 
 //---------------------------------------------------------------------------------
@@ -264,7 +412,7 @@ window.popupLoginDialogBox = function () {
 // @returns <none>
 //---------------------------------------------------------------------------------
 window.ensureSession = function () {
-    if (w2popup.status == "open") {return;} // just return now if we're trying to log in
+    if (w2popup.status == "open") { return; } // just return now if we're trying to log in
 
     var c = getCookieValue("air");          // Do we have an "air" cookie?
     if (c === null || c.length < 20) {   // if not...
@@ -291,19 +439,19 @@ window.logoff = function () {
     app.username = "";
     app.imageurl = "";
     $.get('/v1/logoff/')
-    .done(function(data, textStatus, jqXHR) {
-        if (jqXHR.status == 200) {
-            console.log('logoff success, app.uid set to 0.');
-            ensureSession();
-        } else {
-            console.log( '**** YIPES! ****  status on logoff = ' + textStatus);
-        }
-        deleteCookie("air");  // no matter what, delete the cookie after this call completes
-    })
-    .fail( function() {
-        console.log('Error with /v1/logoff');
-        deleteCookie("air");  // no matter what, delete the cookie after this call completes
-    });
+        .done(function (data, textStatus, jqXHR) {
+            if (jqXHR.status == 200) {
+                console.log('logoff success, app.uid set to 0.');
+                ensureSession();
+            } else {
+                console.log('**** YIPES! ****  status on logoff = ' + textStatus);
+            }
+            deleteCookie("air");  // no matter what, delete the cookie after this call completes
+        })
+        .fail(function () {
+            console.log('Error with /v1/logoff');
+            deleteCookie("air");  // no matter what, delete the cookie after this call completes
+        });
     handleBlankScreen(false);
 };
 
@@ -317,29 +465,29 @@ window.logoff = function () {
 window.resetPW = function () {
     var f = w2ui.passwordform;
     var username = f.record.user;
-    var params = {username: username };
+    var params = { username: username };
     var dat = JSON.stringify(params);
     var message = "";
     $.post('/v1/resetpw/', dat, null, "json")
-    .done(function(data) {
-        if (data.status === "error") {
-            $(f.box).find("#LoginMessage").find(".errors").empty();
-            message = "Error changing password";
-            $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
-            $(f.box).find("#LoginMessage").removeClass("hidden");
-            // w2ui.passwordform.error(w2utils.lang(data.message));
+        .done(function (data) {
+            if (data.status === "error") {
+                $(f.box).find("#LoginMessage").find(".errors").empty();
+                message = "Error changing password";
+                $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
+                $(f.box).find("#LoginMessage").removeClass("hidden");
+                // w2ui.passwordform.error(w2utils.lang(data.message));
+                return;
+            }
+            else if (data.status === "success") {
+                $(f.box).find("#LoginMessage").find(".errors").empty();
+                message = "An updated password has been emailed to you.";
+                $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
+                $(f.box).find("#LoginMessage").removeClass("hidden");
+            }
             return;
-        }
-        else if (data.status === "success") {
-            $(f.box).find("#LoginMessage").find(".errors").empty();
-            message = "An updated password has been emailed to you.";
-            $(f.box).find("#LoginMessage").find(".errors").append("<p>" + message + "</p>");
-            $(f.box).find("#LoginMessage").removeClass("hidden");
-        }
-        return;
-    })
-    .fail(function(/*data*/){
-        w2ui.passwordform.error("Reset password failed");
-        return;
-    });
+        })
+        .fail(function (/*data*/) {
+            w2ui.passwordform.error("Reset password failed");
+            return;
+        });
 };

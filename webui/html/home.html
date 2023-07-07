@@ -102,7 +102,7 @@ function setToForm(sform, url, width) {
     }
 
     f.reload();
-    w2ui.toplayout.content('right', f);
+    w2ui.toplayout.html('right', f);
     w2ui.toplayout.sizeTo('right', width);
     w2ui.toplayout.render();
     w2ui.toplayout.show('right', true);
@@ -153,7 +153,7 @@ function buildPageElements() {
     //------------------------------------------------------------------------
     //          toplayout
     //------------------------------------------------------------------------
-    w2ui.mainlayout.content('main', $().w2layout({
+    w2ui.mainlayout.html('main', $().w2layout({
         name: 'toplayout',
         padding: 2,
         panels: [
@@ -169,7 +169,7 @@ function buildPageElements() {
     //------------------------------------------------------------------------
     //          toptoolbar
     //------------------------------------------------------------------------
-    w2ui.mainlayout.content('top', $().w2toolbar({
+    w2ui.mainlayout.html('top', $().w2toolbar({
         name: 'toptoolbar',
         items: [
              { type: 'html',  id: 'logo',
@@ -221,7 +221,7 @@ function buildPageElements() {
     //------------------------------------------------------------------------
     //          sidebarL1
     //------------------------------------------------------------------------
-    w2ui.toplayout.content('left',$().w2sidebar({
+    w2ui.toplayout.html('left',$().w2sidebar({
         name: 'sidebarL1',
         nodes: [
             { id: 'view', text: 'View', img: 'icon-folder', expanded: true, group: true,
@@ -242,7 +242,7 @@ function buildPageElements() {
                 case 'property':
                     grid = event.target + 'Grid';
                     w2ui[grid].url = '/v' + app.protocolVersion + '/' + event.target + '/';
-                    w2ui.toplayout.content('main', w2ui[grid]);
+                    w2ui.toplayout.html('main', w2ui[grid]);
                     w2ui.toplayout.hide('right',true);
                     break;
             }
@@ -256,10 +256,10 @@ function buildPageElements() {
     buildPropertyPhotosUIElements();
     buildStateUIElements();
     buildStateChangeForm();
-    buildLoginForm();
+    // buildLoginForm();
 
-    finishRentStepsGridToolbar();
-    finishRenewOptionsGridToolbar();
+    // finishRentStepsGridToolbar();
+    // finishRenewOptionsGridToolbar();
 }
 
 function finishInitialization() {
@@ -300,7 +300,7 @@ $(function () {
 
 </script>
 
-<div id="layout"style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px;"></div>
+<div id="layout" style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px;"></div>
 <div id="blank_screen"></div>
 
 </body>

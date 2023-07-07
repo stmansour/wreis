@@ -48,6 +48,37 @@ function buildRenewOptionsUIElements() {
             toolbarReload   : false,
             toolbarColumns  : false,
         },
+        toolbar: {
+            items: [
+                { id: 'bt3', type: 'spacer' },
+                { id: 'roListType', type: 'menu-radio', icon: 'fa fa-star',
+                    text: function (item) {
+                        var text = item.selected;
+                        var el   = this.get('roListType:' + item.selected);
+                        return 'Renew Type: ' + el.text;
+                    },
+                    selected: 'roListOpt',
+                    items: [
+                        { id: 'roListOpt', text: 'Period', icon: 'fa fa-tachometer' },
+                        { id: 'roListDate', text: 'Date', icon: 'fa fa-tachometer' },
+                    ]
+                },
+            ],
+            onClick: function (event) {
+                switch (event.target) {
+                    case "roListType:roListOpt":
+                        SetRenewOptionColumns(0);
+                        SetRenewOptionFLAGs(0);
+                        propData.roType = 0;
+                        break;
+                    case "roListType:roListDate":
+                        SetRenewOptionColumns(1);
+                        SetRenewOptionFLAGs(1);
+                        propData.roType = 1;
+                        break;
+                }
+            }
+        },
         //======================================================================
         // FLAGS
         //     1<<0  Drive Through?  0 = no, 1 = yes
@@ -163,25 +194,25 @@ function buildRenewOptionsUIElements() {
     });
 }
 
-function finishRenewOptionsGridToolbar() {
-    var t = w2ui.propertyRenewOptionsGrid.toolbar;
-    t.add([
-        { id: 'bt3', type: 'spacer' },
-        { id: 'roListType', type: 'menu-radio', icon: 'fa fa-star',
-            text: function (item) {
-                var text = item.selected;
-                var el   = this.get('roListType:' + item.selected);
-                return 'Renew Type: ' + el.text;
-            },
-            selected: 'roListOpt',
-            items: [
-                { id: 'roListOpt', text: 'Period', icon: 'fa fa-tachometer' },
-                { id: 'roListDate', text: 'Date', icon: 'fa fa-tachometer' },
-            ]
-        },
-    ]);
-    t.on('*', RenewOptionTypeChange);
-}
+// function finishRenewOptionsGridToolbar() {
+//     var t = w2ui.propertyRenewOptionsGrid.toolbar;
+//     t.add([
+//         { id: 'bt3', type: 'spacer' },
+//         { id: 'roListType', type: 'menu-radio', icon: 'fa fa-star',
+//             text: function (item) {
+//                 var text = item.selected;
+//                 var el   = this.get('roListType:' + item.selected);
+//                 return 'Renew Type: ' + el.text;
+//             },
+//             selected: 'roListOpt',
+//             items: [
+//                 { id: 'roListOpt', text: 'Period', icon: 'fa fa-tachometer' },
+//                 { id: 'roListDate', text: 'Date', icon: 'fa fa-tachometer' },
+//             ]
+//         },
+//     ]);
+//     t.on('*', RenewOptionTypeChange);
+// }
 
 //=========================
 //        DELETE
@@ -266,24 +297,24 @@ function SetMonthlyRORentString() {
     setInnerHTML("ROmonthly",s);
 }
 
-function RenewOptionTypeChange(event) {
-    if (event.type != "click") {
-        return;
-    }
-    //console.log('EVENT: '+ event.type + ' TARGET: '+ event.target, event);
-    switch (event.target) {
-    case "roListType:roListOpt":
-        SetRenewOptionColumns(0);
-        SetRenewOptionFLAGs(0);
-        propData.roType = 0;
-        break;
-    case "roListType:roListDate":
-        SetRenewOptionColumns(1);
-        SetRenewOptionFLAGs(1);
-        propData.roType = 1;
-        break;
-    }
-}
+// function RenewOptionTypeChange(event) {
+//     if (event.type != "click") {
+//         return;
+//     }
+//     //console.log('EVENT: '+ event.type + ' TARGET: '+ event.target, event);
+//     switch (event.target) {
+//     case "roListType:roListOpt":
+//         SetRenewOptionColumns(0);
+//         SetRenewOptionFLAGs(0);
+//         propData.roType = 0;
+//         break;
+//     case "roListType:roListDate":
+//         SetRenewOptionColumns(1);
+//         SetRenewOptionFLAGs(1);
+//         propData.roType = 1;
+//         break;
+//     }
+// }
 
 function SetRenewOptionColumns(FLAGS) {
     var b = FLAGS & 0x1;

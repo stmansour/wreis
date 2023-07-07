@@ -141,6 +141,33 @@ function buildPropertyUIElements() {
             toolbarReload   : true,
             toolbarColumns  : true,
         },
+        toolbar: {
+            items: [
+                { type: 'break' },
+                { type: 'check', id: 'myQueue', text: 'Queue', checked: false },
+                { type: 'break' },
+                { type: 'radio', id: 'openProperties', group: '1', text: 'Open', /* icon: 'fa fa-star',*/ checked: true },
+                { type: 'radio', id: 'closedProperties', group: '1', text: 'Closed', /*icon: 'fa fa-heart'*/ },
+                { type: 'radio', id: 'allProperties', group: '1', text: 'All', /*icon: 'fa fa-heart'*/ },
+                { type: 'break' },
+                { type: 'check', id: 'showTerminated', text: 'Terminated', /*icon: 'fa fa-heart'*/ },
+            ],
+            onClick: function (target,data) {
+                var found = false;
+                switch (target) {
+                case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6,7,8];               break;
+                case "closedProperties": found=true; propData.statefilter    = [9];                             break;
+                case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7,8,9];             break;
+                case "showTerminated":   found=true; propData.showTerminated = propData.showTerminated ? 0 : 1; break;
+                case "myQueue":          found=true; propData.myQueue        = (propData.myQueue == 1) ? 0 : 1; break;
+                }
+                if (found) {
+                    propertySetPostData();
+                    closePropertyForm();
+                    w2ui.propertyGrid.reload();
+                }
+            },
+        },
         postData: {
             statefilter: propData.statefilter,
             showTerminated: propData.showTerminated,
@@ -254,34 +281,34 @@ function buildPropertyUIElements() {
         },
     });
 
-    w2ui.propertyGrid.toolbar.add([
-        { type: 'break' },
-        { type: 'check', id: 'myQueue', text: 'Queue', checked: false },
-        { type: 'break' },
-        { type: 'radio', id: 'openProperties', group: '1', text: 'Open', /* icon: 'fa fa-star',*/ checked: true },
-        { type: 'radio', id: 'closedProperties', group: '1', text: 'Closed', /*icon: 'fa fa-heart'*/ },
-        { type: 'radio', id: 'allProperties', group: '1', text: 'All', /*icon: 'fa fa-heart'*/ },
-        { type: 'break' },
-        { type: 'check', id: 'showTerminated', text: 'Terminated', /*icon: 'fa fa-heart'*/ },
-    ]);
+    // w2ui.propertyGrid.toolbar.add([
+    //     { type: 'break' },
+    //     { type: 'check', id: 'myQueue', text: 'Queue', checked: false },
+    //     { type: 'break' },
+    //     { type: 'radio', id: 'openProperties', group: '1', text: 'Open', /* icon: 'fa fa-star',*/ checked: true },
+    //     { type: 'radio', id: 'closedProperties', group: '1', text: 'Closed', /*icon: 'fa fa-heart'*/ },
+    //     { type: 'radio', id: 'allProperties', group: '1', text: 'All', /*icon: 'fa fa-heart'*/ },
+    //     { type: 'break' },
+    //     { type: 'check', id: 'showTerminated', text: 'Terminated', /*icon: 'fa fa-heart'*/ },
+    // ]);
 
-    w2ui.propertyGrid.toolbar.onClick = function(event) {
-        event.onComplete = function (event) {
-            var found = false;
-            switch (event.item.id) {
-            case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6,7,8];               break;
-            case "closedProperties": found=true; propData.statefilter    = [9];                             break;
-            case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7,8,9];             break;
-            case "showTerminated":   found=true; propData.showTerminated = propData.showTerminated ? 0 : 1; break;
-            case "myQueue":          found=true; propData.myQueue        = (propData.myQueue == 1) ? 0 : 1; break;
-            }
-            if (found) {
-                propertySetPostData();
-                closePropertyForm();
-                w2ui.propertyGrid.reload();
-            }
-        };
-    };
+    // w2ui.propertyGrid.toolbar.onClick = function(event) {
+    //     event.onComplete = function (event) {
+    //         var found = false;
+    //         switch (event.item.id) {
+    //         case "openProperties":   found=true; propData.statefilter    = [1,2,3,4,5,6,7,8];               break;
+    //         case "closedProperties": found=true; propData.statefilter    = [9];                             break;
+    //         case "allProperties":    found=true; propData.statefilter    = [1,2,3,4,5,6,7,8,9];             break;
+    //         case "showTerminated":   found=true; propData.showTerminated = propData.showTerminated ? 0 : 1; break;
+    //         case "myQueue":          found=true; propData.myQueue        = (propData.myQueue == 1) ? 0 : 1; break;
+    //         }
+    //         if (found) {
+    //             propertySetPostData();
+    //             closePropertyForm();
+    //             w2ui.propertyGrid.reload();
+    //         }
+    //     };
+    // };
 
     function propertySetPostData() {
         w2ui.propertyGrid.postData = {
