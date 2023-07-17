@@ -36,7 +36,7 @@ function buildRenewOptionsUIElements() {
         method: 'POST',
         postData: {
             cmd: 'get',
-        },
+        },  
         show: {
             toolbar         : true,
             footer          : false,

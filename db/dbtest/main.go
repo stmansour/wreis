@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"database/sql"
-	"extres"
 	"flag"
 	"fmt"
 	"os"
 	"time"
 	db "wreis/db/lib"
 	"wreis/session"
+
+	"github.com/stmansour/extres"
 
 	_ "github.com/go-sql-driver/mysql"
 )

@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"extres"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"time"
 	util "wreis/util/lib"
+
+	"github.com/stmansour/extres"
 )
 
 // WSPerson is the person information we pass over the web service call.

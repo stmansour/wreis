@@ -2,12 +2,13 @@ package db
 
 import (
 	"database/sql"
-	"extres"
 	"fmt"
 	"log"
 	"math/rand"
 	"time"
 	util "wreis/util/lib"
+
+	"github.com/stmansour/extres"
 
 	"github.com/kardianos/osext"
 )

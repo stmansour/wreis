@@ -3,7 +3,6 @@ package main
 
 import (
 	"database/sql"
-	"extres"
 	"flag"
 	"fmt"
 	"log"
@@ -14,6 +13,8 @@ import (
 	"wreis/session"
 	util "wreis/util/lib"
 	"wreis/ws"
+
+	"github.com/stmansour/extres"
 
 	_ "github.com/go-sql-driver/mysql"
 )

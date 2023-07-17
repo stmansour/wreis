@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"extres"
 	"fmt"
 	"runtime/debug"
 	"wreis/session"
 	util "wreis/util/lib"
+
+	"github.com/stmansour/extres"
 )
 
 // ErrSessionRequired session required error
