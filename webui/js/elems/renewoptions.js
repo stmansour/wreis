@@ -33,6 +33,10 @@ function buildRenewOptionsUIElements() {
     $().w2grid({
         name: 'propertyRenewOptionsGrid',
         url: '/v1/renewoptions',
+        method: 'POST',
+        postData: {
+            cmd: 'get',
+        },
         show: {
             toolbar         : true,
             footer          : false,
@@ -48,37 +52,6 @@ function buildRenewOptionsUIElements() {
             toolbarReload   : false,
             toolbarColumns  : false,
         },
-        toolbar: {
-            items: [
-                { id: 'bt3', type: 'spacer' },
-                { id: 'roListType', type: 'menu-radio', icon: 'fa fa-star',
-                    text: function (item) {
-                        var text = item.selected;
-                        var el   = this.get('roListType:' + item.selected);
-                        return 'Renew Type: ' + el.text;
-                    },
-                    selected: 'roListOpt',
-                    items: [
-                        { id: 'roListOpt', text: 'Period', icon: 'fa fa-tachometer' },
-                        { id: 'roListDate', text: 'Date', icon: 'fa fa-tachometer' },
-                    ]
-                },
-            ],
-            onClick: function (event) {
-                switch (event.target) {
-                    case "roListType:roListOpt":
-                        SetRenewOptionColumns(0);
-                        SetRenewOptionFLAGs(0);
-                        propData.roType = 0;
-                        break;
-                    case "roListType:roListDate":
-                        SetRenewOptionColumns(1);
-                        SetRenewOptionFLAGs(1);
-                        propData.roType = 1;
-                        break;
-                }
-            }
-        },
         //======================================================================
         // FLAGS
         //     1<<0  Drive Through?  0 = no, 1 = yes
@@ -86,17 +59,17 @@ function buildRenewOptionsUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
         columns: [
-            {field: 'recid',       caption: 'recid',      size: '60px', sortable: true, hidden: true},
-            {field: 'ROID',        caption: 'ROID',       size: '60px', sortable: true, hidden: true},
-            {field: 'ROLID',       caption: 'ROLID',      size: '60px', sortable: true, hidden: true},
-            {field: 'FLAGS',       caption: 'FLAGS',      size: '60px', sortable: true, hidden: true},
-            {field: 'Opt',         caption: 'Period',     size: '250px', sortable: true, hidden: false},
-            {field: 'Dt',          caption: 'Date',       size: '80px', sotrable: true, hidden: false},
-            {field: 'Rent',        caption: 'Rent',       size: '80px', sortable: true, hidden: false, render: 'money'},
-            {field: 'CreateTime',  caption: 'CreateTime', size: '60px', sortable: true, hidden: true},
-            {field: 'CreateBy',   caption: 'CreateBy',  size: '60px', sortable: true, hidden: true},
-            {field: 'LastModTime', caption: 'LastModTime',size: '60px', sortable: true, hidden: true},
-            {field: 'LastModBy',   caption: 'LastModBy',  size: '60px', sortable: true, hidden: true},
+            {field: 'recid',       text: 'recid',       size: '60px', sortable: true, hidden: true},
+            {field: 'ROID',        text: 'ROID',        size: '60px', sortable: true, hidden: true},
+            {field: 'ROLID',       text: 'ROLID',       size: '60px', sortable: true, hidden: true},
+            {field: 'FLAGS',       text: 'FLAGS',       size: '60px', sortable: true, hidden: true},
+            {field: 'Opt',         text: 'Opt',         size: '250px', sortable: true, hidden: false},
+            {field: 'Dt',          text: 'Dt',          size: '80px', sotrable: true, hidden: false},
+            {field: 'Rent',        text: 'Rent',        size: '80px', sortable: true, hidden: false, render: 'money'},
+            {field: 'CreateTime',  text: 'CreateTime',  size: '60px', sortable: true, hidden: true},
+            {field: 'CreateBy',    text: 'CreateBy',    size: '60px', sortable: true, hidden: true},
+            {field: 'LastModTime', text: 'LastModTime', size: '60px', sortable: true, hidden: true},
+            {field: 'LastModBy',   text: 'LastModBy',   size: '60px', sortable: true, hidden: true},
         ],
         onLoad: function(event) {
             event.onComplete = function() {
@@ -194,25 +167,25 @@ function buildRenewOptionsUIElements() {
     });
 }
 
-// function finishRenewOptionsGridToolbar() {
-//     var t = w2ui.propertyRenewOptionsGrid.toolbar;
-//     t.add([
-//         { id: 'bt3', type: 'spacer' },
-//         { id: 'roListType', type: 'menu-radio', icon: 'fa fa-star',
-//             text: function (item) {
-//                 var text = item.selected;
-//                 var el   = this.get('roListType:' + item.selected);
-//                 return 'Renew Type: ' + el.text;
-//             },
-//             selected: 'roListOpt',
-//             items: [
-//                 { id: 'roListOpt', text: 'Period', icon: 'fa fa-tachometer' },
-//                 { id: 'roListDate', text: 'Date', icon: 'fa fa-tachometer' },
-//             ]
-//         },
-//     ]);
-//     t.on('*', RenewOptionTypeChange);
-// }
+function finishRenewOptionsGridToolbar() {
+    var t = w2ui.propertyRenewOptionsGrid.toolbar;
+    t.add([
+        { id: 'bt3', type: 'spacer' },
+        { id: 'roListType', type: 'menu-radio', icon: 'fa fa-star',
+            text: function (item) {
+                var text = item.selected;
+                var el   = this.get('roListType:' + item.selected);
+                return 'Renew Type: ' + el.text;
+            },
+            selected: 'roListOpt',
+            items: [
+                { id: 'roListOpt', text: 'Period', icon: 'fa fa-tachometer' },
+                { id: 'roListDate', text: 'Date', icon: 'fa fa-tachometer' },
+            ]
+        },
+    ]);
+    t.on('*', RenewOptionTypeChange);
+}
 
 //=========================
 //        DELETE
@@ -297,24 +270,24 @@ function SetMonthlyRORentString() {
     setInnerHTML("ROmonthly",s);
 }
 
-// function RenewOptionTypeChange(event) {
-//     if (event.type != "click") {
-//         return;
-//     }
-//     //console.log('EVENT: '+ event.type + ' TARGET: '+ event.target, event);
-//     switch (event.target) {
-//     case "roListType:roListOpt":
-//         SetRenewOptionColumns(0);
-//         SetRenewOptionFLAGs(0);
-//         propData.roType = 0;
-//         break;
-//     case "roListType:roListDate":
-//         SetRenewOptionColumns(1);
-//         SetRenewOptionFLAGs(1);
-//         propData.roType = 1;
-//         break;
-//     }
-// }
+function RenewOptionTypeChange(event) {
+    if (event.type != "click") {
+        return;
+    }
+    //console.log('EVENT: '+ event.type + ' TARGET: '+ event.target, event);
+    switch (event.target) {
+    case "roListType:roListOpt":
+        SetRenewOptionColumns(0);
+        SetRenewOptionFLAGs(0);
+        propData.roType = 0;
+        break;
+    case "roListType:roListDate":
+        SetRenewOptionColumns(1);
+        SetRenewOptionFLAGs(1);
+        propData.roType = 1;
+        break;
+    }
+}
 
 function SetRenewOptionColumns(FLAGS) {
     var b = FLAGS & 0x1;
@@ -353,7 +326,7 @@ function EnableRenewOptionFormFields() {
 }
 
 function showRenewOptionForm() {
-    w2ui.renewOptionsLayout.content('right',w2ui.propertyRenewOptionForm);
+    w2ui.renewOptionsLayout.html('right',w2ui.propertyRenewOptionForm);
     w2ui.renewOptionsLayout.sizeTo('right',400);
     w2ui.renewOptionsLayout.show('right',true);
     setPropertyFormActionButtons(false);

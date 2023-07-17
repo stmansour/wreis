@@ -192,13 +192,13 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 	svcDebugTxn(funcname, r)
 	var d ServiceData
 	d.ID = -1 // indicates it has not been set
-	// util.Console("debug> SVC: 00\n")
+	util.Console("debug> SVC: 00\n")
 	if e := svcGetPayload(w, r, &d); e != nil {
 		// util.Console("debug> SVC: 01\n")
 		SvcErrorReturn(w, e)
 		return
 	}
-	// util.Console("debug> SVC: 02\n")
+	util.Console("debug> SVC: 02\nd = %v\n", d)
 	sid := -1 // index to the service requested. Initialize to "not found"
 	for i := 0; i < len(Svcs); i++ {
 		if Svcs[i].Cmd == d.Service {
@@ -206,7 +206,7 @@ func V1ServiceHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	// util.Console("debug> SVC: 03: sid = %d\n", sid)
+	util.Console("debug> SVC: 03: sid = %d\n", sid)
 	if sid < 0 {
 		// util.Console("debug> SVC: 04: sid = %d\n", sid)
 		util.Console("**** YIPES! **** %s - Handler not found\n", r.RequestURI)

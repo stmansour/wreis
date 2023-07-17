@@ -29,6 +29,7 @@ package:
 	mkdir -p ${STATIC}/js
 	cat js/elems/*.js >js/wreis.js
 	cp js/*.js ${STATIC}/js/
+	cp js/w2ui*.map ${STATIC}/js/
 	cp js/*.css ${STATIC}/js/
 	@rm -f fail
 	@echo "*** ${THISDIR}: completed package ***"

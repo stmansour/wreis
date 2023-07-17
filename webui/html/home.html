@@ -2,7 +2,7 @@
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="/static/html/fa/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="/static/js/w2ui-2.0.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/w2ui-1.5.css">
     <link rel="stylesheet" type="text/css" href="/static/html/wreis.css" />
     <link rel="icon" type="image/png" href="/static/html/images/favicon32x32.png">
 </head>
@@ -11,7 +11,7 @@
 <!--  color Icon images:  icon-page, w2ui-icon-check, ... see below in toptoolbar -->
 
 <script src="/static/js/jquery-3.7.0.min.js"></script>
-<script src="/static/js/w2ui-2.0.js"></script>
+<script src="/static/js/w2ui-1.5.js"></script>
 <script src="/static/js/wreis.js"></script>
 <script>
 /*global
@@ -178,15 +178,15 @@ function buildPageElements() {
                       '</div>'
             },
             { type: 'break', id: 'break1' },
-            { type: 'menu',    id: 'moduleMenu', caption: 'Select Module',    icon: 'fa fa-sitemap', items: [
+            { type: 'menu',    id: 'moduleMenu', text: 'Select Module',    icon: 'fa fa-sitemap', items: [
                 { text: 'Directory',          icon: 'fa fa-user' },
             ]},
             { type: 'break', id: 'break2' },
-            // { type: 'button', id: 'msgButton', caption: 'News Flash', icon: 'fa fa-spinner fa-pulse fa-3x fa-fw'},
-            // { type: 'menu',    id: 'menuButton', caption: 'Developer',    icon: 'fa fa-user-circle', items: [ { text: 'Webdocs', icon: 'fa fa-book' }, ]},
+            // { type: 'button', id: 'msgButton', text: 'News Flash', icon: 'fa fa-spinner fa-pulse fa-3x fa-fw'},
+            // { type: 'menu',    id: 'menuButton', text: 'Developer',    icon: 'fa fa-user-circle', items: [ { text: 'Webdocs', icon: 'fa fa-book' }, ]},
             { id: 'bt3', type: 'spacer' },
             { type: 'menu',   id: 'userMenu',
-                caption: '<div id="user_menu_container">'+
+                text: '<div id="user_menu_container">'+
                       '<span id="username"></span>'+
                       '<img src="" />'+
                       '</div>',
@@ -256,10 +256,10 @@ function buildPageElements() {
     buildPropertyPhotosUIElements();
     buildStateUIElements();
     buildStateChangeForm();
-    // buildLoginForm();
+    buildLoginForm();
 
-    // finishRentStepsGridToolbar();
-    // finishRenewOptionsGridToolbar();
+    finishRentStepsGridToolbar();
+    finishRenewOptionsGridToolbar();
 }
 
 function finishInitialization() {
@@ -300,7 +300,7 @@ $(function () {
 
 </script>
 
-<div id="layout" style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px;"></div>
+<div id="layout"style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px;"></div>
 <div id="blank_screen"></div>
 
 </body>

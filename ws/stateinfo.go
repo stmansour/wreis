@@ -1066,34 +1066,30 @@ func getStateInfo(w http.ResponseWriter, r *http.Request, d *ServiceData) {
 		SvcErrorReturn(w, err)
 		return
 	}
-	util.Console("Number of state info items found: %d\n", len(a))
-	util.Console("a = %#v\n", a)
+	// util.Console("Number of state info items found: %d\n", len(a))
+	// util.Console("a = %#v\n", a)
 
 	for i := 0; i < len(a); i++ {
 		var gg StateInfo
 		util.MigrateStructVals(&a[i], &gg)
 		gg.Recid = gg.SIID
 		g.Records = append(g.Records, gg)
-		util.Console("after migrate: gg.OwnerUID = %d, gg.ApproverUID = %d, gg.CreateBy = %d, gg.LastModBy = %d\n", gg.OwnerUID, gg.ApproverUID, gg.CreateBy, gg.LastModBy)
+		// util.Console("after migrate: gg.OwnerUID = %d, gg.ApproverUID = %d, gg.CreateBy = %d, gg.LastModBy = %d\n", gg.OwnerUID, gg.ApproverUID, gg.CreateBy, gg.LastModBy)
 
 		// Keep track of the users we need, we'll pull them down after the
 		// loop completes...
 		//-------------------------------------------------------------------
 		if gg.OwnerUID > 0 {
 			mm[gg.OwnerUID] = 1
-			util.Console("+ mm[%d]\n", mm[gg.OwnerUID])
 		}
 		if gg.ApproverUID > 0 {
 			mm[gg.ApproverUID] = 1
-			util.Console("+ mm[%d]\n", mm[gg.ApproverUID])
 		}
 		if gg.CreateBy > 0 {
 			mm[gg.CreateBy] = 1
-			util.Console("+ mm[%d]\n", mm[gg.CreateBy])
 		}
 		if gg.LastModBy > 0 {
 			mm[gg.LastModBy] = 1
-			util.Console("+ mm[%d]\n", mm[gg.LastModBy])
 		}
 	}
 

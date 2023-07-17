@@ -32,6 +32,10 @@ function buildRentStepsUIElements() {
     $().w2grid({
         name: 'propertyRentStepsGrid',
         url: '/v1/rentsteps',
+        method: 'POST',
+        postData: {
+            cmd: 'get',
+        },
         show: {
             toolbar         : true,
             footer          : false,
@@ -47,18 +51,6 @@ function buildRentStepsUIElements() {
             toolbarReload   : false,
             toolbarColumns  : false,
         },
-        toolbar: {
-            items: [
-                { id: 'btnNotes', type: 'button', icon: 'fa fa-sticky-note-o' },
-                { id: 'bt3', type: 'spacer' },
-                { id: 'btnClose', type: 'button', icon: 'fa fa-times' },
-            ],
-            onClick: function (event) {
-                if (event.target == 'btnClose') {
-                    closeRentStepForm();
-                }
-            },
-        },
         //======================================================================
         // FLAGS
         //     1<<0  Drive Through?  0 = no, 1 = yes
@@ -66,24 +58,24 @@ function buildRentStepsUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
         columns: [
-            {field: 'recid',  caption: 'recid',        size: '60px',  sortable: true, hidden: true},
-            {field: 'RSID',   caption: 'RSID',         size: '60px',  sortable: true, hidden: true},
-            {field: 'RSLID',  caption: 'RSLID',        size: '60px',  sortable: true, hidden: true},
-            {field: 'FLAGS',  caption: 'FLAGS',        size: '60px',  sortable: true, hidden: true},
-            {field: 'Opt',    caption: 'Period',       size: '250px', sortable: true, hidden: false},
-            {field: 'Dt',     caption: 'Date',         size: '80px',  sotrable: true, hidden: false},
-            {field: 'Rent',   caption: 'Annual Rent',  size: '110px', sortable: true, hidden: false, render: 'money'},
-            {field: 'mrent',  caption: 'Monthly Rent', size: '110px', sortable: false, style: 'text-align: right', hidden: false,
+            {field: 'recid',  text: 'recid',  size: '60px',  sortable: true, hidden: true},
+            {field: 'RSID',   text: 'RSID',   size: '60px',  sortable: true, hidden: true},
+            {field: 'RSLID',  text: 'RSLID',  size: '60px',  sortable: true, hidden: true},
+            {field: 'FLAGS',  text: 'FLAGS',  size: '60px',  sortable: true, hidden: true},
+            {field: 'Opt',    text: 'Opt',    size: '250px', sortable: true, hidden: false},
+            {field: 'Dt',     text: 'Dt',     size: '80px',  sotrable: true, hidden: false},
+            {field: 'Rent',   text: 'Rent',   size: '110px', sortable: true, hidden: false, render: 'money'},
+            {field: 'mrent',  text: 'Monthly Rent',  size: '110px', sortable: false, style: 'text-align: right', hidden: false,
                 render: function (record, index, col_index) {
                     var y = record.Rent/12;
                     var s = "$" + number_format(y,2,'.',',');
                     return s;
                 }
             },
-            {field: 'CreateTime',  caption: 'CreateTime',   size: '60px',  sortable: true, hidden: true},
-            {field: 'CreateBy',    caption: 'CreateBy',     size: '60px',  sortable: true, hidden: true},
-            {field: 'LastModTime', caption: 'LastModTime',  size: '60px',  sortable: true, hidden: true},
-            {field: 'LastModBy',   caption: 'LastModBy',    size: '60px',  sortable: true, hidden: true},
+            {field: 'CreateTime',  text: 'CreateTime',  size: '60px',  sortable: true, hidden: true},
+            {field: 'CreateBy',    text: 'CreateBy',    size: '60px',  sortable: true, hidden: true},
+            {field: 'LastModTime', text: 'LastModTime', size: '60px',  sortable: true, hidden: true},
+            {field: 'LastModBy',   text: 'LastModBy',   size: '60px',  sortable: true, hidden: true},
         ],
         onLoad: function(event) {
             event.onComplete = function() {
@@ -123,26 +115,6 @@ function buildRentStepsUIElements() {
         }
     });
 
-    // function finishRentStepsGridToolbar() {
-    //     var t = w2ui.propertyRentStepsGrid.toolbar;
-    //     t.add([
-    //         { id: 'bt3', type: 'spacer' },
-    //         { id: 'rsListType', type: 'menu-radio', icon: 'fa fa-star',
-    //             text: function (item) {
-    //                 var text = item.selected;
-    //                 var el   = this.get('rsListType:' + item.selected);
-    //                 return 'Step Type: ' + el.text;
-    //             },
-    //             selected: 'rsListOpt',
-    //             items: [
-    //                 { id: 'rsListOpt',  text: 'Period', icon: 'fa fa-tachometer' },
-    //                 { id: 'rsListDate', text: 'Date',   icon: 'fa fa-tachometer' },
-    //             ]
-    //         },
-    //     ]);
-    //     t.on('*', RentStepTypeChange);
-    // }
-    
     $().w2form({
         name: 'propertyRentStepForm',
         style: 'border: 0px; background-color: transparent;',
@@ -198,6 +170,26 @@ function buildRentStepsUIElements() {
             { type: 'right',   size: 0,     hidden: true,  content: 'right' }
         ],
     });
+}
+
+function finishRentStepsGridToolbar() {
+    var t = w2ui.propertyRentStepsGrid.toolbar;
+    t.add([
+        { id: 'bt3', type: 'spacer' },
+        { id: 'rsListType', type: 'menu-radio', icon: 'fa fa-star',
+            text: function (item) {
+                var text = item.selected;
+                var el   = this.get('rsListType:' + item.selected);
+                return 'Step Type: ' + el.text;
+            },
+            selected: 'rsListOpt',
+            items: [
+                { id: 'rsListOpt',  text: 'Period', icon: 'fa fa-tachometer' },
+                { id: 'rsListDate', text: 'Date',   icon: 'fa fa-tachometer' },
+            ]
+        },
+    ]);
+    t.on('*', RentStepTypeChange);
 }
 
 //=========================
@@ -340,7 +332,7 @@ function EnableRentStepFormFields() {
 }
 
 function showRentStepForm() {
-    w2ui.rentStepsLayout.content('right',w2ui.propertyRentStepForm);
+    w2ui.rentStepsLayout.html('right',w2ui.propertyRentStepForm);
     w2ui.rentStepsLayout.sizeTo('right',400);
     w2ui.rentStepsLayout.show('right',true);
     setPropertyFormActionButtons(false); // turn off the property form buttons when this form is on

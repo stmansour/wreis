@@ -18,6 +18,7 @@ test:
 
 package:
 	for dir in $(DIRS); do make -C $$dir package;done
+	@mysql --no-defaults wreis < test/ws/xh.sql
 
 all: clean wreis package test stats
 	echo "Completed"

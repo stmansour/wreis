@@ -22,7 +22,7 @@ function propertyStateChgOnLoad() {
     w2ui.propertyStateLayout.sizeTo('right', 450);
     w2ui.propertyStateLayout.show('right');
     // w2ui.propertyStateLayout.load('right', '/static/html/statechg.html', 1, setStateChangeDialogValues);
-    w2ui.propertyStateLayout.content('right', w2ui.stateChangeForm);
+    w2ui.propertyStateLayout.html('right', w2ui.stateChangeForm);
     w2ui.propertyStateLayout.render();
     setTimeout(setStateChangeDialogValues, 150 );
 }
@@ -34,7 +34,7 @@ function buildStateChangeForm() {
         // header: 'State Change Form',
         formURL: '/static/html/statechg.html',
         fields: [
-            {name: 'ApproverName',   type: 'enum',       required: true,     html: {caption: "ApproverName"},
+            {field: 'ApproverName',   type: 'enum',       required: true,     html: {caption: "ApproverName"},
                 options: {
                     url: '/v1/usertd/',
                     max: 1,
@@ -57,7 +57,7 @@ function buildStateChangeForm() {
                     // }
                 }
             },
-            {name: 'OwnerName',   type: 'enum',       required: true,     html: {caption: "OwnerName"},
+            {field: 'OwnerName',   type: 'enum',       required: true,     html: {caption: "OwnerName"},
                 options: {
                     url: '/v1/usertd/',
                     max: 1,

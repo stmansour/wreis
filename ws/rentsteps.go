@@ -77,13 +77,18 @@ func SvcHandlerRentSteps(w http.ResponseWriter, r *http.Request, d *ServiceData)
 
 	switch d.wsSearchReq.Cmd {
 	case "get":
+		util.Console("SvcHandlerRentSteps: A\n")
 		if d.ID <= 0 && d.wsSearchReq.Limit > 0 {
+			util.Console("SvcHandlerRentSteps: B\n")
 			SvcSearchRentSteps(w, r, d) // it is a query for the grid.
 		} else {
+			util.Console("SvcHandlerRentSteps: C\n")
 			if d.ID < 0 {
+				util.Console("SvcHandlerRentSteps: D\n")
 				SvcErrorReturn(w, fmt.Errorf("RentStepsID is required but was not specified"))
 				return
 			}
+			util.Console("SvcHandlerRentSteps: E\n")
 			getRentSteps(w, r, d)
 		}
 	case "save":

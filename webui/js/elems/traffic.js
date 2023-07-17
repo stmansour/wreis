@@ -31,6 +31,10 @@ function buildTrafficUIElements() {
     $().w2grid({
         name: 'propertyTrafficGrid',
         url: '/v1/trafficitems',
+        method: 'POST',
+        postData: {
+            cmd: 'get',
+        },
         show: {
             toolbar         : true,
             footer          : false,
@@ -53,16 +57,16 @@ function buildTrafficUIElements() {
         //	   1<<2  Right Of First Refusal: 0 = no, 1 = yes
         //======================================================================
         columns: [
-            {field: 'recid',       caption: 'recid',      size: '60px',  sortable: true, hidden: true},
-            {field: 'TID',         caption: 'TID',        size: '60px',  sortable: true, hidden: true},
-            {field: 'PRID',        caption: 'PRID',       size: '60px',  sortable: true, hidden: true},
-            {field: 'FLAGS',       caption: 'FLAGS',      size: '60px',  sortable: true, hidden: true},
-            {field: 'Count',       caption: 'Count',      size: '80px',  sortable: true, hidden: false},
-            {field: 'Description', caption: 'Street Name',size: '350px', sortable: true, hidden: false},
-            {field: 'CreateTime',  caption: 'CreateTime', size: '60px',  sortable: true, hidden: true},
-            {field: 'CreateBy',    caption: 'CreateBy',   size: '60px',  sortable: true, hidden: true},
-            {field: 'LastModTime', caption: 'LastModTime',size: '60px',  sortable: true, hidden: true},
-            {field: 'LastModBy',   caption: 'LastModBy',  size: '60px',  sortable: true, hidden: true},
+            {field: 'recid',       text: 'recid',       size: '60px',  sortable: true, hidden: true},
+            {field: 'TID',         text: 'TID',         size: '60px',  sortable: true, hidden: true},
+            {field: 'PRID',        text: 'PRID',        size: '60px',  sortable: true, hidden: true},
+            {field: 'FLAGS',       text: 'FLAGS',       size: '60px',  sortable: true, hidden: true},
+            {field: 'Count',       text: 'Count',       size: '80px',  sortable: true, hidden: false},
+            {field: 'Description', text: 'Description', size: '350px', sortable: true, hidden: false},
+            {field: 'CreateTime',  text: 'CreateTime',  size: '60px',  sortable: true, hidden: true},
+            {field: 'CreateBy',    text: 'CreateBy',    size: '60px',  sortable: true, hidden: true},
+            {field: 'LastModTime', text: 'LastModTime', size: '60px',  sortable: true, hidden: true},
+            {field: 'LastModBy',   text: 'LastModBy',   size: '60px',  sortable: true, hidden: true},
         ],
          onLoad: function(event) {
             event.onComplete = function() {
@@ -104,14 +108,14 @@ function buildTrafficUIElements() {
         formURL: '/static/html/formTraffic.html',
         // url: '/v1/property',
         fields: [
-            {field: 'PRID',        type: 'int',   required: false},
-            {field: 'TID',         type: 'int',   required: false},
-            {field: 'Description', type: 'text',  required: true},
-            {field: 'Count',       type: 'int',   required: true },
-            {field: 'CreateTime',  type: 'text',  required: false},
-            {field: 'CreateBy',   type: 'text',  required: false},
-            {field: 'LastModTime', type: 'text',  required: false},
-            {field: 'LastModBy',   type: 'text',  required: false},
+            {field: 'PRID',        text: 'PRID',        type: 'int',   required: false},
+            {field: 'TID',         text: 'TID',         type: 'int',   required: false},
+            {field: 'Description', text: 'Description', type: 'text',  required: true},
+            {field: 'Count',       text: 'Count',       type: 'int',   required: true },
+            {field: 'CreateTime',  text: 'CreateTime',  type: 'text',  required: false},
+            {field: 'CreateBy',    text: 'CreateBy',    type: 'text',  required: false},
+            {field: 'LastModTime', text: 'LastModTime', type: 'text',  required: false},
+            {field: 'LastModBy',   text: 'LastModBy',   type: 'text',  required: false},
         ],
         toolbar: {
             items: [
@@ -179,7 +183,7 @@ function TrafficSave() {
 }
 
 function showTrafficForm() {
-    w2ui.propertyTrafficLayout.content('right',w2ui.propertyTrafficForm);
+    w2ui.propertyTrafficLayout.html('right',w2ui.propertyTrafficForm);
     w2ui.propertyTrafficLayout.sizeTo('right',400);
     w2ui.propertyTrafficLayout.show('right',true);
     setPropertyFormActionButtons(false);
