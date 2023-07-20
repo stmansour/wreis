@@ -14,6 +14,8 @@ RENTJSON="rent.json"
 SKIPIMAGES=0
 CWD=$(pwd)
 SAVECOREFILES=0
+FORMATTER="python3" # possible values: "ruby"  "perl"  "python"  "python3"
+CHECKTOOLS=0        # by default, we do not check tools
 
 WRHOME="${HOME}/.wreis"
 WRCONFIG="${WRHOME}/config"
@@ -21,17 +23,74 @@ WRCONFIG="${WRHOME}/config"
 #HOST="http://localhost:8276"
 HOST="https://showponyinvestments.com"
 
-ShowPlan() {
+#------------------------------------------------------------------------------
+#  CheckTools - A quick check to make sure that tools are in place
+#------------------------------------------------------------------------------
+CheckTools() {
 
+    local p="0"
+    local p3="0"
+    notfound=()
+
+    tools=("ruby" "perl" "python" "python3")
+
+    for tool in "${tools[@]}"; do
+        if ! command -v "$tool" &>/dev/null; then
+            notfound+=("${tool}")
+            if [ "${tool}" == "python" ]; then
+                p="1"
+            elif [ "${tool}" == "python3" ]; then
+                p3="1"
+            fi
+        fi
+    done
+
+    #--------------------------------
+    # are we missing the formatter?
+    #--------------------------------
+    for tool in "${notfound[@]}"; do
+        if [ "${FORMATTER}" == "${tool}" ]; then
+            echo "*** FATAL ERROR ***  the internal formatter (${FORMATTER}) is not on this computer"
+            echo "exiting now"
+            exit 1
+        fi
+    done
+
+    #-------------------------------------------------------------
+    # return now if we're not going to report missing tools...
+    #-------------------------------------------------------------
+    if [ "${CHECKTOOLS}" == "0" ]; then
+        return
+    fi
+
+    #--------------------------------
+    #  Report missing tools
+    #--------------------------------
+    if ((${#notfound[@]} > 0)); then
+        echo "The following tools are missing from this system:"
+        for tool in "${notfound[@]}"; do
+            echo "  ${tool}"
+        done
+    fi
+}
+
+#------------------------------------------------------------------------------
+#  ShowPlan - print relevant connection information to the terminal
+#------------------------------------------------------------------------------
+ShowPlan() {
     cat <<EOF
 *************************************************************************
              Server: ${HOST}
                User: ${WUNAME}
     Property (PRID): ${PRID}
+          Formatter: ${FORMATTER}
 *************************************************************************
 EOF
 }
 
+#------------------------------------------------------------------------------
+#  Usage - call to print instructions to the terminal
+#------------------------------------------------------------------------------
 Usage() {
     cat <<FEOF
 mpak.sh
@@ -67,8 +126,14 @@ USAGE
     mpak.sh [OPTIONS]
 
     OPTIONS:
+    -a  Save temporary files (server response files)
 
     -c	Clean. Removes any temporary files in the directory.
+
+    -f { ruby | perl | python | python3 }
+        Which formatter to use.  Different systems have different tools
+        installed, this script can use any of these 4 choices. The
+        default is python3.
 
     -p  PRID
         PRID specifies the Property ID for which the marketing package will
@@ -78,6 +143,9 @@ USAGE
 
     -s  Causes the images to NOT be downloaded. Only use this option if you
         really know what you are doing.
+
+    -t  Check this system for the existence of the tools needed to
+        run this script.
 
     -u  Display this usage writeup.
 
@@ -114,6 +182,38 @@ encodeRequest() {
     echo "${encoded}" >request
 }
 
+#------------------------------------------------------------------------------
+# doformat
+#
+# INPUTS
+# $1 = "1" means use head -1 serverreply,  "2" means cat serverreply | ...
+# $2 = output file
+#------------------------------------------------------------------------------
+doformat() {
+    local f
+
+    if [[ "$1" == "1" ]]; then
+        f=$(head -n1 serverreply)
+    else
+        f=$(cat serverreply)
+    fi
+
+    case "${FORMATTER}" in
+    "ruby")
+        echo "${f}" | ruby -rjson -e 'puts JSON.pretty_generate(JSON.parse(ARGF.read))' >"${2}" 2>>${LOGFILE}
+        ;;
+    "perl")
+        echo "${f}" | perl -MJSON -0777 -ne 'print JSON->new->pretty->encode(decode_json($_))' >"${2}" 2>>${LOGFILE}
+        ;;
+    "python")
+        echo "${f}" | python -m json.tool >"${2}" 2>>${LOGFILE}
+        ;;
+    "python3")
+        echo "${f}" | python3 -m json.tool >"${2}" 2>>${LOGFILE}
+        ;;
+    esac
+}
+
 ########################################################################
 # dojsonPOST()
 #   Simulate a POST command to the server and use
@@ -133,33 +233,32 @@ dojsonPOST() {
     fi
     endpoint=${1}  # first script argument
     json_file=${2} # second script argument
- 
+
     if [ ${PERFMON} -eq 0 ]; then
         CMD="curl ${COOK} --keepalive-time 2 -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-        ${CMD} | tee serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+        ${CMD} >serverreply
+        # cat serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
+        doformat "2" "${3}"
     else
         CMD="curl ${COOK} -w @${CRLFMT} --keepalive-time 2 -s -X POST ${1} -H \"Content-Type: application/json\" -d @${2}"
-        echo "${CMD}" >> "${LOGALL}"
-        ${CMD} > serverreply
+        echo "${CMD}" >>"${LOGALL}"
+        ${CMD} >serverreply
+        doformat "1" "${3}"
 
+        #---------------------
         # python solution
+        #---------------------
         # head -1 serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
 
+        #---------------------
         # Perl solution
-        head -1 serverreply | perl -MJSON -0777 -ne 'print JSON->new->pretty->encode(decode_json($_))' > "${3}" 2>>${LOGFILE}
+        #---------------------
+        #head -1 serverreply | perl -MJSON -0777 -ne 'print JSON->new->pretty->encode(decode_json($_))' >"${3}" 2>>${LOGFILE}
 
+        #---------------------
         # Ruby solution
+        #---------------------
         # head -1 serverreply | ruby -rjson -e 'puts JSON.pretty_generate(JSON.parse(ARGF.read))' > "${3}" 2>>${LOGFILE}
-
-
-        # CMD=(curl "${COOK}" -s ${PRF} -X POST "${endpoint}" -H "\"Content-Type: application/json\"" -d "@${json_file}")
-        # "${CMD[@]}" | tee serverreply | python3 -m json.tool >"${3}" 2>>${LOGFILE}
-        # C=""
-        # for item in "${CMD[@]}"; do
-        #     echo "$item" >> "${LOGALL}"
-        #     C="${C} ${item}"
-        # done
-        # echo "${C}" >> "${LOGALL}"
 
         cat serverreply >>"${LOGALL}"
     fi
@@ -271,7 +370,7 @@ LIReq() {
     encodeRequest "{\"user\":\"${WUNAME}\",\"pass\":\"${PASSWD}\"}" # puts encoded request in file named "request"
     dojsonPOST "${HOST}/v1/authn/" "request" "response"             # URL, JSONfname, serverresponse
 
-    cat response > loginresponse
+    cat response >loginresponse
 
     #-----------------------------------------------------------------------------
     # Now we need to add the token to the curl command for future calls to
@@ -279,7 +378,7 @@ LIReq() {
     # Set the command line for cookies in ${COOKIES} and dojsonPOST will use them.
     #-----------------------------------------------------------------------------
     # TOKEN=$(grep Token "response" | awk '{print $2;}' | sed 's/[",]//g')  # worked for Python formatter
-    TOKEN=$(grep Token "response" | sed -n 's/.*"Token"[ ]*:[ ]*"\(.*\)",/\1/p')  # works with Perl formatter
+    TOKEN=$(grep Token "response" | sed -n 's/.*"Token"[ ]*:[ ]*"\(.*\)",/\1/p') # works with Perl formatter
 
     if [ "${TOKEN}x" == "x" ]; then
         echo
@@ -412,13 +511,13 @@ var jb = {
         "Double Net",
         "Triple Net",
         "Gross"
-    ],
+    ]
 };
 FFEOF
     cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" res/core.js >>"${OUTFILE}"
 
     if ((SAVECOREFILES != 1)); then
-        echo "REMOVING FILES..."
+        echo "removing temporary files..."
         rm -rf "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" log request response serverreply
     fi
 
@@ -445,14 +544,31 @@ FEOF
 ###############################################################################
 ###############################################################################
 
-while getopts "cmrsp:u" o; do
+while getopts "acmtrsf:p:u" o; do
     # echo "o = ${o}"
     case "${o}" in
+    a)
+        SAVECOREFILES=1
+        echo "SAVECOREFILES = ${SAVECOREFILES}"
+        ;;
     c)
         Clean
         echo "cleaned temporary files"
         exit 0
         ;;
+    f)
+        FORMATTER="${OPTARG}"
+        case "${FORMATTER}" in
+        "ruby" | "perl" | "python" | "python3")
+            echo "Formatter is set to ${FORMATTER}"
+            ;;
+        *)
+            echo "Invalid formatter! Please set FORMATTER to either 'ruby', 'perl', 'python', or 'python3'."
+            exit 1
+            ;;
+        esac
+        ;;
+
     r)
         PERFMON=1
         echo "curl performance monitoring enabled. Filename: ${LOGALL}"
@@ -462,13 +578,13 @@ while getopts "cmrsp:u" o; do
         PRID="${OPTARG}"
         echo "PRID set to ${PRID}"
         ;;
-    r)  
-        SAVECOREFILES=1
-        echo "SAVECOREFILES = ${SAVECOREFILES}"
-        ;;
     s)
         SKIPIMAGES=1
         echo "do not load images"
+        ;;
+    t)
+        CHECKTOOLS="1"
+        echo "CHECKTOOLS = ${CHECKTOOLS}"
         ;;
     u)
         Usage
@@ -488,6 +604,7 @@ if [ "${1}x" != "x" ]; then
     exit 1
 fi
 
+CheckTools
 Clean # Remove any old files
 LIReq # Log in
 ShowPlan
