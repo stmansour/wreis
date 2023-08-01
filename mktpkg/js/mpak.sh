@@ -181,10 +181,10 @@ Clean() {
 GetCreds() {
     if [ "${WUNAME}x" = "x" ]; then
         echo "Your username is required to access the WREIS server."
-        echo "You can enter it at the prompt, or to avoid having to enter it"
-        echo "you can export it in an environment variable as follows:"
-        echo "    WUNAME=\"your username\""
-        echo "    export WUNAME"
+        # echo "You can enter it at the prompt, or to avoid having to enter it"
+        # echo "you can export it in an environment variable as follows:"
+        # echo "    WUNAME=\"your username\""
+        # echo "    export WUNAME"
     else
         DONE=1
     fi
@@ -199,10 +199,10 @@ GetCreds() {
 
     if [ "${PASSWD}x" = "x" ]; then
         echo "Your password is required to access the WREIS server."
-        echo "You can enter it at the prompt, or to avoid having to enter it"
-        echo "you can export it in an environment variable as follows:"
-        echo "    PASSWD=\"your password\""
-        echo "    export PASSWD"
+        # echo "You can enter it at the prompt, or to avoid having to enter it"
+        # echo "you can export it in an environment variable as follows:"
+        # echo "    PASSWD=\"your password\""
+        # echo "    export PASSWD"
         read -rsp 'password: ' PASSWD
         echo
         echo "got it."
@@ -412,7 +412,7 @@ var jb = {
         "Double Net",
         "Triple Net",
         "Gross"
-    ],
+    ]
 };
 FFEOF
     cat "${PROPJSON}" "${ROPTJSON}" "${RENTJSON}" res/core.js >>"${OUTFILE}"
