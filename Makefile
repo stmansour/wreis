@@ -21,7 +21,7 @@ package:
 	@mysql --no-defaults wreis < test/ws/xh.sql
 
 all: clean wreis package test stats
-	echo "Completed"
+	@echo "Completed"
 
 build: clean wreis package
 
